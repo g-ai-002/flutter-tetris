@@ -1,0 +1,64 @@
+# 俄罗斯方块 — 项目规划
+
+## 长期目标
+- 跨 Android + Windows 双平台的俄罗斯方块游戏
+- 精美克制的界面，操作与主流游戏一致
+- 持续可演进：每个版本可独立交付，可观测、可回滚
+
+## 中期目标
+- [x] 经典俄罗斯方块核心玩法（7 种方块、旋转、移动、硬降）
+- [x] 分数系统（消行计分、等级递增、最高分记录）
+- [x] Ghost piece 预览（硬降落点提示）
+- [x] 下一个方块预览
+- [x] 暂停/继续
+- [x] 游戏结束检测与重新开始
+- [x] 日志系统（按日落盘到用户目录 logs/）
+- [x] 浅色/深色主题
+- [x] 自适应布局（竖屏/横屏、手机/平板/折叠屏）
+- [ ] 触屏手势操作（滑动移动、点击旋转）
+- [ ] 键盘快捷键支持（Windows 桌面端）
+- [ ] 音效与背景音乐
+- [ ] 排行榜/历史记录
+- [ ] 多种游戏模式（限时、挑战）
+
+## 短期目标
+- 持续按 prompt.md 的版本节奏：新功能 → patch 修复 → patch 重构
+
+---
+
+## 版本历史
+
+### v0.1.0 (MINOR)
+- **状态**: 开发中 🚧
+- **目标**: 首个版本：俄罗斯方块最小可用集
+- **任务**:
+  - [x] 项目脚手架（pubspec/analysis_options/.gitignore）
+  - [x] Android 平台文件（manifest、build.gradle、签名、minSdk=34/targetSdk=36/compileSdk=36）
+  - [x] 主题（Material 3 浅/深色、Windows YaHei UI）
+  - [x] 数据模型 Tetromino（7 种方块、旋转）
+  - [x] 游戏状态 GameState（棋盘、碰撞检测、消行、计分）
+  - [x] 状态管理 GameProvider（定时下落、操作接口）
+  - [x] 界面：游戏面板 + 分数面板 + 下一个预览 + 方向控制按钮
+  - [x] Ghost piece 硬降预览
+  - [x] 暂停/继续 + 游戏结束/重新开始
+  - [x] 自适应布局（竖屏/横屏）
+  - [x] 日志服务
+  - [x] 单元测试：Tetromino、GameState、Constants
+  - [x] GitHub Actions：lint + 单测 + Android APK + Windows ZIP + tag 自动 release
+  - [x] README/plan
+
+---
+
+## 设计原则
+- **离线优先**：无需网络连接即可游玩。
+- **克制设计**：界面简洁，操作直观。
+- **可观测**：所有关键操作写入日志文件，方便排障。
+- **包体克制**：依赖均为成熟稳定的纯 Dart / Flutter 插件。
+
+## 依赖与版本基线
+- Flutter: 3.44.1
+- provider: 6.1.5+1
+- shared_preferences: 2.5.5
+- path_provider: 2.1.5
+- path: 1.9.1
+- window_manager: 0.5.1
