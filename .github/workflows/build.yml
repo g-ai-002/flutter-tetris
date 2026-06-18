@@ -143,6 +143,21 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Patch audioplayers_windows for MSVC coroutine deprecation
+        shell: pwsh
+        run: |
+          $cmakeFile = 'windows\flutter\ephemeral\.plugin_symlinks\audioplayers_windows\windows\CMakeLists.txt'
+          if (Test-Path $cmakeFile) {
+            $content = Get-Content $cmakeFile -Raw
+            if ($content -notmatch '_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS') {
+              $content = "add_compile_definitions(_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)`n" + $content
+              Set-Content $cmakeFile -Value $content
+              Write-Host "Patched audioplayers_windows CMakeLists.txt"
+            }
+          } else {
+            Write-Host "audioplayers_windows CMakeLists.txt not found, skipping patch"
+          }
+
       - name: Build Windows
         run: flutter build windows --release
 
