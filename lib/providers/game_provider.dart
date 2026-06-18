@@ -36,13 +36,17 @@ class GameProvider extends ChangeNotifier {
     _tickTimer = Timer.periodic(Duration(milliseconds: dropIntervalMs), (_) {
       if (_state.isPaused || _state.isGameOver) return;
       _state = _state.moveDown();
-      if (_state.isGameOver) {
-        _tickTimer?.cancel();
-        _saveHighScore();
-        LogService.info('游戏结束, 得分: ${_state.score}');
-      }
+      _checkGameOver();
       notifyListeners();
     });
+  }
+
+  void _checkGameOver() {
+    if (_state.isGameOver) {
+      _tickTimer?.cancel();
+      _saveHighScore();
+      LogService.info('游戏结束, 得分: ${_state.score}');
+    }
   }
 
   void moveLeft() {
@@ -57,21 +61,13 @@ class GameProvider extends ChangeNotifier {
 
   void moveDown() {
     _state = _state.moveDown();
-    if (_state.isGameOver) {
-      _tickTimer?.cancel();
-      _saveHighScore();
-      LogService.info('游戏结束, 得分: ${_state.score}');
-    }
+    _checkGameOver();
     notifyListeners();
   }
 
   void hardDrop() {
     _state = _state.hardDrop();
-    if (_state.isGameOver) {
-      _tickTimer?.cancel();
-      _saveHighScore();
-      LogService.info('游戏结束, 得分: ${_state.score}');
-    }
+    _checkGameOver();
     notifyListeners();
   }
 
