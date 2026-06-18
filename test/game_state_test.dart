@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_tetris/models/game_state.dart';
-import 'package:flutter_tetris/models/tetromino.dart';
 
 void main() {
   group('GameState', () {

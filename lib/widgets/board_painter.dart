@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/game_state.dart';
 import '../models/tetromino.dart';
-import '../utils/constants.dart';
 
 class BoardPainter extends CustomPainter {
   final GameState state;
@@ -79,7 +78,6 @@ class BoardPainter extends CustomPainter {
     for (var r = 0; r < shape.length; r++) {
       for (var c = 0; c < shape[r].length; c++) {
         if (shape[r][c] == 0) continue;
-        final x = (state.currentX + c) * cellSize;
         final y = (state.currentY + r) * cellSize;
         if (y < 0) continue;
         _drawCell(canvas, state.currentX + c, state.currentY + r,

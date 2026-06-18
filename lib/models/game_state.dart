@@ -106,13 +106,13 @@ class GameState {
     if (isGameOver || isPaused) return this;
     final rotated = currentPiece.rotateCW();
     if (!_collides(rotated, currentX, currentY)) {
-      return _copyWith(currentPiece: Tetromino._(currentPiece.type, rotated, currentPiece.color));
+      return _copyWith(currentPiece: Tetromino(currentPiece.type, rotated, currentPiece.color));
     }
     // wall kick: try shifting left/right
     for (final offset in [1, -1, 2, -2]) {
       if (!_collides(rotated, currentX + offset, currentY)) {
         return _copyWith(
-          currentPiece: Tetromino._(currentPiece.type, rotated, currentPiece.color),
+          currentPiece: Tetromino(currentPiece.type, rotated, currentPiece.color),
           currentX: currentX + offset,
         );
       }

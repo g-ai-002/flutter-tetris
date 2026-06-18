@@ -7,7 +7,7 @@ class Tetromino {
   final List<List<int>> shape;
   final int color;
 
-  const Tetromino._(this.type, this.shape, this.color);
+  Tetromino(this.type, this.shape, this.color);
 
   static const Map<TetrominoType, List<List<int>>> _shapes = {
     TetrominoType.I: [
@@ -58,11 +58,11 @@ class Tetromino {
   };
 
   factory Tetromino.create(TetrominoType type) {
-    return Tetromino._(type, _shapes[type]!, _colors[type]!);
+    return Tetromino(type, _shapes[type]!, _colors[type]!);
   }
 
   static Tetromino random() {
-    final types = TetrominoType.values;
+    const types = TetrominoType.values;
     return Tetromino.create(types[Random().nextInt(types.length)]);
   }
 
