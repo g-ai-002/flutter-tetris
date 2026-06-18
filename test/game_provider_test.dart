@@ -4,6 +4,8 @@ import 'package:flutter_tetris/providers/game_provider.dart';
 import 'package:flutter_tetris/services/sound_service.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('GameProvider', () {
     setUp(() async {
       SharedPreferences.setMockInitialValues({});
