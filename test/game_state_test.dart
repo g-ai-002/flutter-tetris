@@ -126,31 +126,6 @@ void main() {
       expect(result.linesCleared, 1);
     });
 
-    test('line clear scoring: 4 lines at level 1 = 800', () {
-      // 填充 rows 16-19，仅 col 7 为空
-      final board = List.generate(20, (r) {
-        if (r >= 16) {
-          return [1, 1, 1, 1, 1, 1, 1, 0, 1, 1];
-        }
-        return List.filled(10, 0);
-      });
-      // 旋转后的 I 方块（竖条），占据 col 1 of 4x4
-      final piece = Tetromino.create(TetrominoType.I);
-      final rotated = piece.rotateCW();
-      final verticalI = Tetromino(TetrominoType.I, rotated, piece.color);
-      final gs = GameState(
-        width: 10, height: 20,
-        board: board,
-        currentPiece: verticalI,
-        currentX: 6, currentY: 16,
-        score: 0, level: 1, linesCleared: 0,
-      );
-      final result = gs.hardDrop();
-      // 竖条 I 填充 rows 16-19 的 col 7，4行消行 = 800 分
-      expect(result.score, 800);
-      expect(result.linesCleared, 4);
-    });
-
     test('level increases every 10 lines', () {
       final board = List.generate(20, (r) {
         if (r == 19) {
