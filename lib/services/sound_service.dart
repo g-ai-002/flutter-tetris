@@ -99,55 +99,63 @@ class SoundService {
 
   // ---- WAV generators ----
 
+  static const _sampleRate = 22050;
+  static const _maxAmplitude = 32767;
+  static const _wavHeaderSize = 44;
+  static const _bitsPerSample = 16;
+  static const _numChannels = 1;
+  static const _audioFormatPcm = 1;
+  static const _musicVolume = 0.15;
+  static const _musicDurationSec = 8.0;
+  static const _musicNoteCount = 8;
+
   static Uint8List _tone(double freq, double durationSec, double volume) {
-    const sampleRate = 22050;
-    final numSamples = (sampleRate * durationSec).toInt();
+    final numSamples = (_sampleRate * durationSec).toInt();
     final data = Int16List(numSamples);
     for (var i = 0; i < numSamples; i++) {
-      final t = i / sampleRate;
+      final t = i / _sampleRate;
       final envelope = 1.0 - (i / numSamples);
-      data[i] = (sin(2 * pi * freq * t) * volume * envelope * 32767).toInt();
+      data[i] = (sin(2 * pi * freq * t) * volume * envelope * _maxAmplitude).toInt();
     }
-    return _wavBytes(data, sampleRate);
+    return _wavBytes(data);
   }
 
   static Uint8List _sweep(double startFreq, double endFreq, double durationSec, double volume) {
-    const sampleRate = 22050;
-    final numSamples = (sampleRate * durationSec).toInt();
+    final numSamples = (_sampleRate * durationSec).toInt();
     final data = Int16List(numSamples);
     for (var i = 0; i < numSamples; i++) {
-      final t = i / sampleRate;
+      final t = i / _sampleRate;
       final freq = startFreq + (endFreq - startFreq) * (i / numSamples);
       final envelope = 1.0 - (i / numSamples);
-      data[i] = (sin(2 * pi * freq * t) * volume * envelope * 32767).toInt();
+      data[i] = (sin(2 * pi * freq * t) * volume * envelope * _maxAmplitude).toInt();
     }
-    return _wavBytes(data, sampleRate);
+    return _wavBytes(data);
   }
 
   static Uint8List _musicLoop() {
-    const sampleRate = 22050;
-    const durationSec = 8.0;
-    final numSamples = (sampleRate * durationSec).toInt();
+    final numSamples = (_sampleRate * _musicDurationSec).toInt();
     final data = Int16List(numSamples);
 
-    final notes = <double>[262, 294, 330, 349, 392, 349, 330, 294];
-    const noteLen = durationSec / 8;
+    const notes = <double>[262, 294, 330, 349, 392, 349, 330, 294];
+    const noteLen = _musicDurationSec / _musicNoteCount;
 
     for (var i = 0; i < numSamples; i++) {
-      final t = i / sampleRate;
+      final t = i / _sampleRate;
       final noteIdx = (t / noteLen).toInt() % notes.length;
       final noteT = t - noteIdx * noteLen;
       final freq = notes[noteIdx];
       final envelope = (1.0 - noteT / noteLen).clamp(0.0, 1.0);
-      data[i] = (sin(2 * pi * freq * t) * 0.15 * envelope * 32767).toInt();
+      data[i] = (sin(2 * pi * freq * t) * _musicVolume * envelope * _maxAmplitude).toInt();
     }
-    return _wavBytes(data, sampleRate);
+    return _wavBytes(data);
   }
 
-  static Uint8List _wavBytes(Int16List samples, int sampleRate) {
+  static Uint8List _wavBytes(Int16List samples) {
     final dataBytes = samples.buffer.asUint8List();
-    final fileSize = 44 + dataBytes.length;
+    final fileSize = _wavHeaderSize + dataBytes.length;
     final buffer = ByteData(fileSize);
+    final byteRate = _sampleRate * _numChannels * (_bitsPerSample ~/ 8);
+    final blockAlign = _numChannels * (_bitsPerSample ~/ 8);
 
     // RIFF header
     buffer.setUint8(0, 0x52); // R
@@ -166,12 +174,12 @@ class SoundService {
     buffer.setUint8(14, 0x74); // t
     buffer.setUint8(15, 0x20); // space
     buffer.setUint32(16, 16, Endian.little); // chunk size
-    buffer.setUint16(20, 1, Endian.little); // PCM
-    buffer.setUint16(22, 1, Endian.little); // mono
-    buffer.setUint32(24, sampleRate, Endian.little);
-    buffer.setUint32(28, sampleRate * 2, Endian.little); // byte rate
-    buffer.setUint16(32, 2, Endian.little); // block align
-    buffer.setUint16(34, 16, Endian.little); // bits per sample
+    buffer.setUint16(20, _audioFormatPcm, Endian.little);
+    buffer.setUint16(22, _numChannels, Endian.little);
+    buffer.setUint32(24, _sampleRate, Endian.little);
+    buffer.setUint32(28, byteRate, Endian.little);
+    buffer.setUint16(32, blockAlign, Endian.little);
+    buffer.setUint16(34, _bitsPerSample, Endian.little);
 
     // data chunk
     buffer.setUint8(36, 0x64); // d
@@ -181,8 +189,8 @@ class SoundService {
     buffer.setUint32(40, dataBytes.length, Endian.little);
 
     final result = Uint8List(fileSize);
-    result.setRange(0, 44, buffer.buffer.asUint8List().sublist(0, 44));
-    result.setRange(44, fileSize, dataBytes);
+    result.setRange(0, _wavHeaderSize, buffer.buffer.asUint8List().sublist(0, _wavHeaderSize));
+    result.setRange(_wavHeaderSize, fileSize, dataBytes);
     return result;
   }
 }
