@@ -30,9 +30,7 @@ void main() {
     test('rotate changes shape', () async {
       final prefs = await SharedPreferences.getInstance();
       final provider = GameProvider(prefs);
-      final initialShape = provider.state.currentPiece.shape;
       provider.rotate();
-      // rotation may be blocked by wall, but should not crash
       expect(provider.state, isNotNull);
     });
 
