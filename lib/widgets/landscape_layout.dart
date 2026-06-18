@@ -5,6 +5,7 @@ import 'game_board.dart';
 import 'game_controls.dart';
 import 'next_piece_preview.dart';
 import 'score_panel.dart';
+import 'status_overlay.dart';
 
 class LandscapeLayout extends StatelessWidget {
   final GameProvider game;
@@ -51,34 +52,18 @@ class LandscapeLayout extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (state.isGameOver)
-                _restartButton(game)
-              else if (state.isPaused)
-                _pausedText(context)
-              else
+              StatusOverlay(
+                game: game,
+                isGameOver: state.isGameOver,
+                isPaused: state.isPaused,
+              ),
+              if (!state.isGameOver && !state.isPaused)
                 GameControls(game: game),
             ],
           ),
         ),
         const SizedBox(width: 8),
       ],
-    );
-  }
-
-  Widget _restartButton(GameProvider game) {
-    return ElevatedButton.icon(
-      onPressed: () => game.start(),
-      icon: const Icon(Icons.replay),
-      label: const Text('重新开始'),
-    );
-  }
-
-  Widget _pausedText(BuildContext context) {
-    return Text(
-      '已暂停',
-      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
     );
   }
 }

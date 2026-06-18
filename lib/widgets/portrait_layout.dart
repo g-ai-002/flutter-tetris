@@ -6,6 +6,7 @@ import 'game_board.dart';
 import 'game_controls.dart';
 import 'next_piece_preview.dart';
 import 'score_panel.dart';
+import 'status_overlay.dart';
 
 class PortraitLayout extends StatelessWidget {
   final GameProvider game;
@@ -42,45 +43,16 @@ class PortraitLayout extends StatelessWidget {
             boardH: boardH,
             cellSize: cellSize,
           ),
-          _buildStatusOverlay(context, game, state),
+          StatusOverlay(
+            game: game,
+            isGameOver: state.isGameOver,
+            isPaused: state.isPaused,
+          ),
           const SizedBox(height: 8),
           if (!state.isGameOver) GameControls(game: game),
           const SizedBox(height: 16),
         ],
       ),
-    );
-  }
-
-  Widget _buildStatusOverlay(BuildContext context, GameProvider game, GameState state) {
-    if (state.isGameOver) {
-      return Padding(
-        padding: const EdgeInsets.all(16),
-        child: _restartButton(game),
-      );
-    }
-    if (state.isPaused) {
-      return Padding(
-        padding: const EdgeInsets.all(16),
-        child: _pausedText(context),
-      );
-    }
-    return const SizedBox.shrink();
-  }
-
-  Widget _restartButton(GameProvider game) {
-    return ElevatedButton.icon(
-      onPressed: () => game.start(),
-      icon: const Icon(Icons.replay),
-      label: const Text('重新开始'),
-    );
-  }
-
-  Widget _pausedText(BuildContext context) {
-    return Text(
-      '已暂停',
-      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-          ),
     );
   }
 }
