@@ -9,6 +9,7 @@ import 'package:window_manager/window_manager.dart';
 import 'pages/game_page.dart';
 import 'providers/game_provider.dart';
 import 'services/log_service.dart';
+import 'services/sound_service.dart';
 import 'theme/app_theme.dart';
 import 'utils/constants.dart';
 
@@ -41,6 +42,7 @@ Future<void> main() async {
   ));
 
   final prefs = await SharedPreferences.getInstance();
+  await SoundService().init(prefs);
   runApp(TetrisApp(prefs: prefs));
 }
 
