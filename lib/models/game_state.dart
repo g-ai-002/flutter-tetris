@@ -126,35 +126,45 @@ class GameState {
   }
 
   GameState _lockPiece() {
+    final (newBoard, pieceAboveBoard) = _mergePieceToBoard();
+    if (pieceAboveBoard) return _copyWith(isGameOver: true);
+
+    final cleared = _clearLines(newBoard);
+    final newLines = linesCleared + cleared;
+    final newLevel = (newLines ~/ 10) + 1;
+    final newScore = score + _scoreForLines(cleared, newLevel);
+    final newHighScore = max(newScore, highScore);
+
+    return _spawnNextPiece(newBoard, newScore, newLevel, newLines, newHighScore);
+  }
+
+  (List<List<int>>, bool) _mergePieceToBoard() {
     final newBoard = board.map((row) => List<int>.from(row)).toList();
     final shape = currentPiece.shape;
     for (var r = 0; r < shape.length; r++) {
       for (var c = 0; c < shape[r].length; c++) {
         if (shape[r][c] == 0) continue;
         final by = currentY + r;
-        final bx = currentX + c;
-        if (by < 0) {
-          return _copyWith(isGameOver: true);
-        }
-        newBoard[by][bx] = currentPiece.color;
+        if (by < 0) return (newBoard, true);
+        newBoard[by][currentX + c] = currentPiece.color;
       }
     }
+    return (newBoard, false);
+  }
 
-    final cleared = _clearLines(newBoard);
-    final newLines = linesCleared + cleared;
-    final newLevel = (newLines ~/ 10) + 1;
-    final points = _scoreForLines(cleared, newLevel);
-    final newScore = score + points;
-    final newHighScore = max(newScore, highScore);
-
-    final next = nextPiece ?? Tetromino.random();
-    final newPiece = next;
-    final newNext = Tetromino.random();
+  GameState _spawnNextPiece(
+    List<List<int>> board,
+    int newScore,
+    int newLevel,
+    int newLines,
+    int newHighScore,
+  ) {
+    final newPiece = nextPiece ?? Tetromino.random();
     final spawnX = (width - newPiece.shape[0].length) ~/ 2;
 
     if (_collides(newPiece.shape, spawnX, 0)) {
       return _copyWith(
-        board: newBoard,
+        board: board,
         isGameOver: true,
         score: newScore,
         level: newLevel,
@@ -164,11 +174,11 @@ class GameState {
     }
 
     return _copyWith(
-      board: newBoard,
+      board: board,
       currentPiece: newPiece,
       currentX: spawnX,
       currentY: 0,
-      nextPiece: newNext,
+      nextPiece: Tetromino.random(),
       score: newScore,
       level: newLevel,
       linesCleared: newLines,
