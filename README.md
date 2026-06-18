@@ -61,6 +61,7 @@ flutter build windows        # Windows（需在 Windows 上）
 
 ## 版本历史
 
+- **v0.3.1**：修复 CI 测试失败。sound_service_test 添加 FlutterBinding 初始化。
 - **v0.3.0**：音效与背景音乐。程序化生成音效（移动/旋转/硬降/消行/升级/游戏结束），背景音乐循环播放，音效/音乐可独立开关。
 - **v0.2.1**：重构优化。提取布局组件（GameBoard、PortraitLayout、LandscapeLayout），精简主题代码，拆分 _lockPiece 长方法。
 - **v0.2.0**：触屏手势操作 + 键盘快捷键。支持滑动移动/点击旋转/下滑硬降，方向键/空格/P/R 键盘操作。

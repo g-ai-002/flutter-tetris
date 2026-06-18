@@ -3,6 +3,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_tetris/services/sound_service.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   group('SoundService', () {
     setUp(() {
       SharedPreferences.setMockInitialValues({});

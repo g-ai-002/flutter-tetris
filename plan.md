@@ -28,6 +28,14 @@
 
 ## 版本历史
 
+### v0.3.1 (PATCH)
+- **状态**: 已完成 ✅
+- **目标**: 修复 CI 测试失败 — sound_service_test 缺少 FlutterBinding 初始化
+- **任务**:
+  - [x] 修复 sound_service_test.dart：添加 TestWidgetsFlutterBinding.ensureInitialized()
+  - [x] 更新版本号至 0.3.1
+  - [x] 更新 README
+
 ### v0.3.0 (MINOR)
 - **状态**: 已完成 ✅
 - **目标**: 音效与背景音乐
