@@ -16,6 +16,7 @@ class SoundService {
   bool _soundEnabled = true;
   bool _musicEnabled = true;
   bool _initialized = false;
+  bool _testing = false;
 
   bool get soundEnabled => _soundEnabled;
   bool get musicEnabled => _musicEnabled;
@@ -57,7 +58,7 @@ class SoundService {
   }
 
   void _play(Uint8List wavData) {
-    if (!_soundEnabled) return;
+    if (_testing || !_soundEnabled) return;
     try { _safePlayer.play(BytesSource(wavData)); } catch (_) {}
   }
 
@@ -69,7 +70,7 @@ class SoundService {
   void playGameOver() => _play(_sweep(400, 100, 0.5, 0.4));
 
   Future<void> _startMusic() async {
-    if (!_musicEnabled) return;
+    if (_testing || !_musicEnabled) return;
     try {
       await _safeMusicPlayer.stop();
       await _safeMusicPlayer.setReleaseMode(ReleaseMode.loop);
@@ -93,6 +94,7 @@ class SoundService {
     _soundEnabled = true;
     _musicEnabled = true;
     _initialized = false;
+    _testing = true;
   }
 
   // ---- WAV generators ----
