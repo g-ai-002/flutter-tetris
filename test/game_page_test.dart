@@ -8,11 +8,19 @@ import 'package:flutter_tetris/providers/game_provider.dart';
 
 void main() {
   group('GamePage', () {
-    setUp(() {
+    late GameProvider provider;
+
+    setUp(() async {
       SharedPreferences.setMockInitialValues({});
+      final prefs = await SharedPreferences.getInstance();
+      provider = GameProvider(prefs);
     });
 
-    Widget buildTestApp(GameProvider provider) {
+    tearDown(() {
+      provider.dispose();
+    });
+
+    Widget buildTestApp() {
       return MaterialApp(
         home: ChangeNotifierProvider.value(
           value: provider,
@@ -22,16 +30,12 @@ void main() {
     }
 
     testWidgets('renders without crashing', (tester) async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
-      await tester.pumpWidget(buildTestApp(provider));
+      await tester.pumpWidget(buildTestApp());
       expect(find.text('俄罗斯方块'), findsOneWidget);
     });
 
     testWidgets('arrow left key moves piece left', (tester) async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
-      await tester.pumpWidget(buildTestApp(provider));
+      await tester.pumpWidget(buildTestApp());
       final initialX = provider.state.currentX;
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
       await tester.pump();
@@ -39,9 +43,7 @@ void main() {
     });
 
     testWidgets('arrow right key moves piece right', (tester) async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
-      await tester.pumpWidget(buildTestApp(provider));
+      await tester.pumpWidget(buildTestApp());
       final initialX = provider.state.currentX;
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
       await tester.pump();
@@ -49,36 +51,28 @@ void main() {
     });
 
     testWidgets('arrow down key moves piece down', (tester) async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
-      await tester.pumpWidget(buildTestApp(provider));
+      await tester.pumpWidget(buildTestApp());
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
       await tester.pump();
       expect(provider.state, isNotNull);
     });
 
     testWidgets('arrow up key rotates piece', (tester) async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
-      await tester.pumpWidget(buildTestApp(provider));
+      await tester.pumpWidget(buildTestApp());
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
       await tester.pump();
       expect(provider.state, isNotNull);
     });
 
     testWidgets('space key hard drops', (tester) async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
-      await tester.pumpWidget(buildTestApp(provider));
+      await tester.pumpWidget(buildTestApp());
       await tester.sendKeyEvent(LogicalKeyboardKey.space);
       await tester.pump();
       expect(provider.state, isNotNull);
     });
 
     testWidgets('P key toggles pause', (tester) async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
-      await tester.pumpWidget(buildTestApp(provider));
+      await tester.pumpWidget(buildTestApp());
       expect(provider.state.isPaused, false);
       await tester.sendKeyEvent(LogicalKeyboardKey.keyP);
       await tester.pump();
@@ -89,9 +83,7 @@ void main() {
     });
 
     testWidgets('R key restarts when game over', (tester) async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
-      await tester.pumpWidget(buildTestApp(provider));
+      await tester.pumpWidget(buildTestApp());
       for (var i = 0; i < 500; i++) {
         if (provider.state.isGameOver) break;
         provider.hardDrop();
@@ -104,9 +96,7 @@ void main() {
     });
 
     testWidgets('tap on board rotates piece when playing', (tester) async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
-      await tester.pumpWidget(buildTestApp(provider));
+      await tester.pumpWidget(buildTestApp());
       final boardFinder = find.byType(CustomPaint);
       expect(boardFinder, findsWidgets);
       await tester.tap(boardFinder.first);
@@ -115,9 +105,7 @@ void main() {
     });
 
     testWidgets('tap on board restarts when game over', (tester) async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
-      await tester.pumpWidget(buildTestApp(provider));
+      await tester.pumpWidget(buildTestApp());
       for (var i = 0; i < 500; i++) {
         if (provider.state.isGameOver) break;
         provider.hardDrop();
