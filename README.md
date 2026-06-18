@@ -10,6 +10,7 @@
 - ⏸️ 暂停/继续
 - ⌨️ 键盘快捷键（方向键移动/旋转、空格硬降、P 暂停、R 重新开始）
 - 👆 触屏手势（滑动移动、点击旋转、下滑硬降）
+- 🔊 音效与背景音乐（可独立开关）
 - 🌗 浅色 / 深色主题
 - 📱 自适应布局（竖屏/横屏、手机/平板/折叠屏）
 - 📝 用户目录下的日志文件（方便排障）
@@ -55,10 +56,12 @@ flutter build windows        # Windows（需在 Windows 上）
 - Flutter 3.44.1, Material 3
 - provider（状态管理）
 - shared_preferences（最高分持久化）
+- audioplayers（音效与背景音乐）
 - window_manager（Windows 窗口控制）
 
 ## 版本历史
 
+- **v0.3.0**：音效与背景音乐。程序化生成音效（移动/旋转/硬降/消行/升级/游戏结束），背景音乐循环播放，音效/音乐可独立开关。
 - **v0.2.1**：重构优化。提取布局组件（GameBoard、PortraitLayout、LandscapeLayout），精简主题代码，拆分 _lockPiece 长方法。
 - **v0.2.0**：触屏手势操作 + 键盘快捷键。支持滑动移动/点击旋转/下滑硬降，方向键/空格/P/R 键盘操作。
 - **v0.1.1**：重构优化。提取独立 widget（ScorePanel、GameControls、NextPiecePreview、NextPiecePainter），消除 GameProvider 重复代码，精简 game_page.dart 布局，补充测试覆盖。
