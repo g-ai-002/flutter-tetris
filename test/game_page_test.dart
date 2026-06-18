@@ -80,6 +80,7 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.keyP);
       await tester.pump();
       expect(provider.state.isPaused, false);
+      provider.dispose();
     });
 
     testWidgets('R key restarts when game over', (tester) async {
@@ -93,6 +94,7 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.keyR);
       await tester.pump();
       expect(provider.state.isGameOver, false);
+      provider.dispose();
     });
 
     testWidgets('tap on board rotates piece when playing', (tester) async {
@@ -116,6 +118,7 @@ void main() {
       await tester.tap(boardFinder);
       await tester.pump();
       expect(provider.state.isGameOver, false);
+      provider.dispose();
     });
   });
 }
