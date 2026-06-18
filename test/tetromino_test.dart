@@ -33,15 +33,18 @@ void main() {
       final piece = Tetromino.create(TetrominoType.T);
       final rotated = piece.rotateCW();
       expect(rotated.length, piece.shape.length);
-      // T piece: original has top-middle filled, rotated should have left-middle filled
-      expect(rotated[1][0], 1);
+      // T piece CW: [0,1,0],[0,1,1],[0,1,0]
+      expect(rotated[1][1], 1);
+      expect(rotated[1][2], 1);
     });
 
     test('rotateCCW produces valid rotation', () {
       final piece = Tetromino.create(TetrominoType.T);
       final rotated = piece.rotateCCW();
       expect(rotated.length, piece.shape.length);
-      expect(rotated[1][2], 1);
+      // T piece CCW: [0,1,0],[1,1,0],[0,1,0]
+      expect(rotated[1][0], 1);
+      expect(rotated[1][1], 1);
     });
 
     test('O piece rotation is identity', () {
