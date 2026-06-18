@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_tetris/models/game_state.dart';
+import 'package:flutter_tetris/models/tetromino.dart';
 
 void main() {
   group('GameState', () {
@@ -101,6 +102,123 @@ void main() {
     test('score calculation', () {
       final state = GameState.initial();
       expect(state.score, 0);
+    });
+
+    test('line clear scoring: 1 line at level 1 = 100', () {
+      final state = GameState.initial();
+      // fill bottom row except one column, then drop a piece to clear it
+      final board = List.generate(20, (r) {
+        if (r == 19) {
+          return [1, 1, 1, 1, 1, 1, 1, 1, 1, 0];
+        }
+        return List.filled(10, 0);
+      });
+      final piece = Tetromino.create(TetrominoType.I);
+      final gs = GameState(
+        width: 10, height: 20,
+        board: board,
+        currentPiece: piece,
+        currentX: 6, currentY: 18,
+        score: 0, level: 1, linesCleared: 0,
+      );
+      final result = gs.hardDrop();
+      expect(result.score, 100);
+      expect(result.linesCleared, 1);
+    });
+
+    test('line clear scoring: 4 lines at level 1 = 800', () {
+      final board = List.generate(20, (r) {
+        if (r >= 16) {
+          return [1, 1, 1, 1, 1, 1, 1, 1, 1, 0];
+        }
+        return List.filled(10, 0);
+      });
+      final piece = Tetromino.create(TetrominoType.I);
+      final gs = GameState(
+        width: 10, height: 20,
+        board: board,
+        currentPiece: piece,
+        currentX: 6, currentY: 15,
+        score: 0, level: 1, linesCleared: 0,
+      );
+      final result = gs.hardDrop();
+      expect(result.score, 800);
+      expect(result.linesCleared, 4);
+    });
+
+    test('level increases every 10 lines', () {
+      final board = List.generate(20, (r) {
+        if (r == 19) {
+          return [1, 1, 1, 1, 1, 1, 1, 1, 1, 0];
+        }
+        return List.filled(10, 0);
+      });
+      final piece = Tetromino.create(TetrominoType.I);
+      final gs = GameState(
+        width: 10, height: 20,
+        board: board,
+        currentPiece: piece,
+        currentX: 6, currentY: 18,
+        score: 0, level: 1, linesCleared: 9,
+      );
+      final result = gs.hardDrop();
+      expect(result.level, 2);
+    });
+
+    test('highScore is updated when score exceeds it', () {
+      final board = List.generate(20, (r) {
+        if (r == 19) {
+          return [1, 1, 1, 1, 1, 1, 1, 1, 1, 0];
+        }
+        return List.filled(10, 0);
+      });
+      final piece = Tetromino.create(TetrominoType.I);
+      final gs = GameState(
+        width: 10, height: 20,
+        board: board,
+        currentPiece: piece,
+        currentX: 6, currentY: 18,
+        score: 0, level: 1, linesCleared: 0,
+        highScore: 50,
+      );
+      final result = gs.hardDrop();
+      expect(result.highScore, 100);
+    });
+
+    test('wall kick on rotation', () {
+      // place piece at left edge and rotate
+      final board = List.generate(20, (_) => List.filled(10, 0));
+      final piece = Tetromino.create(TetrominoType.I);
+      final gs = GameState(
+        width: 10, height: 20,
+        board: board,
+        currentPiece: piece,
+        currentX: -1, currentY: 10,
+        score: 0, level: 1, linesCleared: 0,
+      );
+      final result = gs.rotateCW();
+      // should not crash, wall kick may apply
+      expect(result, isNotNull);
+    });
+
+    test('game over when piece locks above board', () {
+      final board = List.generate(20, (_) => List.filled(10, 0));
+      // fill top rows
+      for (var r = 0; r < 3; r++) {
+        for (var c = 0; c < 10; c++) {
+          board[r][c] = 1;
+        }
+      }
+      final piece = Tetromino.create(TetrominoType.I);
+      final gs = GameState(
+        width: 10, height: 20,
+        board: board,
+        currentPiece: piece,
+        currentX: 3, currentY: -1,
+        score: 0, level: 1, linesCleared: 0,
+      );
+      final result = gs.hardDrop();
+      expect(result.isGameOver, true);
     });
   });
 }
