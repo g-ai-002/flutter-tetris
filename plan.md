@@ -28,8 +28,19 @@
 
 ## 版本历史
 
+### v0.1.1 (PATCH)
+- **状态**: 已完成 ✅
+- **目标**: 重构优化存量代码，提升可维护性
+- **任务**:
+  - [x] 提取 NextPiecePainter 到独立文件
+  - [x] 提取 ScorePanel、Controls 为独立 widget
+  - [x] 消除 GameProvider 中重复的游戏结束处理代码
+  - [x] 精简 game_page.dart 布局代码
+  - [x] 补充测试用例覆盖
+  - [x] 代码审查与清理
+
 ### v0.1.0 (MINOR)
-- **状态**: 开发中 🚧
+- **状态**: 已完成 ✅
 - **目标**: 首个版本：俄罗斯方块最小可用集
 - **任务**:
   - [x] 项目脚手架（pubspec/analysis_options/.gitignore）

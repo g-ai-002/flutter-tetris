@@ -57,6 +57,7 @@ flutter build windows        # Windows（需在 Windows 上）
 
 ## 版本历史
 
+- **v0.1.1**：重构优化。提取独立 widget（ScorePanel、GameControls、NextPiecePreview、NextPiecePainter），消除 GameProvider 重复代码，精简 game_page.dart 布局，补充测试覆盖。
 - **v0.1.0**：首个版本。经典俄罗斯方块核心玩法、7 种方块、旋转/移动/硬降、Ghost piece 预览、分数系统、暂停/继续、自适应布局、浅色/深色主题、日志系统、CI/CD 自动出包。
 
 更多详情见 [plan.md](./plan.md)。
