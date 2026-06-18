@@ -28,6 +28,18 @@
 
 ## 版本历史
 
+### v0.3.2 (PATCH)
+- **状态**: 已完成 ✅
+- **目标**: 重构优化存量代码，消除重复，提升可维护性
+- **任务**:
+  - [x] 提取 portrait/landscape 中重复的 _restartButton/_pausedText 为共享 StatusOverlay widget
+  - [x] 提取 game_page.dart 中 _buildSoundMenu 为独立 SoundMenu widget
+  - [x] 清理 sound_service.dart 中 WAV 生成的魔法数字
+  - [x] 添加 const 构造函数、清理冗余代码
+  - [x] 补充测试用例
+  - [x] 更新版本号至 0.3.2
+  - [x] 更新 README
+
 ### v0.3.1 (PATCH)
 - **状态**: 已完成 ✅
 - **目标**: 修复 CI 测试失败 — sound_service_test 缺少 FlutterBinding 初始化

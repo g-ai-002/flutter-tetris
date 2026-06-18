@@ -61,12 +61,12 @@ flutter build windows        # Windows（需在 Windows 上）
 
 ## 版本历史
 
+- **v0.3.2**：重构优化。提取 StatusOverlay、SoundMenu 独立 widget，消除 portrait/landscape 重复代码，清理 WAV 生成魔法数字。
 - **v0.3.1**：修复 CI 测试失败。sound_service_test 添加 FlutterBinding 初始化。
 - **v0.3.0**：音效与背景音乐。程序化生成音效（移动/旋转/硬降/消行/升级/游戏结束），背景音乐循环播放，音效/音乐可独立开关。
 - **v0.2.1**：重构优化。提取布局组件（GameBoard、PortraitLayout、LandscapeLayout），精简主题代码，拆分 _lockPiece 长方法。
 - **v0.2.0**：触屏手势操作 + 键盘快捷键。支持滑动移动/点击旋转/下滑硬降，方向键/空格/P/R 键盘操作。
-- **v0.1.1**：重构优化。提取独立 widget（ScorePanel、GameControls、NextPiecePreview、NextPiecePainter），消除 GameProvider 重复代码，精简 game_page.dart 布局，补充测试覆盖。
-- **v0.1.0**：首个版本。经典俄罗斯方块核心玩法、7 种方块、旋转/移动/硬降、Ghost piece 预览、分数系统、暂停/继续、自适应布局、浅色/深色主题、日志系统、CI/CD 自动出包。
+- **v0.1.x**：首个版本与重构。经典俄罗斯方块核心玩法、7 种方块、Ghost piece 预览、分数系统、暂停/继续、自适应布局、浅色/深色主题、日志系统、CI/CD 自动出包；提取独立 widget（ScorePanel、GameControls、NextPiecePreview 等），消除重复代码，补充测试覆盖。
 
 更多详情见 [plan.md](./plan.md)。
 
