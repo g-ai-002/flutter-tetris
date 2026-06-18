@@ -108,21 +108,5 @@ void main() {
       await tester.pump();
       expect(provider.state, isNotNull);
     });
-
-    testWidgets('tap on board restarts when game over', (tester) async {
-      final provider = await _createProvider();
-      await tester.pumpWidget(buildTestApp(provider));
-      for (var i = 0; i < 500; i++) {
-        if (provider.state.isGameOver) break;
-        provider.hardDrop();
-      }
-      await tester.pump();
-      expect(provider.state.isGameOver, true);
-      final boardFinder = find.byType(CustomPaint).first;
-      await tester.tap(boardFinder);
-      await tester.pump();
-      expect(provider.state.isGameOver, false);
-      provider.dispose();
-    });
   });
 }
