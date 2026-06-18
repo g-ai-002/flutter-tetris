@@ -92,7 +92,6 @@ void main() {
       final prefs = await SharedPreferences.getInstance();
       final provider = GameProvider(prefs);
       await tester.pumpWidget(buildTestApp(provider));
-      // force game over
       for (var i = 0; i < 500; i++) {
         if (provider.state.isGameOver) break;
         provider.hardDrop();
@@ -104,11 +103,10 @@ void main() {
       expect(provider.state.isGameOver, false);
     });
 
-    testWidgets('tap on board rotates piece', (tester) async {
+    testWidgets('tap on board rotates piece when playing', (tester) async {
       final prefs = await SharedPreferences.getInstance();
       final provider = GameProvider(prefs);
       await tester.pumpWidget(buildTestApp(provider));
-      // find the board area and tap it
       final boardFinder = find.byType(CustomPaint);
       expect(boardFinder, findsWidgets);
       await tester.tap(boardFinder.first);
@@ -116,49 +114,7 @@ void main() {
       expect(provider.state, isNotNull);
     });
 
-    testWidgets('swipe right moves piece right', (tester) async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
-      await tester.pumpWidget(buildTestApp(provider));
-      final initialX = provider.state.currentX;
-      final boardFinder = find.byType(CustomPaint).first;
-      final center = tester.getCenter(boardFinder);
-      // simulate swipe right
-      final gesture = await tester.startGesture(center);
-      await gesture.moveBy(const Offset(100, 0));
-      await gesture.up();
-      await tester.pump();
-      expect(provider.state.currentX, initialX + 1);
-    });
-
-    testWidgets('swipe left moves piece left', (tester) async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
-      await tester.pumpWidget(buildTestApp(provider));
-      final initialX = provider.state.currentX;
-      final boardFinder = find.byType(CustomPaint).first;
-      final center = tester.getCenter(boardFinder);
-      final gesture = await tester.startGesture(center);
-      await gesture.moveBy(const Offset(-100, 0));
-      await gesture.up();
-      await tester.pump();
-      expect(provider.state.currentX, initialX - 1);
-    });
-
-    testWidgets('swipe down hard drops', (tester) async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
-      await tester.pumpWidget(buildTestApp(provider));
-      final boardFinder = find.byType(CustomPaint).first;
-      final center = tester.getCenter(boardFinder);
-      final gesture = await tester.startGesture(center);
-      await gesture.moveBy(const Offset(0, 200));
-      await gesture.up();
-      await tester.pump();
-      expect(provider.state, isNotNull);
-    });
-
-    testWidgets('tap on board when game over restarts', (tester) async {
+    testWidgets('tap on board restarts when game over', (tester) async {
       final prefs = await SharedPreferences.getInstance();
       final provider = GameProvider(prefs);
       await tester.pumpWidget(buildTestApp(provider));

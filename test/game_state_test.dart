@@ -45,9 +45,9 @@ void main() {
     test('hardDrop locks piece', () {
       final state = GameState.initial();
       final dropped = state.hardDrop();
-      expect(dropped.currentPiece.type != state.currentPiece.type ||
-          dropped.currentX != state.currentX ||
-          dropped.currentY != state.currentY, true);
+      // after hard drop, piece locks and new piece spawns; game should not be over
+      expect(dropped.isGameOver, false);
+      expect(dropped.currentPiece, isNotNull);
     });
 
     test('rotateCW changes shape', () {

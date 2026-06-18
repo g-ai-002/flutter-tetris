@@ -9,16 +9,15 @@ class ScorePanel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Wrap(
+          spacing: 16,
+          runSpacing: 4,
+          alignment: WrapAlignment.center,
           children: [
             _scoreItem('分数', state.score.toString()),
-            const SizedBox(width: 24),
             _scoreItem('等级', state.level.toString()),
-            const SizedBox(width: 24),
             _scoreItem('行数', state.linesCleared.toString()),
-            const SizedBox(width: 24),
             _scoreItem('最高', state.highScore.toString()),
           ],
         ),
