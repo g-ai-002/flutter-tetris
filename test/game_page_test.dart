@@ -5,12 +5,15 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_tetris/pages/game_page.dart';
 import 'package:flutter_tetris/providers/game_provider.dart';
+import 'package:flutter_tetris/services/sound_service.dart';
 
 void main() {
   group('GamePage', () {
     Future<GameProvider> _createProvider() async {
       SharedPreferences.setMockInitialValues({});
+      SoundService().resetForTest();
       final prefs = await SharedPreferences.getInstance();
+      await SoundService().init(prefs);
       return GameProvider(prefs);
     }
 

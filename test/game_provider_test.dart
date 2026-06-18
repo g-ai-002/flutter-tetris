@@ -1,11 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_tetris/providers/game_provider.dart';
+import 'package:flutter_tetris/services/sound_service.dart';
 
 void main() {
   group('GameProvider', () {
-    setUp(() {
+    setUp(() async {
       SharedPreferences.setMockInitialValues({});
+      SoundService().resetForTest();
+      final prefs = await SharedPreferences.getInstance();
+      await SoundService().init(prefs);
     });
 
     test('initial state is not game over', () async {
