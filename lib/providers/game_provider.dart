@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../models/game_mode.dart';
 import '../models/game_state.dart';
 import '../services/history_service.dart';
 import '../services/log_service.dart';
@@ -11,8 +12,10 @@ import '../utils/constants.dart';
 class GameProvider extends ChangeNotifier {
   GameState _state;
   Timer? _tickTimer;
+  Timer? _secondTimer;
   final SharedPreferences _prefs;
   final SoundService _sound = SoundService();
+  GameMode _selectedMode = GameMode.classic;
 
   GameProvider(this._prefs)
       : _state = GameState.initial(
@@ -20,18 +23,35 @@ class GameProvider extends ChangeNotifier {
         );
 
   GameState get state => _state;
+  GameMode get selectedMode => _selectedMode;
 
   int get dropIntervalMs => max(100, 800 - (_state.level - 1) * 70);
 
+  void selectMode(GameMode mode) {
+    _selectedMode = mode;
+    _state = GameState.initial(
+      highScore: _prefs.getInt(AppConstants.prefKeyHighScore) ?? 0,
+      mode: mode,
+    );
+    _tickTimer?.cancel();
+    _secondTimer?.cancel();
+    _sound.stopMusic();
+    notifyListeners();
+  }
+
   void start() {
     if (_state.isGameOver) {
-      _state = GameState.initial(highScore: _state.highScore);
+      _state = GameState.initial(
+        highScore: _state.highScore,
+        mode: _selectedMode,
+      );
     } else if (_state.isPaused) {
       _state = _state.togglePause();
     }
     _startTick();
+    if (_state.gameMode == GameMode.timed) _startSecondTimer();
     _sound.startMusicIfEnabled();
-    LogService.info('游戏开始');
+    LogService.info('游戏开始, 模式: ${_state.gameMode.label}');
     notifyListeners();
   }
 
@@ -47,9 +67,23 @@ class GameProvider extends ChangeNotifier {
     });
   }
 
+  void _startSecondTimer() {
+    _secondTimer?.cancel();
+    _secondTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      if (_state.isPaused || _state.isGameOver) return;
+      _state = _state.tickSecond();
+      if (_state.isGameOver) {
+        _secondTimer?.cancel();
+        _checkGameOver();
+      }
+      notifyListeners();
+    });
+  }
+
   void _checkGameOver() {
     if (_state.isGameOver) {
       _tickTimer?.cancel();
+      _secondTimer?.cancel();
       _saveHighScore();
       _sound.playGameOver();
       HistoryService.addRecord(
@@ -57,7 +91,7 @@ class GameProvider extends ChangeNotifier {
         level: _state.level,
         linesCleared: _state.linesCleared,
       );
-      LogService.info('游戏结束, 得分: ${_state.score}');
+      LogService.info('游戏结束, 得分: ${_state.score}, 完成: ${_state.isCompleted}');
     }
   }
 
@@ -103,8 +137,10 @@ class GameProvider extends ChangeNotifier {
     _state = _state.togglePause();
     if (_state.isPaused) {
       _tickTimer?.cancel();
+      _secondTimer?.cancel();
     } else {
       _startTick();
+      if (_state.gameMode == GameMode.timed) _startSecondTimer();
     }
     notifyListeners();
   }
@@ -127,6 +163,7 @@ class GameProvider extends ChangeNotifier {
   @override
   void dispose() {
     _tickTimer?.cancel();
+    _secondTimer?.cancel();
     super.dispose();
   }
 }

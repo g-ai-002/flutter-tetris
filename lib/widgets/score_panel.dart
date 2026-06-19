@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../models/game_mode.dart';
 import '../models/game_state.dart';
 
 class ScorePanel extends StatelessWidget {
@@ -19,10 +20,20 @@ class ScorePanel extends StatelessWidget {
             _scoreItem('等级', state.level.toString()),
             _scoreItem('行数', state.linesCleared.toString()),
             _scoreItem('最高', state.highScore.toString()),
+            if (state.gameMode == GameMode.timed)
+              _scoreItem('剩余', _formatTime(state.remainingSeconds)),
+            if (state.gameMode == GameMode.challenge)
+              _scoreItem('目标', '${state.linesCleared}/${state.targetLines}'),
           ],
         ),
       ),
     );
+  }
+
+  String _formatTime(int seconds) {
+    final m = seconds ~/ 60;
+    final s = seconds % 60;
+    return '${m.toString().padLeft(2, '0')}:${s.toString().padLeft(2, '0')}';
   }
 
   Widget _scoreItem(String label, String value) {

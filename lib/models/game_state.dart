@@ -1,5 +1,6 @@
 import 'dart:math';
 import '../utils/constants.dart';
+import 'game_mode.dart';
 import 'tetromino.dart';
 
 class GameState {
@@ -16,6 +17,10 @@ class GameState {
   final bool isPaused;
   final Tetromino? nextPiece;
   final int highScore;
+  final GameMode gameMode;
+  final int remainingSeconds;
+  final int targetLines;
+  final bool isCompleted;
 
   GameState({
     required this.width,
@@ -31,15 +36,20 @@ class GameState {
     this.isPaused = false,
     this.nextPiece,
     this.highScore = 0,
+    this.gameMode = GameMode.classic,
+    this.remainingSeconds = 0,
+    this.targetLines = 0,
+    this.isCompleted = false,
   });
 
-  factory GameState.initial({int highScore = 0}) {
+  factory GameState.initial({int highScore = 0, GameMode mode = GameMode.classic}) {
     final board = List.generate(
       AppConstants.boardHeight,
       (_) => List.filled(AppConstants.boardWidth, 0),
     );
     final piece = Tetromino.random();
     final next = Tetromino.random();
+    final config = ModeConfig(mode);
     return GameState(
       width: AppConstants.boardWidth,
       height: AppConstants.boardHeight,
@@ -52,6 +62,9 @@ class GameState {
       linesCleared: 0,
       nextPiece: next,
       highScore: highScore,
+      gameMode: mode,
+      remainingSeconds: config.durationSeconds,
+      targetLines: config.targetLines,
     );
   }
 
@@ -135,7 +148,10 @@ class GameState {
     final newScore = score + _scoreForLines(cleared, newLevel);
     final newHighScore = max(newScore, highScore);
 
-    return _spawnNextPiece(newBoard, newScore, newLevel, newLines, newHighScore);
+    final completed = gameMode == GameMode.challenge && newLines >= targetLines;
+
+    return _spawnNextPiece(newBoard, newScore, newLevel, newLines, newHighScore,
+        isCompleted: completed);
   }
 
   (List<List<int>>, bool) _mergePieceToBoard() {
@@ -157,8 +173,21 @@ class GameState {
     int newScore,
     int newLevel,
     int newLines,
-    int newHighScore,
-  ) {
+    int newHighScore, {
+    bool isCompleted = false,
+  }) {
+    if (isCompleted) {
+      return _copyWith(
+        board: board,
+        isGameOver: true,
+        isCompleted: true,
+        score: newScore,
+        level: newLevel,
+        linesCleared: newLines,
+        highScore: newHighScore,
+      );
+    }
+
     final newPiece = nextPiece ?? Tetromino.random();
     final spawnX = (width - newPiece.shape[0].length) ~/ 2;
 
@@ -218,6 +247,15 @@ class GameState {
     return gy;
   }
 
+  GameState tickSecond() {
+    if (isGameOver || isPaused || gameMode != GameMode.timed) return this;
+    final newRemaining = remainingSeconds - 1;
+    if (newRemaining <= 0) {
+      return _copyWith(remainingSeconds: 0, isGameOver: true);
+    }
+    return _copyWith(remainingSeconds: newRemaining);
+  }
+
   GameState _copyWith({
     List<List<int>>? board,
     Tetromino? currentPiece,
@@ -230,6 +268,10 @@ class GameState {
     bool? isPaused,
     Tetromino? nextPiece,
     int? highScore,
+    GameMode? gameMode,
+    int? remainingSeconds,
+    int? targetLines,
+    bool? isCompleted,
   }) {
     return GameState(
       width: width,
@@ -245,6 +287,10 @@ class GameState {
       isPaused: isPaused ?? this.isPaused,
       nextPiece: nextPiece ?? this.nextPiece,
       highScore: highScore ?? this.highScore,
+      gameMode: gameMode ?? this.gameMode,
+      remainingSeconds: remainingSeconds ?? this.remainingSeconds,
+      targetLines: targetLines ?? this.targetLines,
+      isCompleted: isCompleted ?? this.isCompleted,
     );
   }
 }

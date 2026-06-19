@@ -7,6 +7,7 @@ import '../widgets/landscape_layout.dart';
 import '../widgets/portrait_layout.dart';
 import '../widgets/sound_menu.dart';
 import 'history_page.dart';
+import 'mode_select_page.dart';
 
 class GamePage extends StatefulWidget {
   const GamePage({super.key});
@@ -76,7 +77,7 @@ class _GamePageState extends State<GamePage> {
           final state = game.state;
           return Scaffold(
             appBar: AppBar(
-              title: const Text(AppConstants.appName),
+              title: Text('${AppConstants.appName} - ${state.gameMode.label}'),
               actions: [
                 IconButton(
                   icon: const Icon(Icons.emoji_events_outlined),
@@ -86,6 +87,17 @@ class _GamePageState extends State<GamePage> {
                       context,
                       MaterialPageRoute(builder: (_) => const HistoryPage()),
                     );
+                  },
+                ),
+                IconButton(
+                  icon: const Icon(Icons.grid_view_rounded),
+                  tooltip: '切换模式',
+                  onPressed: () async {
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const ModeSelectPage()),
+                    );
+                    _focusNode.requestFocus();
                   },
                 ),
                 const SoundMenu(),

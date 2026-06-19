@@ -82,6 +82,10 @@ class SoundService {
     if (_musicEnabled) await _startMusic();
   }
 
+  Future<void> stopMusic() async {
+    try { await _musicPlayer?.stop(); } catch (_) {}
+  }
+
   void dispose() {
     try { _player?.dispose(); } catch (_) {}
     try { _musicPlayer?.dispose(); } catch (_) {}
