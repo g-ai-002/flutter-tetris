@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_tetris/models/game_mode.dart';
 import 'package:flutter_tetris/providers/game_provider.dart';
 import 'package:flutter_tetris/services/history_service.dart';
 import 'package:flutter_tetris/services/sound_service.dart';
@@ -90,6 +91,40 @@ void main() {
       final records = HistoryService.getRecords();
       expect(records.length, greaterThanOrEqualTo(1));
       expect(records.first.score, greaterThanOrEqualTo(0));
+    });
+
+    test('selectMode changes mode and resets state', () async {
+      final provider = await createTestProvider();
+      provider.selectMode(GameMode.timed);
+      expect(provider.selectedMode, GameMode.timed);
+      expect(provider.state.gameMode, GameMode.timed);
+      expect(provider.state.remainingSeconds, 120);
+      expect(provider.state.score, 0);
+    });
+
+    test('selectMode to challenge sets target lines', () async {
+      final provider = await createTestProvider();
+      provider.selectMode(GameMode.challenge);
+      expect(provider.state.gameMode, GameMode.challenge);
+      expect(provider.state.targetLines, 40);
+    });
+
+    test('start in timed mode initializes second timer', () async {
+      final provider = await createTestProvider();
+      provider.selectMode(GameMode.timed);
+      provider.start();
+      expect(provider.state.isGameOver, false);
+      expect(provider.state.remainingSeconds, 120);
+    });
+
+    test('togglePause in timed mode stops and resumes timers', () async {
+      final provider = await createTestProvider();
+      provider.selectMode(GameMode.timed);
+      provider.start();
+      provider.togglePause();
+      expect(provider.state.isPaused, true);
+      provider.togglePause();
+      expect(provider.state.isPaused, false);
     });
   });
 }

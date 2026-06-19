@@ -20,7 +20,7 @@ void main() {
     testWidgets('renders without crashing', (tester) async {
       final provider = await createTestProvider();
       await tester.pumpWidget(buildTestApp(provider));
-      expect(find.text('俄罗斯方块'), findsOneWidget);
+      expect(find.text('俄罗斯方块 - 经典模式'), findsOneWidget);
     });
 
     testWidgets('arrow left key moves piece left', (tester) async {
