@@ -62,6 +62,7 @@ flutter build windows        # Windows（需在 Windows 上）
 
 ## 版本历史
 
+- **v0.4.2**：重构优化。提取公共布局组件（InfoPanel/ControlArea）、合并 SoundService WAV 生成重复代码、合并 GameProvider 移动重复逻辑、提取测试公共工具、BoardPainter 通用绘制方法、拆分主题构建方法、提取日期格式化工具类。
 - **v0.4.1**：修复 CI 测试挂起（HistoryService 测试环境无平台通道）。
 - **v0.4.0**：排行榜/历史记录。游戏结束自动保存记录，按分数降序排列，支持清空历史。
 - **v0.3.x**：音效与背景音乐（程序化生成 WAV），重构优化（提取 StatusOverlay/SoundMenu 独立 widget，消除重复代码）。

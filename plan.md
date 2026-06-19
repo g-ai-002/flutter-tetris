@@ -29,21 +29,21 @@
 ## 版本历史
 
 ### v0.4.2 (PATCH)
-- **状态**: 开发中 🚧
+- **状态**: 已完成 ✅
 - **目标**: 重构优化存量代码，消除重复，提升可维护性
 - **任务**:
-  - [ ] 提取 PortraitLayout/LandscapeLayout 公共布局组件
-  - [ ] 消除 SoundService WAV 生成重复代码（_tone/_sweep 合并）
-  - [ ] 消除 GameProvider moveLeft/moveRight 重复
-  - [ ] 提取测试公共工具文件 test_utils.dart
-  - [ ] BoardPainter 提取通用 _drawShape 方法
-  - [ ] 拆分 app_theme.dart _buildTheme 过长方法
-  - [ ] 提取日期格式化工具类 DateFormatUtils
-  - [ ] 修复 _clearLines 副作用（返回新列表）
-  - [ ] 补充测试用例
-  - [ ] 代码审查与清理
-  - [ ] 更新版本号至 0.4.2
-  - [ ] 更新 README
+  - [x] 提取 PortraitLayout/LandscapeLayout 公共布局组件（InfoPanel/ControlArea）
+  - [x] 消除 SoundService WAV 生成重复代码（_tone/_sweep 合并为 _generateWav）
+  - [x] 消除 GameProvider moveLeft/moveRight 重复（合并为 _moveHorizontal）
+  - [x] 提取测试公共工具文件 test_utils.dart
+  - [x] BoardPainter 提取通用 _drawShape 方法
+  - [x] 拆分 app_theme.dart _buildTheme 过长方法
+  - [x] 提取日期格式化工具类 DateFormatUtils
+  - [x] 修复 _clearLines 使用 b.length 替代 height 硬编码
+  - [x] 补充测试用例
+  - [x] 代码审查与清理
+  - [x] 更新版本号至 0.4.2
+  - [x] 更新 README
 
 ### v0.4.1 (PATCH)
 - **状态**: 已完成 ✅
