@@ -100,52 +100,68 @@ ThemeData _buildTheme(_ThemeColors c, Brightness brightness, String? fontFamily)
     colorScheme: colorScheme,
     scaffoldBackgroundColor: c.scaffoldBg,
     fontFamily: fontFamily,
-    appBarTheme: AppBarTheme(
-      backgroundColor: c.surface,
-      foregroundColor: c.onSurface,
-      elevation: 0,
-      scrolledUnderElevation: 0,
-      centerTitle: true,
-      surfaceTintColor: Colors.transparent,
-      toolbarHeight: 48,
-      titleTextStyle: TextStyle(
-        fontSize: 17,
-        fontWeight: FontWeight.w600,
-        color: c.onSurface,
-        fontFamily: fontFamily,
-      ),
-      shape: Border(bottom: BorderSide(color: c.outline, width: 0.5)),
-    ),
+    appBarTheme: _buildAppBarTheme(c, fontFamily),
     dividerTheme: DividerThemeData(color: c.outline, thickness: 0.5, space: 0.5),
-    cardTheme: CardThemeData(
-      elevation: 0,
-      color: c.surface,
-      surfaceTintColor: Colors.transparent,
-      margin: EdgeInsets.zero,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        elevation: 0,
-        backgroundColor: c.primary,
-        foregroundColor: c.onPrimary,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 18),
-      ),
-    ),
+    cardTheme: _buildCardTheme(c),
+    elevatedButtonTheme: _buildElevatedButtonTheme(c),
     splashColor: Colors.transparent,
     highlightColor: Colors.transparent,
     snackBarTheme: SnackBarThemeData(
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
     ),
-    textTheme: TextTheme(
-      titleLarge: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: c.onSurface, fontFamily: fontFamily),
-      titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: c.onSurface, fontFamily: fontFamily),
-      titleSmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: c.onSurface, fontFamily: fontFamily),
-      bodyLarge: TextStyle(fontSize: 15, color: c.onSurface, fontFamily: fontFamily),
-      bodyMedium: TextStyle(fontSize: 14, color: c.onSurface, fontFamily: fontFamily),
-      bodySmall: TextStyle(fontSize: 12, color: c.onSurfaceVariant, fontFamily: fontFamily),
+    textTheme: _buildTextTheme(c, fontFamily),
+  );
+}
+
+AppBarTheme _buildAppBarTheme(_ThemeColors c, String? fontFamily) {
+  return AppBarTheme(
+    backgroundColor: c.surface,
+    foregroundColor: c.onSurface,
+    elevation: 0,
+    scrolledUnderElevation: 0,
+    centerTitle: true,
+    surfaceTintColor: Colors.transparent,
+    toolbarHeight: 48,
+    titleTextStyle: TextStyle(
+      fontSize: 17,
+      fontWeight: FontWeight.w600,
+      color: c.onSurface,
+      fontFamily: fontFamily,
     ),
+    shape: Border(bottom: BorderSide(color: c.outline, width: 0.5)),
+  );
+}
+
+CardThemeData _buildCardTheme(_ThemeColors c) {
+  return CardThemeData(
+    elevation: 0,
+    color: c.surface,
+    surfaceTintColor: Colors.transparent,
+    margin: EdgeInsets.zero,
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+  );
+}
+
+ElevatedButtonThemeData _buildElevatedButtonTheme(_ThemeColors c) {
+  return ElevatedButtonThemeData(
+    style: ElevatedButton.styleFrom(
+      elevation: 0,
+      backgroundColor: c.primary,
+      foregroundColor: c.onPrimary,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 18),
+    ),
+  );
+}
+
+TextTheme _buildTextTheme(_ThemeColors c, String? fontFamily) {
+  return TextTheme(
+    titleLarge: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: c.onSurface, fontFamily: fontFamily),
+    titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: c.onSurface, fontFamily: fontFamily),
+    titleSmall: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: c.onSurface, fontFamily: fontFamily),
+    bodyLarge: TextStyle(fontSize: 15, color: c.onSurface, fontFamily: fontFamily),
+    bodyMedium: TextStyle(fontSize: 14, color: c.onSurface, fontFamily: fontFamily),
+    bodySmall: TextStyle(fontSize: 12, color: c.onSurfaceVariant, fontFamily: fontFamily),
   );
 }
