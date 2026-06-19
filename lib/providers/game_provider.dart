@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/game_state.dart';
+import '../services/history_service.dart';
 import '../services/log_service.dart';
 import '../services/sound_service.dart';
 import '../utils/constants.dart';
@@ -51,6 +52,11 @@ class GameProvider extends ChangeNotifier {
       _tickTimer?.cancel();
       _saveHighScore();
       _sound.playGameOver();
+      HistoryService.addRecord(
+        score: _state.score,
+        level: _state.level,
+        linesCleared: _state.linesCleared,
+      );
       LogService.info('游戏结束, 得分: ${_state.score}');
     }
   }
@@ -70,6 +76,7 @@ class GameProvider extends ChangeNotifier {
   }
 
   void moveDown() {
+    if (_state.isGameOver) return;
     final prev = _state;
     _state = _state.moveDown();
     _checkSoundEffects(prev);
@@ -78,6 +85,7 @@ class GameProvider extends ChangeNotifier {
   }
 
   void hardDrop() {
+    if (_state.isGameOver) return;
     final prev = _state;
     _state = _state.hardDrop();
     _sound.playHardDrop();

@@ -8,6 +8,7 @@ import 'package:window_manager/window_manager.dart';
 
 import 'pages/game_page.dart';
 import 'providers/game_provider.dart';
+import 'services/history_service.dart';
 import 'services/log_service.dart';
 import 'services/sound_service.dart';
 import 'theme/app_theme.dart';
@@ -34,6 +35,8 @@ Future<void> main() async {
 
   await LogService.init();
   LogService.info('应用启动: ${AppConstants.appName} v${AppConstants.version}');
+
+  await HistoryService.init();
 
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,

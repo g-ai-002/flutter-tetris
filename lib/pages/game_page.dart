@@ -6,6 +6,7 @@ import '../utils/constants.dart';
 import '../widgets/landscape_layout.dart';
 import '../widgets/portrait_layout.dart';
 import '../widgets/sound_menu.dart';
+import 'history_page.dart';
 
 class GamePage extends StatefulWidget {
   const GamePage({super.key});
@@ -77,6 +78,16 @@ class _GamePageState extends State<GamePage> {
             appBar: AppBar(
               title: const Text(AppConstants.appName),
               actions: [
+                IconButton(
+                  icon: const Icon(Icons.emoji_events_outlined),
+                  tooltip: '排行榜',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const HistoryPage()),
+                    );
+                  },
+                ),
                 const SoundMenu(),
                 IconButton(
                   icon: Icon(state.isPaused ? Icons.play_arrow : Icons.pause),

@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_tetris/providers/game_provider.dart';
+import 'package:flutter_tetris/services/history_service.dart';
 import 'package:flutter_tetris/services/sound_service.dart';
 
 void main() {
@@ -12,6 +13,8 @@ void main() {
       SoundService().resetForTest();
       final prefs = await SharedPreferences.getInstance();
       await SoundService().init(prefs);
+      await HistoryService.init();
+      await HistoryService.clearAll();
     });
 
     test('initial state is not game over', () async {
@@ -85,6 +88,20 @@ void main() {
       provider.start();
       provider.dispose();
       // should not throw
+    });
+
+    test('game over saves history record', () async {
+      final prefs = await SharedPreferences.getInstance();
+      final provider = GameProvider(prefs);
+      // simulate game over by hard dropping many times
+      for (var i = 0; i < 500; i++) {
+        if (provider.state.isGameOver) break;
+        provider.hardDrop();
+      }
+      expect(provider.state.isGameOver, true);
+      final records = HistoryService.getRecords();
+      expect(records.length, greaterThanOrEqualTo(1));
+      expect(records.first.score, greaterThanOrEqualTo(0));
     });
   });
 }
