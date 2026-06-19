@@ -61,16 +61,12 @@ class GameProvider extends ChangeNotifier {
     }
   }
 
-  void moveLeft() {
-    final prev = _state;
-    _state = _state.moveLeft();
-    if (_state.currentX != prev.currentX) _sound.playMove();
-    notifyListeners();
-  }
+  void moveLeft() => _moveHorizontal(_state.moveLeft);
+  void moveRight() => _moveHorizontal(_state.moveRight);
 
-  void moveRight() {
+  void _moveHorizontal(GameState Function() moveAction) {
     final prev = _state;
-    _state = _state.moveRight();
+    _state = moveAction();
     if (_state.currentX != prev.currentX) _sound.playMove();
     notifyListeners();
   }
