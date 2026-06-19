@@ -109,27 +109,32 @@ class SoundService {
   static const _musicDurationSec = 8.0;
   static const _musicNoteCount = 8;
 
-  static Uint8List _tone(double freq, double durationSec, double volume) {
-    final numSamples = (_sampleRate * durationSec).toInt();
+  static Uint8List _generateWav(
+    int numSamples,
+    double Function(int i, double t) freqFn,
+    double volume,
+  ) {
     final data = Int16List(numSamples);
     for (var i = 0; i < numSamples; i++) {
       final t = i / _sampleRate;
       final envelope = 1.0 - (i / numSamples);
-      data[i] = (sin(2 * pi * freq * t) * volume * envelope * _maxAmplitude).toInt();
+      data[i] = (sin(2 * pi * freqFn(i, t) * t) * volume * envelope * _maxAmplitude).toInt();
     }
     return _wavBytes(data);
   }
 
+  static Uint8List _tone(double freq, double durationSec, double volume) {
+    final numSamples = (_sampleRate * durationSec).toInt();
+    return _generateWav(numSamples, (_, __) => freq, volume);
+  }
+
   static Uint8List _sweep(double startFreq, double endFreq, double durationSec, double volume) {
     final numSamples = (_sampleRate * durationSec).toInt();
-    final data = Int16List(numSamples);
-    for (var i = 0; i < numSamples; i++) {
-      final t = i / _sampleRate;
-      final freq = startFreq + (endFreq - startFreq) * (i / numSamples);
-      final envelope = 1.0 - (i / numSamples);
-      data[i] = (sin(2 * pi * freq * t) * volume * envelope * _maxAmplitude).toInt();
-    }
-    return _wavBytes(data);
+    return _generateWav(
+      numSamples,
+      (i, _) => startFreq + (endFreq - startFreq) * (i / numSamples),
+      volume,
+    );
   }
 
   static Uint8List _musicLoop() {
