@@ -188,12 +188,12 @@ class GameState {
 
   int _clearLines(List<List<int>> b) {
     var cleared = 0;
-    for (var r = height - 1; r >= 0; r--) {
+    for (var r = b.length - 1; r >= 0; r--) {
       if (b[r].every((cell) => cell != 0)) {
         b.removeAt(r);
         b.insert(0, List.filled(width, 0));
         cleared++;
-        r++; // re-check this row
+        r++;
       }
     }
     return cleared;
