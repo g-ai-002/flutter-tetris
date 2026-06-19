@@ -50,26 +50,14 @@ class BoardPainter extends CustomPainter {
     final ghostY = state.ghostY;
     if (ghostY == state.currentY) return;
     final shape = state.currentPiece.shape;
-    final paint = Paint()
+    final fillPaint = Paint()
       ..color = Color(state.currentPiece.color).withValues(alpha: 0.2)
       ..style = PaintingStyle.fill;
     final borderPaint = Paint()
       ..color = Color(state.currentPiece.color).withValues(alpha: 0.4)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
-    for (var r = 0; r < shape.length; r++) {
-      for (var c = 0; c < shape[r].length; c++) {
-        if (shape[r][c] == 0) continue;
-        final x = (state.currentX + c) * cellSize;
-        final y = (ghostY + r) * cellSize;
-        final rect = RRect.fromRectAndRadius(
-          Rect.fromLTWH(x + 1, y + 1, cellSize - 2, cellSize - 2),
-          const Radius.circular(3),
-        );
-        canvas.drawRRect(rect, paint);
-        canvas.drawRRect(rect, borderPaint);
-      }
-    }
+    _drawShape(canvas, shape, state.currentX, ghostY, fillPaint, borderPaint);
   }
 
   void _drawCurrentPiece(Canvas canvas) {
@@ -81,6 +69,29 @@ class BoardPainter extends CustomPainter {
         if (y < 0) continue;
         _drawCell(canvas, state.currentX + c, state.currentY + r,
             Color(state.currentPiece.color));
+      }
+    }
+  }
+
+  void _drawShape(
+    Canvas canvas,
+    List<List<int>> shape,
+    int offsetX,
+    int offsetY,
+    Paint fillPaint,
+    Paint borderPaint,
+  ) {
+    for (var r = 0; r < shape.length; r++) {
+      for (var c = 0; c < shape[r].length; c++) {
+        if (shape[r][c] == 0) continue;
+        final x = (offsetX + c) * cellSize;
+        final y = (offsetY + r) * cellSize;
+        final rect = RRect.fromRectAndRadius(
+          Rect.fromLTWH(x + 1, y + 1, cellSize - 2, cellSize - 2),
+          const Radius.circular(3),
+        );
+        canvas.drawRRect(rect, fillPaint);
+        canvas.drawRRect(rect, borderPaint);
       }
     }
   }
