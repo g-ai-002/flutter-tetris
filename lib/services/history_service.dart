@@ -124,9 +124,10 @@ class HistoryService {
   }
 
   static void resetForTest() {
-    _instance?._records.clear();
-    _instance?._initialized = false;
-    _instance?._testing = true;
-    _instance?._file = null;
+    _instance ??= HistoryService._();
+    _instance!._records.clear();
+    _instance!._initialized = false;
+    _instance!._testing = true;
+    _instance!._file = null;
   }
 }
