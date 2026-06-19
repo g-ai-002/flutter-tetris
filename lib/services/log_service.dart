@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
+import '../utils/date_format_utils.dart';
 
 class LogService {
   static LogService? _instance;
@@ -19,8 +20,7 @@ class LogService {
     if (_initialized) return;
     final dir = await _getLogDir();
     final now = DateTime.now();
-    final dateStr =
-        '${now.year}${now.month.toString().padLeft(2, '0')}${now.day.toString().padLeft(2, '0')}';
+    final dateStr = DateFormatUtils.formatDate(now);
     final file = File('${dir.path}${Platform.pathSeparator}app_$dateStr.log');
     if (!await file.exists()) await file.create();
     _logFile = file;
@@ -46,9 +46,7 @@ class LogService {
   }
 
   void _write(String level, String message) {
-    final now = DateTime.now();
-    final ts =
-        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}:${now.second.toString().padLeft(2, '0')}.${now.millisecond.toString().padLeft(3, '0')}';
+    final ts = DateFormatUtils.formatTime(DateTime.now());
     final line = '[$ts][$level] $message';
     _buffer.add(line);
     if (_buffer.length > _maxBufferLines) _buffer.removeAt(0);

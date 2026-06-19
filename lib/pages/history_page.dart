@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/history_service.dart';
+import '../utils/date_format_utils.dart';
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -112,10 +113,7 @@ class _RecordTile extends StatelessWidget {
     }
   }
 
-  String _formatDate(DateTime d) {
-    return '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')} '
-        '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
-  }
+  String _formatDate(DateTime d) => DateFormatUtils.formatDateTime(d);
 
   @override
   Widget build(BuildContext context) {
