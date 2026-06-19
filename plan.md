@@ -29,7 +29,7 @@
 ## 版本历史
 
 ### v0.4.1 (PATCH)
-- **状态**: 开发中 🔧
+- **状态**: 已完成 ✅
 - **目标**: 修复 CI 测试挂起 — HistoryService 测试环境无平台通道
 - **任务**:
   - [x] HistoryService 添加 _testing 标志位和 resetForTest 方法
