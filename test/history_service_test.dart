@@ -28,8 +28,8 @@ void main() {
 
   group('HistoryService', () {
     setUp(() async {
+      HistoryService.resetForTest();
       await HistoryService.init();
-      await HistoryService.clearAll();
     });
 
     test('init creates empty records', () {

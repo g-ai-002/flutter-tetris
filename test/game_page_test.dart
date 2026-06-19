@@ -13,10 +13,10 @@ void main() {
     Future<GameProvider> _createProvider() async {
       SharedPreferences.setMockInitialValues({});
       SoundService().resetForTest();
+      HistoryService.resetForTest();
       final prefs = await SharedPreferences.getInstance();
       await SoundService().init(prefs);
       await HistoryService.init();
-      await HistoryService.clearAll();
       return GameProvider(prefs);
     }
 

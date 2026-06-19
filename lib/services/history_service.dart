@@ -36,6 +36,7 @@ class HistoryService {
   File? _file;
   List<GameRecord> _records = [];
   bool _initialized = false;
+  bool _testing = false;
 
   HistoryService._();
 
@@ -46,6 +47,11 @@ class HistoryService {
 
   Future<void> _init() async {
     if (_initialized) return;
+    if (_testing) {
+      _initialized = true;
+      LogService.info('历史记录服务初始化(测试模式)');
+      return;
+    }
     final dir = await _getDataDir();
     _file = File('${dir.path}${Platform.pathSeparator}history.json');
     await _load();
@@ -101,7 +107,7 @@ class HistoryService {
     );
     _instance!._records.add(record);
     _instance!._records.sort((a, b) => b.score.compareTo(a.score));
-    await _instance!._save();
+    if (!_instance!._testing) await _instance!._save();
     LogService.info('保存游戏记录: 分数=$score, 等级=$level, 行数=$linesCleared');
   }
 
@@ -113,7 +119,14 @@ class HistoryService {
   static Future<void> clearAll() async {
     if (_instance == null) return;
     _instance!._records.clear();
-    await _instance!._save();
+    if (!_instance!._testing) await _instance!._save();
     LogService.info('历史记录已清空');
+  }
+
+  static void resetForTest() {
+    _instance?._records.clear();
+    _instance?._initialized = false;
+    _instance?._testing = true;
+    _instance?._file = null;
   }
 }

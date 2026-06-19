@@ -11,10 +11,10 @@ void main() {
     setUp(() async {
       SharedPreferences.setMockInitialValues({});
       SoundService().resetForTest();
+      HistoryService.resetForTest();
       final prefs = await SharedPreferences.getInstance();
       await SoundService().init(prefs);
       await HistoryService.init();
-      await HistoryService.clearAll();
     });
 
     test('initial state is not game over', () async {
