@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_tetris/providers/game_provider.dart';
 import 'package:flutter_tetris/services/history_service.dart';
 import 'package:flutter_tetris/services/sound_service.dart';
+import 'test_utils.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -18,8 +19,7 @@ void main() {
     });
 
     test('initial state is not game over', () async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
+      final provider = await createTestProvider();
       expect(provider.state.isGameOver, false);
       expect(provider.state.isPaused, false);
       expect(provider.state.score, 0);
@@ -27,8 +27,7 @@ void main() {
     });
 
     test('moveLeft and moveRight change position', () async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
+      final provider = await createTestProvider();
       final initialX = provider.state.currentX;
       provider.moveLeft();
       expect(provider.state.currentX, initialX - 1);
@@ -37,24 +36,20 @@ void main() {
     });
 
     test('rotate changes shape', () async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
+      final provider = await createTestProvider();
       provider.rotate();
       expect(provider.state, isNotNull);
     });
 
     test('hardDrop locks piece and spawns new one', () async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
+      final provider = await createTestProvider();
       provider.hardDrop();
-      // after hard drop, game should not be over and state should be valid
       expect(provider.state.isGameOver, false);
       expect(provider.state.currentPiece, isNotNull);
     });
 
     test('togglePause toggles state', () async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
+      final provider = await createTestProvider();
       expect(provider.state.isPaused, false);
       provider.togglePause();
       expect(provider.state.isPaused, true);
@@ -63,9 +58,7 @@ void main() {
     });
 
     test('start resets game over state', () async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
-      // simulate game over by hard dropping many times
+      final provider = await createTestProvider();
       for (var i = 0; i < 500; i++) {
         if (provider.state.isGameOver) break;
         provider.hardDrop();
@@ -77,23 +70,18 @@ void main() {
     });
 
     test('dropIntervalMs decreases with level', () async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
+      final provider = await createTestProvider();
       expect(provider.dropIntervalMs, 800);
     });
 
     test('dispose cancels timer', () async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
+      final provider = await createTestProvider();
       provider.start();
       provider.dispose();
-      // should not throw
     });
 
     test('game over saves history record', () async {
-      final prefs = await SharedPreferences.getInstance();
-      final provider = GameProvider(prefs);
-      // simulate game over by hard dropping many times
+      final provider = await createTestProvider();
       for (var i = 0; i < 500; i++) {
         if (provider.state.isGameOver) break;
         provider.hardDrop();

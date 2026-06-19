@@ -1,26 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_tetris/providers/game_provider.dart';
-import 'package:flutter_tetris/services/history_service.dart';
-import 'package:flutter_tetris/services/sound_service.dart';
 import 'package:flutter_tetris/widgets/status_overlay.dart';
+import 'test_utils.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   group('StatusOverlay', () {
-    Future<GameProvider> _createProvider() async {
-      SharedPreferences.setMockInitialValues({});
-      SoundService().resetForTest();
-      HistoryService.resetForTest();
-      final prefs = await SharedPreferences.getInstance();
-      await SoundService().init(prefs);
-      await HistoryService.init();
-      return GameProvider(prefs);
-    }
-
     Widget buildTestApp(GameProvider provider) {
       return MaterialApp(
         home: ChangeNotifierProvider.value(
@@ -35,14 +23,14 @@ void main() {
     }
 
     testWidgets('shows nothing when playing', (tester) async {
-      final provider = await _createProvider();
+      final provider = await createTestProvider();
       await tester.pumpWidget(buildTestApp(provider));
       expect(find.text('重新开始'), findsNothing);
       expect(find.text('已暂停'), findsNothing);
     });
 
     testWidgets('shows restart button when game over', (tester) async {
-      final provider = await _createProvider();
+      final provider = await createTestProvider();
       for (var i = 0; i < 500; i++) {
         if (provider.state.isGameOver) break;
         provider.hardDrop();
@@ -53,7 +41,7 @@ void main() {
     });
 
     testWidgets('shows paused text when paused', (tester) async {
-      final provider = await _createProvider();
+      final provider = await createTestProvider();
       provider.togglePause();
       await tester.pumpWidget(buildTestApp(provider));
       await tester.pump();
@@ -61,7 +49,7 @@ void main() {
     });
 
     testWidgets('restart button triggers game start', (tester) async {
-      final provider = await _createProvider();
+      final provider = await createTestProvider();
       for (var i = 0; i < 500; i++) {
         if (provider.state.isGameOver) break;
         provider.hardDrop();
