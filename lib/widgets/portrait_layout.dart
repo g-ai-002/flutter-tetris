@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import '../models/game_state.dart';
 import '../providers/game_provider.dart';
 import 'game_board.dart';
-import 'game_controls.dart';
-import 'next_piece_preview.dart';
-import 'score_panel.dart';
-import 'status_overlay.dart';
+import 'layout_helpers.dart';
 
 class PortraitLayout extends StatelessWidget {
   final GameProvider game;
@@ -32,9 +29,7 @@ class PortraitLayout extends StatelessWidget {
       child: Column(
         children: [
           const SizedBox(height: 8),
-          ScorePanel(state: state),
-          const SizedBox(height: 8),
-          NextPiecePreview(state: state),
+          InfoPanel(state: state, spacing: 8),
           const SizedBox(height: 8),
           GameBoard(
             game: game,
@@ -43,13 +38,7 @@ class PortraitLayout extends StatelessWidget {
             boardH: boardH,
             cellSize: cellSize,
           ),
-          StatusOverlay(
-            game: game,
-            isGameOver: state.isGameOver,
-            isPaused: state.isPaused,
-          ),
-          const SizedBox(height: 8),
-          if (!state.isGameOver) GameControls(game: game),
+          ControlArea(game: game, state: state),
           const SizedBox(height: 16),
         ],
       ),

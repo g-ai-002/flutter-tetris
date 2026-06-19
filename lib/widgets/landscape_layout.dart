@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/game_state.dart';
 import '../providers/game_provider.dart';
 import 'game_board.dart';
-import 'game_controls.dart';
-import 'next_piece_preview.dart';
-import 'score_panel.dart';
-import 'status_overlay.dart';
+import 'layout_helpers.dart';
 
 class LandscapeLayout extends StatelessWidget {
   final GameProvider game;
@@ -28,17 +25,7 @@ class LandscapeLayout extends StatelessWidget {
     return Row(
       children: [
         const SizedBox(width: 8),
-        SizedBox(
-          width: 120,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ScorePanel(state: state),
-              const SizedBox(height: 16),
-              NextPiecePreview(state: state),
-            ],
-          ),
-        ),
+        SizedBox(width: 120, child: InfoPanel(state: state)),
         const SizedBox(width: 8),
         GameBoard(
           game: game,
@@ -48,20 +35,7 @@ class LandscapeLayout extends StatelessWidget {
           cellSize: cellSize,
         ),
         const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              StatusOverlay(
-                game: game,
-                isGameOver: state.isGameOver,
-                isPaused: state.isPaused,
-              ),
-              if (!state.isGameOver && !state.isPaused)
-                GameControls(game: game),
-            ],
-          ),
-        ),
+        Expanded(child: ControlArea(game: game, state: state)),
         const SizedBox(width: 8),
       ],
     );
