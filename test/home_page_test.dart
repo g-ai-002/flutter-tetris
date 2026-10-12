@@ -6,7 +6,7 @@ import 'test_utils.dart';
 void main() {
   group('HomePage', () {
     Widget buildTestApp(TestProviders providers) {
-      return MaterialApp(home: providers.wrap(const HomePage()));
+      return providers.app(const HomePage());
     }
 
     testWidgets('renders menu entries and high score', (tester) async {
@@ -35,7 +35,6 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
       expect(find.text('选择游戏模式'), findsOneWidget);
-      providers.game.dispose();
     });
 
     testWidgets('settings button opens the settings page', (tester) async {
@@ -45,7 +44,6 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 400));
       expect(find.text('操控方式'), findsOneWidget);
-      providers.game.dispose();
     });
 
     testWidgets('dark mode toggle updates settings', (tester) async {

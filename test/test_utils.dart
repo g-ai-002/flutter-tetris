@@ -13,14 +13,17 @@ class TestProviders {
 
   const TestProviders(this.game, this.settings);
 
-  /// 同时注入 SettingsProvider 与 GameProvider。
-  Widget wrap(Widget child) {
+  /// 构建测试用 App。
+  ///
+  /// provider 必须放在 [MaterialApp] 之上：Navigator 推入的新路由挂在 Overlay 上，
+  /// 若 provider 位于 `MaterialApp(home: ...)` 内部，新路由将读不到它们。
+  Widget app(Widget home) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<SettingsProvider>.value(value: settings),
         ChangeNotifierProvider<GameProvider>.value(value: game),
       ],
-      child: child,
+      child: MaterialApp(home: home),
     );
   }
 }

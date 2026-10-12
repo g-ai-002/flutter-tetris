@@ -9,7 +9,7 @@ import 'test_utils.dart';
 void main() {
   group('GamePage', () {
     Widget buildTestApp(TestProviders providers) {
-      return MaterialApp(home: providers.wrap(const GamePage()));
+      return providers.app(const GamePage());
     }
 
     testWidgets('renders without crashing', (tester) async {
