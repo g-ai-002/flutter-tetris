@@ -28,6 +28,18 @@
 
 ## 版本历史
 
+### v0.5.1 (PATCH)
+- **状态**: 已完成 ✅
+- **目标**: 构建配置整改，并修复 CI 单元测试失败
+- **任务**:
+  - [x] 构建配置对齐姊妹项目 flutter-snake：Flutter 3.47.7、Dart >=3.13.5、compileSdk/targetSdk=37、minSdk=35、NDK 30.0.16248370、Gradle 9.5.1（华为云镜像）
+  - [x] 补齐 .gitea/workflows/build.yml 与 android/gradle/init-aliyun-mirror.gradle
+  - [x] .github 工作流：metadata 补 checkout 并从 pubspec.yaml 读版本号、Windows 补丁改用 windows/CMakeLists.txt
+  - [x] 收紧 analysis_options lint 规则、.gitignore 增补 .qwen
+  - [x] 修复 test/constants_test.dart 版本号断言未随 v0.5.0 同步导致的 CI 失败
+  - [x] 更新版本号至 0.5.1
+  - [x] 更新 README
+
 ### v0.5.0 (MINOR)
 - **状态**: 已完成 ✅
 - **目标**: 多种游戏模式（限时、挑战）
