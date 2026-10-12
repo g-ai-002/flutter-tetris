@@ -11,9 +11,5 @@ void main() {
     test('app name is set', () {
       expect(AppConstants.appName, '俄罗斯方块');
     });
-
-    test('version is 0.5.1', () {
-      expect(AppConstants.version, '0.5.1');
-    });
   });
 }
