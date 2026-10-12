@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
+import '../providers/settings_provider.dart';
 import '../utils/constants.dart';
 import '../widgets/landscape_layout.dart';
 import '../widgets/portrait_layout.dart';
@@ -68,6 +69,7 @@ class _GamePageState extends State<GamePage> {
 
   @override
   Widget build(BuildContext context) {
+    final controlMode = context.watch<SettingsProvider>().controlMode;
     return Focus(
       focusNode: _focusNode,
       autofocus: true,
@@ -93,11 +95,12 @@ class _GamePageState extends State<GamePage> {
                   icon: const Icon(Icons.grid_view_rounded),
                   tooltip: '切换模式',
                   onPressed: () async {
-                    await Navigator.push(
+                    final changed = await Navigator.push<bool>(
                       context,
                       MaterialPageRoute(builder: (_) => const ModeSelectPage()),
                     );
-                    _focusNode.requestFocus();
+                    if (changed == true) game.start();
+                    if (mounted) _focusNode.requestFocus();
                   },
                 ),
                 const SoundMenu(),
@@ -113,8 +116,18 @@ class _GamePageState extends State<GamePage> {
                 builder: (context, constraints) {
                   final isLandscape = constraints.maxWidth > constraints.maxHeight;
                   return isLandscape
-                      ? LandscapeLayout(game: game, state: state, constraints: constraints)
-                      : PortraitLayout(game: game, state: state, constraints: constraints);
+                      ? LandscapeLayout(
+                          game: game,
+                          state: state,
+                          constraints: constraints,
+                          controlMode: controlMode,
+                        )
+                      : PortraitLayout(
+                          game: game,
+                          state: state,
+                          constraints: constraints,
+                          controlMode: controlMode,
+                        );
                 },
               ),
             ),

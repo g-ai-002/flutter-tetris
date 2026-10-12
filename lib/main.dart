@@ -6,8 +6,9 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
 
-import 'pages/game_page.dart';
+import 'pages/home_page.dart';
 import 'providers/game_provider.dart';
+import 'providers/settings_provider.dart';
 import 'services/history_service.dart';
 import 'services/log_service.dart';
 import 'services/sound_service.dart';
@@ -56,24 +57,30 @@ class TetrisApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final fontFamily = Platform.isWindows ? 'Microsoft YaHei UI' : null;
-    final darkMode = prefs.getBool(AppConstants.prefKeyDarkMode) ?? false;
 
-    return ChangeNotifierProvider(
-      create: (_) => GameProvider(prefs),
-      child: MaterialApp(
-        title: AppConstants.appName,
-        debugShowCheckedModeBanner: false,
-        theme: buildLightTheme(fontFamily: fontFamily),
-        darkTheme: buildDarkTheme(fontFamily: fontFamily),
-        themeMode: darkMode ? ThemeMode.dark : ThemeMode.light,
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [Locale('zh', 'CN')],
-        locale: const Locale('zh', 'CN'),
-        home: const GamePage(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => SettingsProvider(prefs)),
+        ChangeNotifierProvider(create: (_) => GameProvider(prefs)),
+      ],
+      child: Consumer<SettingsProvider>(
+        builder: (context, settings, _) {
+          return MaterialApp(
+            title: AppConstants.appName,
+            debugShowCheckedModeBanner: false,
+            theme: buildLightTheme(fontFamily: fontFamily),
+            darkTheme: buildDarkTheme(fontFamily: fontFamily),
+            themeMode: settings.darkMode ? ThemeMode.dark : ThemeMode.light,
+            localizationsDelegates: const [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [Locale('zh', 'CN')],
+            locale: const Locale('zh', 'CN'),
+            home: const HomePage(),
+          );
+        },
       ),
     );
   }

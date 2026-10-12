@@ -76,7 +76,7 @@ class _ModeCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         onTap: () {
           game.selectMode(mode);
-          Navigator.pop(context);
+          Navigator.pop(context, true);
         },
         child: Padding(
           padding: const EdgeInsets.all(20),

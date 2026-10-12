@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../services/sound_service.dart';
+import 'package:provider/provider.dart';
+import '../providers/settings_provider.dart';
 
-class SoundMenu extends StatefulWidget {
+class SoundMenu extends StatelessWidget {
   const SoundMenu({super.key});
 
   @override
-  State<SoundMenu> createState() => _SoundMenuState();
-}
-
-class _SoundMenuState extends State<SoundMenu> {
-  final SoundService _sound = SoundService();
-
-  @override
   Widget build(BuildContext context) {
+    final settings = context.watch<SettingsProvider>();
     return PopupMenuButton<String>(
-      icon: Icon(_sound.soundEnabled ? Icons.volume_up : Icons.volume_off),
+      icon: Icon(settings.soundEnabled ? Icons.volume_up : Icons.volume_off),
       tooltip: '音效设置',
       itemBuilder: (context) => [
         PopupMenuItem(
@@ -33,9 +27,9 @@ class _SoundMenuState extends State<SoundMenu> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(_sound.soundEnabled ? Icons.music_note : Icons.music_off, size: 20),
+              Icon(settings.soundEnabled ? Icons.music_note : Icons.music_off, size: 20),
               const SizedBox(width: 8),
-              Text(_sound.soundEnabled ? '关闭音效' : '开启音效'),
+              Text(settings.soundEnabled ? '关闭音效' : '开启音效'),
             ],
           ),
         ),
@@ -44,21 +38,19 @@ class _SoundMenuState extends State<SoundMenu> {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(_sound.musicEnabled ? Icons.library_music : Icons.library_music_outlined, size: 20),
+              Icon(settings.musicEnabled ? Icons.library_music : Icons.library_music_outlined, size: 20),
               const SizedBox(width: 8),
-              Text(_sound.musicEnabled ? '关闭音乐' : '开启音乐'),
+              Text(settings.musicEnabled ? '关闭音乐' : '开启音乐'),
             ],
           ),
         ),
       ],
-      onSelected: (value) async {
-        final prefs = await SharedPreferences.getInstance();
+      onSelected: (value) {
         if (value == 'sound') {
-          await _sound.setSoundEnabled(!_sound.soundEnabled, prefs);
+          settings.setSoundEnabled(!settings.soundEnabled);
         } else if (value == 'music') {
-          await _sound.setMusicEnabled(!_sound.musicEnabled, prefs);
+          settings.setMusicEnabled(!settings.musicEnabled);
         }
-        setState(() {});
       },
     );
   }
