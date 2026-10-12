@@ -6,9 +6,6 @@ import '../providers/settings_provider.dart';
 import '../utils/constants.dart';
 import '../widgets/landscape_layout.dart';
 import '../widgets/portrait_layout.dart';
-import '../widgets/sound_menu.dart';
-import 'history_page.dart';
-import 'mode_select_page.dart';
 
 class GamePage extends StatefulWidget {
   const GamePage({super.key});
@@ -82,29 +79,6 @@ class _GamePageState extends State<GamePage> {
               title: Text('${AppConstants.appName} - ${state.gameMode.label}'),
               actions: [
                 IconButton(
-                  icon: const Icon(Icons.emoji_events_outlined),
-                  tooltip: '排行榜',
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const HistoryPage()),
-                    );
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.grid_view_rounded),
-                  tooltip: '切换模式',
-                  onPressed: () async {
-                    final changed = await Navigator.push<bool>(
-                      context,
-                      MaterialPageRoute(builder: (_) => const ModeSelectPage()),
-                    );
-                    if (changed == true) game.start();
-                    if (mounted) _focusNode.requestFocus();
-                  },
-                ),
-                const SoundMenu(),
-                IconButton(
                   icon: Icon(state.isPaused ? Icons.play_arrow : Icons.pause),
                   tooltip: state.isPaused ? '继续' : '暂停',
                   onPressed: () => game.togglePause(),
@@ -114,18 +88,17 @@ class _GamePageState extends State<GamePage> {
             body: SafeArea(
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  final isLandscape = constraints.maxWidth > constraints.maxHeight;
+                  final isLandscape =
+                      constraints.maxWidth > constraints.maxHeight;
                   return isLandscape
                       ? LandscapeLayout(
                           game: game,
                           state: state,
-                          constraints: constraints,
                           controlMode: controlMode,
                         )
                       : PortraitLayout(
                           game: game,
                           state: state,
-                          constraints: constraints,
                           controlMode: controlMode,
                         );
                 },

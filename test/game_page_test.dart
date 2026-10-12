@@ -18,6 +18,15 @@ void main() {
       expect(find.text('俄罗斯方块 - 经典模式'), findsOneWidget);
     });
 
+    testWidgets('app bar keeps only pause action', (tester) async {
+      final providers = await createTestProviders();
+      await tester.pumpWidget(buildTestApp(providers));
+      expect(find.byTooltip('暂停'), findsOneWidget);
+      expect(find.byTooltip('排行榜'), findsNothing);
+      expect(find.byTooltip('切换模式'), findsNothing);
+      expect(find.byTooltip('音效设置'), findsNothing);
+    });
+
     testWidgets('arrow left key moves piece left', (tester) async {
       final providers = await createTestProviders();
       final provider = providers.game;

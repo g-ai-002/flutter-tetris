@@ -2,30 +2,21 @@ import 'package:flutter/material.dart';
 import '../models/game_state.dart';
 import 'next_piece_painter.dart';
 
+/// 下一个方块的紧凑预览，尺寸由 [size] 控制。
 class NextPiecePreview extends StatelessWidget {
   final GameState state;
-  const NextPiecePreview({super.key, required this.state});
+  final double size;
+
+  const NextPiecePreview({super.key, required this.state, this.size = 48});
 
   @override
   Widget build(BuildContext context) {
     if (state.nextPiece == null) return const SizedBox.shrink();
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text('下一个', style: TextStyle(fontSize: 12, color: Colors.grey)),
-            const SizedBox(height: 4),
-            SizedBox(
-              width: 80,
-              height: 80,
-              child: CustomPaint(
-                painter: NextPiecePainter(piece: state.nextPiece!),
-              ),
-            ),
-          ],
-        ),
+    return SizedBox(
+      width: size,
+      height: size,
+      child: CustomPaint(
+        painter: NextPiecePainter(piece: state.nextPiece!),
       ),
     );
   }
