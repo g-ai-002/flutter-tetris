@@ -24,7 +24,7 @@
 
 最低系统要求：
 - Windows 10 及以上
-- Android 14（minSdk=34，targetSdk/compileSdk=36，仅打包 arm64-v8a）
+- Android 15（minSdk=35，targetSdk/compileSdk=37，仅打包 arm64-v8a）
 
 ## 玩法
 
@@ -42,6 +42,12 @@
 
 ## 本地开发
 
+### 环境要求
+
+- Flutter 3.47.7+
+- Android SDK 37+（编译 SDK；最低支持 Android 15，仅覆盖最新 3 个 Android 大版本）
+- Windows 10+
+
 ```bash
 flutter pub get
 flutter analyze
@@ -55,7 +61,7 @@ flutter build windows        # Windows（需在 Windows 上）
 
 ## 技术栈
 
-- Flutter 3.44.1, Material 3
+- Flutter 3.47.7, Material 3
 - provider（状态管理）
 - shared_preferences（最高分持久化）
 - audioplayers（音效与背景音乐）

@@ -19,17 +19,13 @@ android/local.properties
 windows/
 
 # macOS
-macos/Runner/DerivedData/
-macos/Flutter/ephemeral/
+macos/
 
 # iOS
-ios/Pods/
-ios/.symlinks/
-ios/Flutter/Flutter.framework
-ios/Flutter/Flutter.podspec
+ios/
 
 # Linux
-linux/flutter/ephemeral/
+linux/
 
 # Web
 web/
@@ -46,3 +42,5 @@ Thumbs.db
 **/gradle-wrapper.jar
 **/gradlew
 **/gradlew.bat
+
+.qwen

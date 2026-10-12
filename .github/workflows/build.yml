@@ -2,8 +2,6 @@ name: Build and Release
 
 on:
   push:
-    branches:
-      - main
     tags:
       - 'v*'
   workflow_dispatch:
@@ -14,7 +12,7 @@ concurrency:
 
 env:
   JAVA_VERSION: '21'
-  FLUTTER_VERSION: '3.44.1'
+  FLUTTER_VERSION: '3.47.7'
   APP_NAME: ${{ github.event.repository.name }}
 
 jobs:
@@ -25,17 +23,20 @@ jobs:
       app_version: ${{ steps.version.outputs.jversion }}
       project_name: ${{ steps.project.outputs.project_name }}
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
       - name: Prepare package version
         id: version
         shell: bash
         run: |
-          jversion="0.1.0"
+          jversion=$(grep '^version:' pubspec.yaml | awk '{print $2}')
           if [[ "${{ github.ref_type }}" == "tag" ]]; then
             raw_tag="${{ github.ref_name }}"
             version=$(echo "$raw_tag" | sed -E 's/^[vV]//')
             jversion=$(echo "$version" | sed -E 's/^([0-9]+\.[0-9]+(\.[0-9]+)?).*/\1/')
             if [ -z "$jversion" ]; then
-              jversion="0.1.0"
+              jversion=$(grep '^version:' pubspec.yaml | awk '{print $2}')
             fi
           fi
           echo "jversion=$jversion" >> $GITHUB_OUTPUT
@@ -140,23 +141,15 @@ jobs:
       - name: Generate Windows platform files
         run: flutter create --platforms=windows --project-name ${{ needs.metadata.outputs.project_name }} .
 
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Patch audioplayers_windows for MSVC coroutine deprecation
+      - name: Fix audioplayers_windows compile error
         shell: pwsh
         run: |
-          $cmakeFile = 'windows\flutter\ephemeral\.plugin_symlinks\audioplayers_windows\windows\CMakeLists.txt'
-          if (Test-Path $cmakeFile) {
-            $content = Get-Content $cmakeFile -Raw
-            if ($content -notmatch '_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS') {
-              $content = "add_compile_definitions(_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)`n" + $content
-              Set-Content $cmakeFile -Value $content
-              Write-Host "Patched audioplayers_windows CMakeLists.txt"
-            }
-          } else {
-            Write-Host "audioplayers_windows CMakeLists.txt not found, skipping patch"
-          }
+          $content = Get-Content windows\CMakeLists.txt -Raw
+          $content = $content -replace '(cmake_minimum_required\(VERSION [\d.]+\))', "`$1`nadd_compile_options(`"/D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS`")"
+          Set-Content windows\CMakeLists.txt -Value $content -NoNewline
+
+      - name: Install dependencies
+        run: flutter pub get
 
       - name: Build Windows
         run: flutter build windows --release
@@ -222,7 +215,7 @@ jobs:
           prev_tag=$(git tag --sort=-version:refname | grep -v "^$current_tag$" | head -1)
           body_content=""
           if [[ -n "$prev_tag" ]]; then
-            body_content=$(git log --pretty=format:"* %s (%h)" "$prev_tag".."$current_tag" -- . ":(exclude)docs" ":(exclude).github")
+            body_content=$(git log --pretty=format:"* %s (%h)" "$prev_tag".."$current_tag" -- . ":(exclude)docs" ":(exclude).github" ":(exclude).gitea")
           else
             body_content="Initial release."
           fi
