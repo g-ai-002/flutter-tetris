@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- 与 foreground 同形状, 供 Android 13+ 主题图标重新着色 -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M34,39.5h10a2,2 0 0 1 2,2v10a2,2 0 0 1 -2,2h-10a2,2 0 0 1 -2,-2v-10a2,2 0 0 1 2,-2z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M49,39.5h10a2,2 0 0 1 2,2v10a2,2 0 0 1 -2,2h-10a2,2 0 0 1 -2,-2v-10a2,2 0 0 1 2,-2z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M64,39.5h10a2,2 0 0 1 2,2v10a2,2 0 0 1 -2,2h-10a2,2 0 0 1 -2,-2v-10a2,2 0 0 1 2,-2z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M49,54.5h10a2,2 0 0 1 2,2v10a2,2 0 0 1 -2,2h-10a2,2 0 0 1 -2,-2v-10a2,2 0 0 1 2,-2z" />
+</vector>

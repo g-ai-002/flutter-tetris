@@ -4,19 +4,17 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
+    <!-- T 形方块, 格宽 14, 间隙 1, 整体居中于 54,54 (安全区 66dp 内) -->
     <path
-        android:fillColor="#1E88E5"
-        android:pathData="M20,20 L88,20 L88,88 L20,88 Z" />
+        android:fillColor="#FF3FD9FF"
+        android:pathData="M34,39.5h10a2,2 0 0 1 2,2v10a2,2 0 0 1 -2,2h-10a2,2 0 0 1 -2,-2v-10a2,2 0 0 1 2,-2z" />
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M40,35 L68,35 L68,40 L40,40 Z" />
+        android:fillColor="#FF6C8CFF"
+        android:pathData="M49,39.5h10a2,2 0 0 1 2,2v10a2,2 0 0 1 -2,2h-10a2,2 0 0 1 -2,-2v-10a2,2 0 0 1 2,-2z" />
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M40,45 L68,45 L68,50 L40,50 Z" />
+        android:fillColor="#FF8B5CFF"
+        android:pathData="M64,39.5h10a2,2 0 0 1 2,2v10a2,2 0 0 1 -2,2h-10a2,2 0 0 1 -2,-2v-10a2,2 0 0 1 2,-2z" />
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M40,55 L68,55 L68,60 L40,60 Z" />
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M40,65 L68,65 L68,70 L40,70 Z" />
+        android:fillColor="#FF6C8CFF"
+        android:pathData="M49,54.5h10a2,2 0 0 1 2,2v10a2,2 0 0 1 -2,2h-10a2,2 0 0 1 -2,-2v-10a2,2 0 0 1 2,-2z" />
 </vector>
