@@ -43,6 +43,8 @@
 - Windows：`%USERPROFILE%\Documents\FlutterTetris\logs\`
 - Android：`/data/data/com.flutter.tetris/app_flutter/FlutterTetris/logs/`
 
+「设置」→「查看日志」可查看最近日志并一键复制。
+
 ## 本地开发
 
 ### 环境要求
