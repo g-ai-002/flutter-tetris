@@ -1,7 +1,8 @@
-import 'dart:io' show Platform;
+import 'dart:io' show Directory, Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
@@ -34,7 +35,7 @@ Future<void> main() async {
     });
   }
 
-  await LogService.init();
+  await LogService.init(logRoot: _logRoot);
   LogService.info('应用启动: ${AppConstants.appName} v${AppConstants.version}');
 
   await HistoryService.init();
@@ -48,6 +49,18 @@ Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
   await SoundService().init(prefs);
   runApp(TetrisApp(prefs: prefs));
+}
+
+/// 日志根目录：用户文档目录下的 FlutterTetris/logs
+Future<Directory> _logRoot() async {
+  final base = await getApplicationDocumentsDirectory();
+  final dir = Directory(
+    '${base.path}${Platform.pathSeparator}FlutterTetris${Platform.pathSeparator}logs',
+  );
+  if (!await dir.exists()) {
+    await dir.create(recursive: true);
+  }
+  return dir;
 }
 
 class TetrisApp extends StatelessWidget {
