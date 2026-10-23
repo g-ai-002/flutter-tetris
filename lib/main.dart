@@ -51,9 +51,15 @@ Future<void> main() async {
   runApp(TetrisApp(prefs: prefs));
 }
 
-/// 日志根目录：用户文档目录下的 FlutterTetris/logs
+/// 日志根目录：用户文档目录（Android 为应用外部目录）下的 FlutterTetris/logs
 Future<Directory> _logRoot() async {
-  final base = await getApplicationDocumentsDirectory();
+  Directory base;
+  if (Platform.isAndroid) {
+    final ext = await getExternalStorageDirectory();
+    base = ext ?? await getApplicationDocumentsDirectory();
+  } else {
+    base = await getApplicationDocumentsDirectory();
+  }
   final dir = Directory(
     '${base.path}${Platform.pathSeparator}FlutterTetris${Platform.pathSeparator}logs',
   );
