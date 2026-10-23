@@ -1,8 +1,7 @@
-import 'dart:io' show Directory, Platform;
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:window_manager/window_manager.dart';
@@ -10,6 +9,7 @@ import 'package:window_manager/window_manager.dart';
 import 'pages/home_page.dart';
 import 'providers/game_provider.dart';
 import 'providers/settings_provider.dart';
+import 'services/file_system_service.dart';
 import 'services/history_service.dart';
 import 'services/log_service.dart';
 import 'services/sound_service.dart';
@@ -35,7 +35,7 @@ Future<void> main() async {
     });
   }
 
-  await LogService.init(logRoot: _logRoot);
+  await LogService.init(logRoot: FileSystemService.instance.getLogRoot);
   LogService.info('应用启动: ${AppConstants.appName} v${AppConstants.version}');
 
   await HistoryService.init();
@@ -49,24 +49,6 @@ Future<void> main() async {
   final prefs = await SharedPreferences.getInstance();
   await SoundService().init(prefs);
   runApp(TetrisApp(prefs: prefs));
-}
-
-/// 日志根目录：用户文档目录（Android 为应用外部目录）下的 FlutterTetris/logs
-Future<Directory> _logRoot() async {
-  Directory base;
-  if (Platform.isAndroid) {
-    final ext = await getExternalStorageDirectory();
-    base = ext ?? await getApplicationDocumentsDirectory();
-  } else {
-    base = await getApplicationDocumentsDirectory();
-  }
-  final dir = Directory(
-    '${base.path}${Platform.pathSeparator}FlutterTetris${Platform.pathSeparator}logs',
-  );
-  if (!await dir.exists()) {
-    await dir.create(recursive: true);
-  }
-  return dir;
 }
 
 class TetrisApp extends StatelessWidget {

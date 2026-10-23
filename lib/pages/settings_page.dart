@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../providers/settings_provider.dart';
+import '../services/file_system_service.dart';
 import '../services/log_service.dart';
 import '../utils/constants.dart';
 
@@ -178,7 +179,7 @@ class _SettingsPageState extends State<SettingsPage> {
               icon: Icon(Icons.open_in_new, color: theme.colorScheme.primary),
               tooltip: '打开目录',
               onPressed: () async {
-                final ok = await _openDirectory(path);
+                final ok = await FileSystemService.instance.openDirectory(path);
                 if (!ok && mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('当前平台不支持打开目录')),
@@ -189,27 +190,6 @@ class _SettingsPageState extends State<SettingsPage> {
         ],
       ),
     );
-  }
-
-  /// 打开系统文件管理器定位到目录（桌面端），失败返回 false
-  Future<bool> _openDirectory(String path) async {
-    try {
-      if (Platform.isWindows) {
-        await Process.run('explorer.exe', [path]);
-        return true;
-      }
-      if (Platform.isMacOS) {
-        await Process.run('open', [path]);
-        return true;
-      }
-      if (Platform.isLinux) {
-        await Process.run('xdg-open', [path]);
-        return true;
-      }
-    } catch (e, stack) {
-      LogService.error('打开目录失败: $path', e, stack);
-    }
-    return false;
   }
 
   void _copyText(BuildContext context, String text) {
