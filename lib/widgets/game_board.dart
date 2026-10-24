@@ -52,7 +52,9 @@ class _GameBoardState extends State<GameBoard> {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(4),
-        child: GameWidget<TetrisGame>(game: game),
+        // GameWidget 默认 autofocus 会把焦点抢到棋盘上，并对非 KeyboardEvents
+        // 的游戏把所有按键标成 handled，键盘操控因此交给外层 GamePage。
+        child: GameWidget<TetrisGame>(game: game, autofocus: false),
       ),
     );
   }
