@@ -108,9 +108,7 @@ void main() {
       final providers = await createTestProviders();
       final provider = providers.game;
       await tester.pumpWidget(buildTestApp(providers));
-      final boardFinder = find.byType(CustomPaint);
-      expect(boardFinder, findsWidgets);
-      await tester.tap(boardFinder.first);
+      await tester.tap(find.byType(GameBoard));
       await tester.pump();
       expect(provider.state, isNotNull);
     });

@@ -34,12 +34,10 @@ class LandscapeLayout extends StatelessWidget {
                   boardConstraints.maxWidth / state.width,
                   boardConstraints.maxHeight / state.height,
                 );
-                Widget board = GameBoard(
-                  game: game,
-                  state: state,
-                  boardW: cellSize * state.width,
-                  boardH: cellSize * state.height,
-                  cellSize: cellSize,
+                Widget board = SizedBox(
+                  width: cellSize * state.width,
+                  height: cellSize * state.height,
+                  child: GameBoard(game: game),
                 );
                 if (controlMode != ControlMode.buttons) {
                   board = GestureControl(
