@@ -68,7 +68,11 @@ class TetrisBoardComponent extends PositionComponent
     super.onDragEnd(event);
     final delta = _dragDelta;
     _dragDelta = Vector2.zero();
-    if (!gesturesEnabled || delta.length < TetrisInput.swipeThreshold) {
+    if (!gesturesEnabled) {
+      return;
+    }
+    final action = TetrisInput.actionFromDelta(Offset(delta.x, delta.y));
+    if (action == null) {
       return;
     }
 
@@ -76,16 +80,14 @@ class TetrisBoardComponent extends PositionComponent
     if (state.isGameOver || state.isPaused) {
       return;
     }
-    final direction =
-        TetrisInput.directionFromDelta(Offset(delta.x, delta.y));
-    switch (direction) {
-      case SwipeDirection.up:
+    switch (action) {
+      case SwipeAction.rotate:
         provider.rotate();
-      case SwipeDirection.down:
+      case SwipeAction.hardDrop:
         provider.hardDrop();
-      case SwipeDirection.left:
+      case SwipeAction.moveLeft:
         provider.moveLeft();
-      case SwipeDirection.right:
+      case SwipeAction.moveRight:
         provider.moveRight();
     }
   }

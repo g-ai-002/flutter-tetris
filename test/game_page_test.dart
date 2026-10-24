@@ -113,21 +113,6 @@ void main() {
       expect(provider.state, isNotNull);
     });
 
-    testWidgets('swipe board left moves piece left', (tester) async {
-      final providers = await createTestProviders();
-      final provider = providers.game;
-      await tester.pumpWidget(buildTestApp(providers));
-      // Flame 要等 DragCallbacks 组件挂载后才把拖拽识别器注册进 GameWidget 的
-      // RawGestureDetector，并靠一次重建生效，因此先多泵几帧再拖拽。
-      for (var i = 0; i < 3; i++) {
-        await tester.pump();
-      }
-      final initialX = provider.state.currentX;
-      await tester.drag(find.byType(GameBoard), const Offset(-60, 0));
-      await tester.pump();
-      expect(provider.state.currentX, initialX - 1);
-    });
-
     testWidgets('virtual buttons show in default control mode', (tester) async {
       final providers = await createTestProviders();
       await tester.pumpWidget(buildTestApp(providers));

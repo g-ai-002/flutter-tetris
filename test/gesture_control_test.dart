@@ -32,4 +32,35 @@ void main() {
       );
     });
   });
+
+  group('TetrisInput.actionFromDelta', () {
+    test('按主分量映射到游戏动作', () {
+      expect(
+        TetrisInput.actionFromDelta(const Offset(-20, 0)),
+        SwipeAction.moveLeft,
+      );
+      expect(
+        TetrisInput.actionFromDelta(const Offset(20, 0)),
+        SwipeAction.moveRight,
+      );
+      expect(
+        TetrisInput.actionFromDelta(const Offset(0, 20)),
+        SwipeAction.hardDrop,
+      );
+      expect(
+        TetrisInput.actionFromDelta(const Offset(0, -20)),
+        SwipeAction.rotate,
+      );
+      expect(
+        TetrisInput.actionFromDelta(const Offset(30, 8)),
+        SwipeAction.moveRight,
+      );
+    });
+
+    test('位移不足阈值时不产生动作', () {
+      expect(TetrisInput.actionFromDelta(Offset.zero), isNull);
+      expect(TetrisInput.actionFromDelta(const Offset(6, 0)), isNull);
+      expect(TetrisInput.actionFromDelta(const Offset(0, -11)), isNull);
+    });
+  });
 }
