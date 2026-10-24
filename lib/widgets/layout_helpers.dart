@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/game_state.dart';
 import '../providers/game_provider.dart';
 import '../utils/constants.dart';
@@ -54,7 +55,6 @@ class CompactInfoColumn extends StatelessWidget {
 
 class ControlArea extends StatelessWidget {
   final GameProvider game;
-  final GameState state;
   final ControlMode controlMode;
 
   /// 为 true 时虚拟按键横向单行排布（竖屏紧凑布局）。
@@ -63,32 +63,36 @@ class ControlArea extends StatelessWidget {
   const ControlArea({
     super.key,
     required this.game,
-    required this.state,
     this.controlMode = ControlMode.both,
     this.compactControls = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final showButtons = controlMode != ControlMode.gesture;
-    final showHint = controlMode != ControlMode.buttons;
-    final playing = !state.isGameOver && !state.isPaused;
+    return Consumer<GameProvider>(
+      builder: (context, provider, _) {
+        final state = provider.state;
+        final showButtons = controlMode != ControlMode.gesture;
+        final showHint = controlMode != ControlMode.buttons;
+        final playing = !state.isGameOver && !state.isPaused;
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        if (playing && showButtons)
-          GameControls(game: game, singleRow: compactControls),
-        if (playing && showHint)
-          Padding(
-            padding: const EdgeInsets.only(top: 6),
-            child: Text(
-              '点击/上滑旋转 · 左右滑动移动 · 下滑硬降',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-          ),
-      ],
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (playing && showButtons)
+              GameControls(game: provider, singleRow: compactControls),
+            if (playing && showHint)
+              Padding(
+                padding: const EdgeInsets.only(top: 6),
+                child: Text(
+                  '点击/上滑旋转 · 左右滑动移动 · 下滑硬降',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }
