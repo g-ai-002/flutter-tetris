@@ -1,15 +1,19 @@
 import 'package:flame/components.dart';
+import 'package:flame/events.dart';
 import 'package:flutter/material.dart';
 
 import '../models/game_state.dart';
 import '../providers/game_provider.dart';
 import '../utils/constants.dart';
+import 'tetris_input.dart';
 
-/// 棋盘渲染组件：网格、已锁定方块、幽灵块与当前方块。
-class TetrisBoardComponent extends PositionComponent {
+/// 棋盘渲染组件：网格、已锁定方块、幽灵块与当前方块，并处理点击/滑动手势。
+class TetrisBoardComponent extends PositionComponent
+    with TapCallbacks, DragCallbacks {
   TetrisBoardComponent({
     required this.provider,
     required this.gridColor,
+    required this.gesturesEnabled,
     int? priority,
   }) : super(
           priority: priority,
@@ -24,12 +28,73 @@ class TetrisBoardComponent extends PositionComponent {
 
   final GameProvider provider;
   final Color gridColor;
+  final bool gesturesEnabled;
+
+  Vector2 _dragDelta = Vector2.zero();
 
   final Paint _fill = Paint();
   final Paint _stroke = Paint()..style = PaintingStyle.stroke;
   final Paint _grid = Paint();
   final Paint _highlight = Paint()
     ..color = Colors.white.withValues(alpha: 0.25);
+
+  @override
+  void onTapUp(TapUpEvent event) {
+    if (!gesturesEnabled) {
+      return;
+    }
+    final state = provider.state;
+    if (state.isGameOver) {
+      provider.start();
+    } else if (!state.isPaused) {
+      provider.rotate();
+    }
+  }
+
+  @override
+  void onDragStart(DragStartEvent event) {
+    super.onDragStart(event);
+    _dragDelta = Vector2.zero();
+  }
+
+  @override
+  void onDragUpdate(DragUpdateEvent event) {
+    super.onDragUpdate(event);
+    _dragDelta += event.localDelta;
+  }
+
+  @override
+  void onDragEnd(DragEndEvent event) {
+    super.onDragEnd(event);
+    final delta = _dragDelta;
+    _dragDelta = Vector2.zero();
+    if (!gesturesEnabled || delta.length < TetrisInput.swipeThreshold) {
+      return;
+    }
+
+    final state = provider.state;
+    if (state.isGameOver || state.isPaused) {
+      return;
+    }
+    final direction =
+        TetrisInput.directionFromDelta(Offset(delta.x, delta.y));
+    switch (direction) {
+      case SwipeDirection.up:
+        provider.rotate();
+      case SwipeDirection.down:
+        provider.hardDrop();
+      case SwipeDirection.left:
+        provider.moveLeft();
+      case SwipeDirection.right:
+        provider.moveRight();
+    }
+  }
+
+  @override
+  void onDragCancel(DragCancelEvent event) {
+    super.onDragCancel(event);
+    _dragDelta = Vector2.zero();
+  }
 
   @override
   void render(Canvas canvas) {

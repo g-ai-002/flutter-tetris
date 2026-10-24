@@ -2,7 +2,9 @@ import 'dart:math' as math;
 
 import 'package:flame/components.dart';
 import 'package:flame/game.dart';
+import 'package:flame/input.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../models/game_state.dart';
 import '../models/tetromino.dart';
@@ -14,14 +16,14 @@ import 'tetris_world.dart';
 
 /// 基于 Flame 的俄罗斯方块。
 ///
-/// 方块下落由 [FlameGame.update] 驱动（替代原来的两个 Timer），棋盘由
-/// [TetrisBoardComponent] 绘制，消行/落块/结束的反馈由
-/// [TetrisEffectsComponent] 承担；规则仍由 [GameProvider] 持有。
-class TetrisGame extends FlameGame<TetrisWorld> {
+/// 方块下落、键盘/手势输入与暂停/结束浮层都由 Flame 承担；规则仍由
+/// [GameProvider] 持有。
+class TetrisGame extends FlameGame<TetrisWorld> with KeyboardEvents {
   TetrisGame({
     required this.provider,
     required this.surfaceColor,
     required this.gridColor,
+    required this.gesturesEnabled,
   }) : super(
           world: TetrisWorld(),
           camera: CameraComponent.withFixedResolution(
@@ -30,35 +32,92 @@ class TetrisGame extends FlameGame<TetrisWorld> {
           ),
         );
 
+  static const String pauseOverlayId = 'tetrisPause';
+  static const String gameOverOverlayId = 'tetrisGameOver';
+
   final GameProvider provider;
   final Color surfaceColor;
   final Color gridColor;
+  final bool gesturesEnabled;
 
   final math.Random _random = math.Random();
+  final Set<String> _activeOverlays = {};
 
   late final TetrisEffectsComponent _effects;
   late final Vector2 _cameraBase;
 
   double _shakeRemaining = 0;
   double _shakeDuration = 0;
+  double _shakeStrength = 0;
 
   @override
   Color backgroundColor() => surfaceColor;
 
   @override
   Future<void> onLoad() async {
-    _cameraBase = Vector2(size.x / 2, size.y / 2);
+    _cameraBase = Vector2(
+      AppConstants.boardWidth * TetrisBoardComponent.cellSize / 2,
+      AppConstants.boardHeight * TetrisBoardComponent.cellSize / 2,
+    );
     _effects = TetrisEffectsComponent(priority: 5);
     await world.addAll([
       TetrisBoardComponent(
         provider: provider,
         gridColor: gridColor,
+        gesturesEnabled: gesturesEnabled,
         priority: 0,
       ),
       _effects,
     ]);
     camera.viewfinder.position = _cameraBase;
     camera.viewfinder.zoom = 1;
+  }
+
+  @override
+  KeyEventResult onKeyEvent(
+    KeyEvent event,
+    Set<LogicalKeyboardKey> keysPressed,
+  ) {
+    if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
+      return KeyEventResult.ignored;
+    }
+    final key = event.logicalKey;
+    final state = provider.state;
+
+    if (key == LogicalKeyboardKey.keyP) {
+      provider.togglePause();
+      return KeyEventResult.handled;
+    }
+    if (state.isGameOver) {
+      if (key == LogicalKeyboardKey.keyR) {
+        provider.start();
+        return KeyEventResult.handled;
+      }
+      return KeyEventResult.ignored;
+    }
+    if (state.isPaused) {
+      return KeyEventResult.ignored;
+    }
+
+    switch (key) {
+      case LogicalKeyboardKey.arrowLeft:
+        provider.moveLeft();
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowRight:
+        provider.moveRight();
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowDown:
+        provider.moveDown();
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.arrowUp:
+        provider.rotate();
+        return KeyEventResult.handled;
+      case LogicalKeyboardKey.space:
+        provider.hardDrop();
+        return KeyEventResult.handled;
+      default:
+        return KeyEventResult.ignored;
+    }
   }
 
   @override
@@ -80,8 +139,25 @@ class TetrisGame extends FlameGame<TetrisWorld> {
       _effects.landing(before.piece!, before.x, before.y);
     }
 
+    _syncOverlays();
     _updateCamera(dt);
     super.update(dt);
+  }
+
+  void _syncOverlays() {
+    final state = provider.state;
+    _sync(pauseOverlayId, state.isPaused && !state.isGameOver, 100);
+    _sync(gameOverOverlayId, state.isGameOver, 90);
+  }
+
+  void _sync(String id, bool visible, int priority) {
+    if (visible && !_activeOverlays.contains(id)) {
+      overlays.add(id, priority: priority);
+      _activeOverlays.add(id);
+    } else if (!visible && _activeOverlays.contains(id)) {
+      overlays.remove(id);
+      _activeOverlays.remove(id);
+    }
   }
 
   void _shake(double duration, double strength) {
@@ -89,8 +165,6 @@ class TetrisGame extends FlameGame<TetrisWorld> {
     _shakeDuration = duration;
     _shakeStrength = strength;
   }
-
-  double _shakeStrength = 0;
 
   void _updateCamera(double dt) {
     if (_shakeRemaining <= 0) {

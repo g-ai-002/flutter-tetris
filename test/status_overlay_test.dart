@@ -1,66 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter_tetris/providers/game_provider.dart';
-import 'package:flutter_tetris/widgets/status_overlay.dart';
-import 'test_utils.dart';
+import 'package:flutter_tetris/game/overlays/tetris_overlays.dart';
+
+Widget _wrap(Widget child) => MaterialApp(home: Scaffold(body: child));
 
 void main() {
-  TestWidgetsFlutterBinding.ensureInitialized();
+  testWidgets('暂停浮层显示继续并触发回调', (tester) async {
+    var resumed = 0;
+    await tester.pumpWidget(
+      _wrap(TetrisPauseOverlay(onResume: () => resumed++)),
+    );
 
-  group('StatusOverlay', () {
-    Widget buildTestApp(GameProvider provider) {
-      return MaterialApp(
-        home: ChangeNotifierProvider.value(
-          value: provider,
-          child: StatusOverlay(
-            game: provider,
-            isGameOver: provider.state.isGameOver,
-            isPaused: provider.state.isPaused,
-          ),
+    expect(find.text('已暂停'), findsOneWidget);
+    await tester.tap(find.text('继续'));
+    expect(resumed, 1);
+  });
+
+  testWidgets('结束浮层显示标题并可重新开始', (tester) async {
+    var restarted = 0;
+    await tester.pumpWidget(
+      _wrap(
+        TetrisGameOverOverlay(
+          title: '游戏结束',
+          onRestart: () => restarted++,
         ),
-      );
-    }
+      ),
+    );
 
-    testWidgets('shows nothing when playing', (tester) async {
-      final provider = await createTestProvider();
-      await tester.pumpWidget(buildTestApp(provider));
-      expect(find.text('重新开始'), findsNothing);
-      expect(find.text('已暂停'), findsNothing);
-    });
+    expect(find.text('游戏结束'), findsOneWidget);
+    await tester.tap(find.text('重新开始'));
+    expect(restarted, 1);
+  });
 
-    testWidgets('shows restart button when game over', (tester) async {
-      final provider = await createTestProvider();
-      for (var i = 0; i < 500; i++) {
-        if (provider.state.isGameOver) break;
-        provider.hardDrop();
-      }
-      await tester.pumpWidget(buildTestApp(provider));
-      await tester.pump();
-      expect(find.text('重新开始'), findsOneWidget);
-    });
-
-    testWidgets('shows paused text when paused', (tester) async {
-      final provider = await createTestProvider();
-      provider.togglePause();
-      await tester.pumpWidget(buildTestApp(provider));
-      await tester.pump();
-      expect(find.text('已暂停'), findsOneWidget);
-    });
-
-    testWidgets('restart button triggers game start', (tester) async {
-      final provider = await createTestProvider();
-      for (var i = 0; i < 500; i++) {
-        if (provider.state.isGameOver) break;
-        provider.hardDrop();
-      }
-      await tester.pumpWidget(buildTestApp(provider));
-      await tester.pump();
-      expect(provider.state.isGameOver, true);
-      await tester.tap(find.text('重新开始'));
-      await tester.pump();
-      expect(provider.state.isGameOver, false);
-      provider.dispose();
-    });
+  testWidgets('挑战完成标题可复用同一浮层', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        TetrisGameOverOverlay(title: '挑战完成！', onRestart: () {}),
+      ),
+    );
+    expect(find.text('挑战完成！'), findsOneWidget);
   });
 }

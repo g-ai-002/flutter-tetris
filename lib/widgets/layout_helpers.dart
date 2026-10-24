@@ -3,36 +3,8 @@ import '../models/game_state.dart';
 import '../providers/game_provider.dart';
 import '../utils/constants.dart';
 import 'game_controls.dart';
-import 'gesture_control.dart';
 import 'next_piece_preview.dart';
 import 'score_panel.dart';
-import 'status_overlay.dart';
-
-/// 棋盘点击：游戏结束时重新开始，进行中旋转方块。
-void handleBoardTap(GameProvider game) {
-  final state = game.state;
-  if (state.isGameOver) {
-    game.start();
-  } else if (!state.isPaused) {
-    game.rotate();
-  }
-}
-
-/// 棋盘滑动：按方向执行移动/旋转/硬降。
-void handleBoardSwipe(GameProvider game, GestureDirection direction) {
-  final state = game.state;
-  if (state.isGameOver || state.isPaused) return;
-  switch (direction) {
-    case GestureDirection.up:
-      game.rotate();
-    case GestureDirection.down:
-      game.hardDrop();
-    case GestureDirection.left:
-      game.moveLeft();
-    case GestureDirection.right:
-      game.moveRight();
-  }
-}
 
 /// 竖屏顶部紧凑信息条：单行展示分数统计，右侧附带小尺寸下一个方块预览。
 class CompactInfoBar extends StatelessWidget {
@@ -105,11 +77,6 @@ class ControlArea extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        StatusOverlay(
-          game: game,
-          isGameOver: state.isGameOver,
-          isPaused: state.isPaused,
-        ),
         if (playing && showButtons)
           GameControls(game: game, singleRow: compactControls),
         if (playing && showHint)
