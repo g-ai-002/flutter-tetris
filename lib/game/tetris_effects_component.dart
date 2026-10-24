@@ -95,7 +95,7 @@ class TetrisEffectsComponent extends PositionComponent {
 
     for (final spark in _sparks) {
       spark.life -= dt;
-      spark.position += spark.velocity * dt;
+      spark.position.add(spark.velocity * dt);
       spark.velocity.y += 260 * dt;
     }
     _sparks.removeWhere((spark) => spark.life <= 0);
