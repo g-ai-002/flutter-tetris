@@ -30,8 +30,8 @@
 
 ## 版本历史
 
-### v0.7.1 (PATCH) — 当前开发中
-- **状态**: 开发完成（待 CI 验证）
+### v0.7.1 (PATCH)
+- **状态**: 已发布 ✅
 - **目标**: 收窄重建范围，减少棋盘 `GameWidget` 无效重建
 - **任务**:
   - [x] `GamePage` 移除包住 `Scaffold` 的 `Consumer`，AppBar 标题与暂停按钮各自订阅
@@ -230,7 +230,7 @@
 ## 依赖与版本基线
 - Flutter: 3.47.7
 - Dart: 3.13.5（对应 Flutter 3.47.7 内置 Dart SDK）
-- Android SDK: compileSdk=37 / targetSdk=37 / minSdk=35（只保留最新 3 个 Android 大版本），NDK 30.0.16248370
+- Android SDK: compileSdk=37.2 / targetSdk=37 / minSdk=35（只保留最新 3 个 Android 大版本），NDK 30.0.16248370
 - provider: 6.1.5+1
 - flame: 1.38.2
 - shared_preferences: 2.5.6
