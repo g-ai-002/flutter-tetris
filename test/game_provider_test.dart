@@ -1,7 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_tetris/models/game_mode.dart';
-import 'package:flutter_tetris/providers/game_provider.dart';
 import 'package:flutter_tetris/services/history_service.dart';
 import 'package:flutter_tetris/services/sound_service.dart';
 import 'test_utils.dart';

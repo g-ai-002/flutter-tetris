@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_tetris/providers/settings_provider.dart';
 import 'package:flutter_tetris/services/sound_service.dart';
 import 'package:flutter_tetris/utils/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';

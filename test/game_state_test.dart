@@ -105,7 +105,6 @@ void main() {
     });
 
     test('line clear scoring: 1 line at level 1 = 100', () {
-      final state = GameState.initial();
       // fill bottom row except one column, then drop a piece to clear it
       final board = List.generate(20, (r) {
         if (r == 19) {
