@@ -13,6 +13,9 @@ class NextPieceGame extends FlameGame {
   Tetromino? piece;
 
   @override
+  Color backgroundColor() => Colors.transparent;
+
+  @override
   Future<void> onLoad() async {
     await add(_NextPieceComponent(game: this));
   }
