@@ -2,7 +2,7 @@ class AppConstants {
   AppConstants._();
 
   static const String appName = '俄罗斯方块';
-  static const String version = '0.6.5';
+  static const String version = '0.7.0';
 
   static const String prefKeyDarkMode = 'dark_mode';
   static const String prefKeyHighScore = 'high_score';

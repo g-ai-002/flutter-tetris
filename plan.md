@@ -30,6 +30,19 @@
 
 ## 版本历史
 
+### v0.7.0 (MINOR) — 当前开发中
+- **状态**: 开发完成（待 CI 验证）
+- **目标**: 将棋盘渲染与下落主循环迁移到 Flame 引擎
+- **任务**:
+  - [x] 引入 Flame 1.38.2，棋盘改为固定分辨率 World + CameraComponent
+  - [x] 网格/已锁定方块/幽灵块/当前方块拆为 `TetrisBoardComponent`
+  - [x] 消行横闪、落块碎屑、结束红闪与相机抖动拆为 `TetrisEffectsComponent`
+  - [x] 自动下落与限时倒计时由两个 Timer 迁移到 `FlameGame.update(dt)` 累积推进
+  - [x] 棋盘改用 `GameWidget` 承载，保留原有手势/虚拟按键/键盘操控
+  - [x] 删除不再使用的 `BoardPainter`
+  - [x] 版本号 0.6.5 → 0.7.0
+  - [x] 更新 README/plan/versions
+
 ### v0.6.0 (MINOR)
 - **状态**: 已完成 ✅
 - **目标**: 首页与设置页，操控方式可配置
@@ -209,8 +222,9 @@
 - Dart: 3.13.5（对应 Flutter 3.47.7 内置 Dart SDK）
 - Android SDK: compileSdk=37 / targetSdk=37 / minSdk=35（只保留最新 3 个 Android 大版本），NDK 30.0.16248370
 - provider: 6.1.5+1
-- shared_preferences: 2.5.5
-- path_provider: 2.1.5
+- flame: 1.38.2
+- shared_preferences: 2.5.6
+- path_provider: 2.1.6
 - path: 1.9.1
-- window_manager: 0.5.1
-- audioplayers: 6.5.1
+- window_manager: 0.5.2
+- audioplayers: 6.8.1
