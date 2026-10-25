@@ -30,6 +30,10 @@ class TetrisBoardComponent extends PositionComponent {
   final Paint _fill = Paint();
   final Paint _stroke = Paint()..style = PaintingStyle.stroke;
   final Paint _grid = Paint();
+  late final Paint _border = Paint()
+    ..color = gridColor.withValues(alpha: 0.6)
+    ..style = PaintingStyle.stroke
+    ..strokeWidth = 2;
   final Paint _highlight = Paint()
     ..color = Colors.white.withValues(alpha: 0.25);
 
@@ -68,6 +72,9 @@ class TetrisBoardComponent extends PositionComponent {
 
     _drawGhost(canvas, state);
     _drawCurrentPiece(canvas, state);
+
+    // 外边框：让棋盘边界在铺满整页的画布上清晰可辨。
+    canvas.drawRect(Rect.fromLTWH(1, 1, width - 2, height - 2), _border);
   }
 
   void _drawGhost(Canvas canvas, GameState state) {

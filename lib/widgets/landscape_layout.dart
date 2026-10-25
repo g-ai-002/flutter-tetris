@@ -1,15 +1,26 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
 import '../utils/constants.dart';
 import 'layout_helpers.dart';
 
+/// 横屏布局：棋盘严格居中，信息列在左、控制区在右。
+///
+/// 左右两侧用同样的宽度，棋盘才能落在页面正中间。
 class LandscapeLayout extends StatelessWidget {
   final GameProvider game;
   final ControlMode controlMode;
 
   /// 棋盘占位槽位；真正的棋盘由铺满整页的 Flame 画布绘制。
   final Widget boardSlot;
+
+  /// 左右 HUD 区宽度（与方向键簇宽度一致）。
+  static const double _sideWidth = 176;
+
+  /// 侧栏与棋盘之间的留白。
+  static const double _gap = 8;
 
   const LandscapeLayout({
     super.key,
@@ -20,31 +31,52 @@ class LandscapeLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final width = game.state.width;
-    final height = game.state.height;
-    return Padding(
-      padding: const EdgeInsets.all(8),
-      child: Row(
-        children: [
-          Consumer<GameProvider>(
-            builder: (context, provider, _) => IgnorePointer(
-              child: CompactInfoColumn(state: provider.state),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: AspectRatio(
-                aspectRatio: width / height,
-                child: boardSlot,
+    final ratio = game.state.width / game.state.height;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final size = constraints.biggest;
+        final maxHeightByWidth =
+            (size.width - _sideWidth * 2 - _gap * 2) / ratio;
+        final boardHeight = math.max(
+          0.0,
+          math.min(size.height - 24, maxHeightByWidth),
+        );
+        final boardWidth = boardHeight * ratio;
+
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SizedBox(
+              width: _sideWidth,
+              child: Center(
+                child: IgnorePointer(
+                  child: Consumer<GameProvider>(
+                    builder: (context, provider, _) =>
+                        CompactInfoColumn(state: provider.state),
+                  ),
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 8),
-          ControlArea(game: game, controlMode: controlMode),
-        ],
-      ),
+            const SizedBox(width: _gap),
+            Expanded(
+              child: Center(
+                child: SizedBox(
+                  width: boardWidth,
+                  height: boardHeight,
+                  child: boardSlot,
+                ),
+              ),
+            ),
+            const SizedBox(width: _gap),
+            SizedBox(
+              width: _sideWidth,
+              child: Center(
+                child: ControlArea(game: game, controlMode: controlMode),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
