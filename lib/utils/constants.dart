@@ -14,7 +14,7 @@ class AppConstants {
   static const int boardHeight = 20;
 }
 
-/// 操控方式：棋盘手势与底部虚拟按键的组合方式。
+/// 操控方式：屏幕手势与底部虚拟按键的组合方式。
 enum ControlMode {
   both,
   buttons,
@@ -34,11 +34,11 @@ enum ControlMode {
   String get description {
     switch (this) {
       case ControlMode.both:
-        return '点击/滑动棋盘控制，同时显示底部按键';
+        return '点击/滑动屏幕控制，同时显示底部按键';
       case ControlMode.buttons:
-        return '只使用底部方向按键，禁用棋盘手势';
+        return '只使用底部方向按键，禁用屏幕手势';
       case ControlMode.gesture:
-        return '只通过棋盘点击/滑动控制，隐藏底部按键';
+        return '只通过屏幕点击/滑动控制，隐藏底部按键';
     }
   }
 

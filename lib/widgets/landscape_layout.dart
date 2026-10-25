@@ -2,18 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/game_provider.dart';
 import '../utils/constants.dart';
-import 'game_board.dart';
 import 'layout_helpers.dart';
 
 class LandscapeLayout extends StatelessWidget {
   final GameProvider game;
   final ControlMode controlMode;
-  final FocusNode focusNode;
+
+  /// 棋盘占位槽位；真正的棋盘由铺满整页的 Flame 画布绘制。
+  final Widget boardSlot;
 
   const LandscapeLayout({
     super.key,
     required this.game,
-    required this.focusNode,
+    required this.boardSlot,
     this.controlMode = ControlMode.both,
   });
 
@@ -26,8 +27,9 @@ class LandscapeLayout extends StatelessWidget {
       child: Row(
         children: [
           Consumer<GameProvider>(
-            builder: (context, provider, _) =>
-                CompactInfoColumn(state: provider.state),
+            builder: (context, provider, _) => IgnorePointer(
+              child: CompactInfoColumn(state: provider.state),
+            ),
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -35,11 +37,7 @@ class LandscapeLayout extends StatelessWidget {
               alignment: Alignment.bottomCenter,
               child: AspectRatio(
                 aspectRatio: width / height,
-                child: GameBoard(
-                  game: game,
-                  focusNode: focusNode,
-                  gesturesEnabled: controlMode != ControlMode.buttons,
-                ),
+                child: boardSlot,
               ),
             ),
           ),

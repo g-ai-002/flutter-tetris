@@ -10,41 +10,53 @@ import '../models/game_state.dart';
 import '../models/tetromino.dart';
 import '../providers/game_provider.dart';
 import '../utils/constants.dart';
+import 'board_camera.dart';
+import 'canvas_gesture_layer.dart';
 import 'tetris_board_component.dart';
 import 'tetris_effects_component.dart';
+import 'tetris_input.dart';
 import 'tetris_world.dart';
 
 /// 基于 Flame 的俄罗斯方块。
 ///
-/// 方块下落、键盘/手势输入与暂停/结束浮层都由 Flame 承担；规则仍由
-/// [GameProvider] 持有。
+/// 方块下落、键盘输入、触摸手势与暂停/结束浮层都由 Flame 承担；画布铺满整个
+/// 游戏页，棋盘由相机对齐到 Flutter 侧给出的槽位。规则仍由 [GameProvider] 持有。
 class TetrisGame extends FlameGame<TetrisWorld> with KeyboardEvents {
   TetrisGame({
     required this.provider,
     required this.surfaceColor,
     required this.gridColor,
-    required this.gesturesEnabled,
+    this.gesturesEnabled = true,
   }) : super(
           world: TetrisWorld(),
-          camera: CameraComponent.withFixedResolution(
-            width: AppConstants.boardWidth * TetrisBoardComponent.cellSize,
-            height: AppConstants.boardHeight * TetrisBoardComponent.cellSize,
-          ),
+          camera: CameraComponent(),
         );
 
   static const String pauseOverlayId = 'tetrisPause';
   static const String gameOverOverlayId = 'tetrisGameOver';
 
+  static const double _worldWidth =
+      AppConstants.boardWidth * TetrisBoardComponent.cellSize;
+  static const double _worldHeight =
+      AppConstants.boardHeight * TetrisBoardComponent.cellSize;
+
   final GameProvider provider;
   final Color surfaceColor;
   final Color gridColor;
-  final bool gesturesEnabled;
+
+  /// 仅虚拟按键模式下为 false，此时画布手势不响应。
+  bool gesturesEnabled;
 
   final math.Random _random = math.Random();
   final Set<String> _activeOverlays = {};
 
   late final TetrisEffectsComponent _effects;
-  late final Vector2 _cameraBase;
+  late final CanvasGestureLayer _gestures;
+
+  Vector2 _cameraBase = Vector2(_worldWidth / 2, _worldHeight / 2);
+  Size _canvasSize = Size.zero;
+  Rect _boardRect = Rect.zero;
+  double _baseZoom = 1;
 
   double _shakeRemaining = 0;
   double _shakeDuration = 0;
@@ -55,22 +67,95 @@ class TetrisGame extends FlameGame<TetrisWorld> with KeyboardEvents {
 
   @override
   Future<void> onLoad() async {
-    _cameraBase = Vector2(
-      AppConstants.boardWidth * TetrisBoardComponent.cellSize / 2,
-      AppConstants.boardHeight * TetrisBoardComponent.cellSize / 2,
-    );
     _effects = TetrisEffectsComponent(priority: 5);
     await world.addAll([
       TetrisBoardComponent(
         provider: provider,
         gridColor: gridColor,
-        gesturesEnabled: gesturesEnabled,
         priority: 0,
       ),
       _effects,
     ]);
+
+    _gestures = CanvasGestureLayer(
+      onTap: handleTap,
+      onSwipe: handleSwipe,
+    );
+    camera.viewport.add(_gestures);
+
+    _canvasSize = Size(size.x, size.y);
+    _applyCamera();
+  }
+
+  @override
+  void onGameResize(Vector2 size) {
+    super.onGameResize(size);
+    _canvasSize = Size(size.x, size.y);
+    _applyCamera();
+  }
+
+  /// Flutter 侧把棋盘槽位的页面矩形同步过来，相机据此把世界棋盘画在槽位里。
+  void updateBoardLayout({required Rect boardRect, required Size canvasSize}) {
+    if (_boardRect == boardRect && _canvasSize == canvasSize) {
+      return;
+    }
+    _boardRect = boardRect;
+    _canvasSize = canvasSize;
+    _applyCamera();
+  }
+
+  /// 点击画布任意位置：进行中旋转，结束后重新开局。
+  void handleTap() {
+    if (!gesturesEnabled) {
+      return;
+    }
+    final state = provider.state;
+    if (state.isGameOver) {
+      provider.start();
+    } else if (!state.isPaused) {
+      provider.rotate();
+    }
+  }
+
+  /// 画布上的滑动：按位移映射到旋转/硬降/左右移动。
+  void handleSwipe(Offset delta) {
+    if (!gesturesEnabled) {
+      return;
+    }
+    final action = TetrisInput.actionFromDelta(delta);
+    if (action == null) {
+      return;
+    }
+
+    final state = provider.state;
+    if (state.isGameOver || state.isPaused) {
+      return;
+    }
+    switch (action) {
+      case SwipeAction.rotate:
+        provider.rotate();
+      case SwipeAction.hardDrop:
+        provider.hardDrop();
+      case SwipeAction.moveLeft:
+        provider.moveLeft();
+      case SwipeAction.moveRight:
+        provider.moveRight();
+    }
+  }
+
+  void _applyCamera() {
+    if (_boardRect.isEmpty || _canvasSize.isEmpty) {
+      return;
+    }
+    final layout = cameraLayoutForBoard(
+      canvasSize: _canvasSize,
+      boardRect: _boardRect,
+      worldBoardRect: const Rect.fromLTWH(0, 0, _worldWidth, _worldHeight),
+    );
+    _baseZoom = layout.zoom;
+    _cameraBase = layout.position;
+    camera.viewfinder.zoom = _baseZoom;
     camera.viewfinder.position = _cameraBase;
-    camera.viewfinder.zoom = 1;
   }
 
   @override

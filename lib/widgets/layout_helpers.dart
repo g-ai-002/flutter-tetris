@@ -82,12 +82,14 @@ class ControlArea extends StatelessWidget {
             if (playing && showButtons)
               GameControls(game: provider, singleRow: compactControls),
             if (playing && showHint)
-              Padding(
-                padding: const EdgeInsets.only(top: 6),
-                child: Text(
-                  '点击/上滑旋转 · 左右滑动移动 · 下滑硬降',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodySmall,
+              IgnorePointer(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text(
+                    '屏幕任意位置：点击/上滑旋转 · 左右滑动移动 · 下滑硬降',
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
                 ),
               ),
           ],
