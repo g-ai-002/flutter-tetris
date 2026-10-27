@@ -31,9 +31,11 @@
 | minSdk                                    | 35                                 |
 | NDK                                       | 30.0.16248370                      |
 | Java (source/target)                      | 21                                 |
-| 目标平台                                  | Android (arm64-v8a)、Windows (x64) |
+| 目标平台                                  | Android (arm64-v8a)、Windows (x64)、Web (浏览器) |
 
-发布产物：Android APK（`android-arm64`）与 Windows ZIP（`windows-x86_64`），由 GitHub Actions 与 Gitea Actions 双流水线构建。
+发布产物：Android APK（`android-arm64`）、Windows ZIP（`windows-x86_64`）与
+Web ZIP（`web`，GitHub Pages 另发布多版本在线试玩站点），由 GitHub Actions
+与 Gitea Actions 双流水线构建。
 
 ---
 

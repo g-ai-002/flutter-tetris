@@ -44,6 +44,8 @@ class GameBoard extends StatelessWidget {
         TetrisGame.pauseOverlayId: (context, _) => TetrisPauseOverlay(
               onResume: () {
                 gameProvider.togglePause();
+                // 主循环在暂停时已停，浮层按钮需要显式恢复。
+                game.resumeFromOverlay();
                 focusNode.requestFocus();
               },
             ),
@@ -51,6 +53,7 @@ class GameBoard extends StatelessWidget {
               title: _resultTitle(gameProvider.state),
               onRestart: () {
                 gameProvider.start();
+                game.resumeFromOverlay();
                 focusNode.requestFocus();
               },
             ),

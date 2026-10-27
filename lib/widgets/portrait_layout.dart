@@ -14,6 +14,9 @@ class PortraitLayout extends StatelessWidget {
   /// 棋盘占位槽位；真正的棋盘由铺满整页的 Flame 画布绘制。
   final Widget boardSlot;
 
+  /// 叠加在棋盘顶部的开局提示（数秒后自行淡出）。
+  final Widget? hint;
+
   /// 上下留给信息条/控制区的对称高度，保证棋盘居中后 HUD 不压到棋盘。
   static const double _reserve = 88;
 
@@ -25,6 +28,7 @@ class PortraitLayout extends StatelessWidget {
     required this.game,
     required this.boardSlot,
     this.controlMode = ControlMode.both,
+    this.hint,
   });
 
   @override
@@ -48,7 +52,13 @@ class PortraitLayout extends StatelessWidget {
               child: SizedBox(
                 width: boardWidth,
                 height: boardHeight,
-                child: boardSlot,
+                child: Stack(
+                  children: [
+                    boardSlot,
+                    if (hint != null)
+                      Positioned(top: 8, left: 8, right: 8, child: hint!),
+                  ],
+                ),
               ),
             ),
             Positioned(

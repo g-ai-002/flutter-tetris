@@ -1,41 +1,27 @@
-import 'dart:io' show Platform;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:window_manager/window_manager.dart';
 
 import 'pages/home_page.dart';
 import 'providers/game_provider.dart';
 import 'providers/settings_provider.dart';
-import 'services/file_system_service.dart';
 import 'services/history_service.dart';
 import 'services/log_service.dart';
+import 'services/logging_init.dart';
 import 'services/sound_service.dart';
 import 'theme/app_theme.dart';
 import 'utils/constants.dart';
+import 'utils/window_setup.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  if (Platform.isWindows) {
-    await windowManager.ensureInitialized();
-    const opts = WindowOptions(
-      size: Size(420, 720),
-      minimumSize: Size(360, 520),
-      center: true,
-      skipTaskbar: false,
-      titleBarStyle: TitleBarStyle.normal,
-      title: AppConstants.appName,
-    );
-    windowManager.waitUntilReadyToShow(opts, () async {
-      await windowManager.show();
-      await windowManager.focus();
-    });
-  }
+  await setupDesktopWindow();
 
-  await LogService.init(logRoot: FileSystemService.instance.getLogRoot);
+  await initLogging();
   LogService.info('应用启动: ${AppConstants.appName} v${AppConstants.version}');
 
   await HistoryService.init();
@@ -57,7 +43,9 @@ class TetrisApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fontFamily = Platform.isWindows ? 'Microsoft YaHei UI' : null;
+    final fontFamily = !kIsWeb && defaultTargetPlatform == TargetPlatform.windows
+        ? 'Microsoft YaHei UI'
+        : null;
 
     return MultiProvider(
       providers: [

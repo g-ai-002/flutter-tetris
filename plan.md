@@ -23,6 +23,7 @@
 - [x] 首页与设置页（外观/音效/操控方式集中管理）
 - [x] 操控方式可配置（手势 + 虚拟按键 / 仅虚拟按键 / 仅手势）
 - [x] 画布铺满整页：棋盘严格居中、带外边框，手势覆盖整屏
+- [x] Web 平台：条件导入隔离平台能力，GitHub Pages 多版本在线试玩
 
 ## 短期目标
 - 持续按 prompt.md 的版本节奏：新功能 → patch 修复 → patch 重构
@@ -30,6 +31,22 @@
 ---
 
 ## 版本历史
+
+### Web 平台支持轮次（未升版本号，2026-10-27）
+- **状态**: 已完成 ✅
+- **目标**: 支持 Web 平台、GitHub Pages 多版本部署，并顺带优化静态网格绘制与暂停开销
+- **任务**:
+  - [x] `LogService` 拆条件导出 + `_io`/`_web`，Web 端改为内存环形缓冲；`init` 的 `logRoot` 改为可选
+  - [x] `FileSystemService` 拆 `_io`/`_web`，公开 API 改为 `getLogRootPath()` / `getUserRootPath()` / `openDirectory()`，Web 返回空串/false
+  - [x] 新增 `logging_init` 与 `window_setup` 条件实现，`main.dart` 不再直接依赖 `dart:io` 与 `window_manager`
+  - [x] `HistoryService` 拆 `_io`/`_web`，`GameRecord` 提取到 `models/game_record.dart`，Web 端用 SharedPreferences
+  - [x] 设置页改用 `isDesktopPlatform`，Web 隐藏日志目录与「打开目录」，新增按平台自适应的操作提示
+  - [x] 棋盘网格线与外边框缓存为 `ui.Picture`，按 width/height/gridColor 失效重建，`onRemove` 释放
+  - [x] 暂停/结算时 `pauseEngine()`，恢复时由 provider 监听与浮层回调显式 `resumeEngine()`，用 `_enginePaused` 去重
+  - [x] `.github/workflows/build.yml` 新增 build-web（tag 发 `v<版本>/`，其余发 `debug/`），生成版本索引页与 `versions.json`，release 附带 `-web.zip`
+  - [x] 新增 `.github/pages/index.template.html`（俄罗斯方块标题与操作说明）
+  - [x] `.gitea/workflows/build.yml` 新增 build-web，仅打包 `-web.zip` 并归档到 Release
+  - [x] 更新 README / plan / versions，不升版本号
 
 ### v0.8.0 (MINOR)
 - **状态**: 已发布 ✅

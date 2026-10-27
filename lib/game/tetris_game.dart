@@ -53,6 +53,12 @@ class TetrisGame extends FlameGame<TetrisWorld> with KeyboardEvents {
   late final TetrisEffectsComponent _effects;
   late final CanvasGestureLayer _gestures;
 
+  /// 主循环是否已因暂停/结算停掉，避免重复调用 [pauseEngine]。
+  bool _enginePaused = false;
+
+  /// 组件树是否已加载完成，加载前不碰主循环与 provider 监听。
+  bool _ready = false;
+
   Vector2 _cameraBase = Vector2(_worldWidth / 2, _worldHeight / 2);
   Size _canvasSize = Size.zero;
   Rect _boardRect = Rect.zero;
@@ -85,6 +91,50 @@ class TetrisGame extends FlameGame<TetrisWorld> with KeyboardEvents {
 
     _canvasSize = Size(size.x, size.y);
     _applyCamera();
+    _ready = true;
+    provider.addListener(_handleProviderChange);
+  }
+
+  @override
+  void onRemove() {
+    detachProvider();
+    super.onRemove();
+  }
+
+  /// 断开对 provider 的监听；GameWidget 销毁时显式调用一次。
+  void detachProvider() {
+    provider.removeListener(_handleProviderChange);
+  }
+
+  /// 暂停后主循环已停，必须靠 provider 通知才能收到「继续」并重启。
+  void _handleProviderChange() {
+    if (!_ready) return;
+    final state = provider.state;
+    if (!state.isPaused && !state.isGameOver) {
+      _resumeEngine();
+    }
+  }
+
+  /// 浮层的「继续 / 重新开始」回调里显式恢复主循环（与监听互为兜底）。
+  void resumeFromOverlay() {
+    _resumeEngine();
+  }
+
+  void _resumeEngine() {
+    if (!_enginePaused) return;
+    _enginePaused = false;
+    resumeEngine();
+  }
+
+  /// 暂停或结算浮层已显示时停掉主循环，画面完全静止后不再逐帧重绘。
+  void _syncEnginePause() {
+    final state = provider.state;
+    final shouldPause = state.isPaused ||
+        (state.isGameOver && _activeOverlays.contains(gameOverOverlayId));
+    if (shouldPause && !_enginePaused) {
+      _enginePaused = true;
+      pauseEngine();
+    }
   }
 
   @override
@@ -227,6 +277,7 @@ class TetrisGame extends FlameGame<TetrisWorld> with KeyboardEvents {
     _syncOverlays();
     _updateCamera(dt);
     super.update(dt);
+    _syncEnginePause();
   }
 
   void _syncOverlays() {

@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
 
@@ -7,7 +9,8 @@ import '../utils/constants.dart';
 
 /// 棋盘渲染组件：网格、已锁定方块、幽灵块与当前方块。
 ///
-/// 点击/滑动手势由 TetrisGame 的画布手势层处理，所以这里只负责绘制。
+/// 网格线与外边框在一局内几乎不变，缓存成 [ui.Picture] 后每帧只回放绘制
+/// 指令；棋盘尺寸或网格配色变化时自动重建。
 class TetrisBoardComponent extends PositionComponent {
   TetrisBoardComponent({
     required this.provider,
@@ -37,11 +40,49 @@ class TetrisBoardComponent extends PositionComponent {
   final Paint _highlight = Paint()
     ..color = Colors.white.withValues(alpha: 0.25);
 
+  ui.Picture? _gridPicture;
+  double _cachedWidth = -1;
+  double _cachedHeight = -1;
+  Color? _cachedGridColor;
+
+  bool get _gridNeedsRebuild =>
+      _gridPicture == null ||
+      _cachedWidth != width ||
+      _cachedHeight != height ||
+      _cachedGridColor != gridColor;
+
   @override
   void render(Canvas canvas) {
     final state = provider.state;
     final width = state.width * cellSize;
     final height = state.height * cellSize;
+
+    if (_gridNeedsRebuild) {
+      _gridPicture?.dispose();
+      _gridPicture = _buildGridPicture(state, width, height);
+      _cachedWidth = width;
+      _cachedHeight = height;
+      _cachedGridColor = gridColor;
+    }
+    canvas.drawPicture(_gridPicture!);
+
+    for (var row = 0; row < state.height; row++) {
+      for (var col = 0; col < state.width; col++) {
+        final color = state.board[row][col];
+        if (color != 0) {
+          _drawCell(canvas, col, row, Color(color));
+        }
+      }
+    }
+
+    _drawGhost(canvas, state);
+    _drawCurrentPiece(canvas, state);
+  }
+
+  /// 静态图层：网格线与外边框。
+  ui.Picture _buildGridPicture(GameState state, double width, double height) {
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
 
     _grid
       ..color = gridColor
@@ -61,20 +102,10 @@ class TetrisBoardComponent extends PositionComponent {
       );
     }
 
-    for (var row = 0; row < state.height; row++) {
-      for (var col = 0; col < state.width; col++) {
-        final color = state.board[row][col];
-        if (color != 0) {
-          _drawCell(canvas, col, row, Color(color));
-        }
-      }
-    }
-
-    _drawGhost(canvas, state);
-    _drawCurrentPiece(canvas, state);
-
     // 外边框：让棋盘边界在铺满整页的画布上清晰可辨。
     canvas.drawRect(Rect.fromLTWH(1, 1, width - 2, height - 2), _border);
+
+    return recorder.endRecording();
   }
 
   void _drawGhost(Canvas canvas, GameState state) {
@@ -155,4 +186,11 @@ class TetrisBoardComponent extends PositionComponent {
         ),
         const Radius.circular(3),
       );
+
+  @override
+  void onRemove() {
+    _gridPicture?.dispose();
+    _gridPicture = null;
+    super.onRemove();
+  }
 }

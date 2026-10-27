@@ -1,5 +1,5 @@
 name: flutter_tetris
-description: 俄罗斯方块游戏 - 跨 Android 与 Windows 平台
+description: 俄罗斯方块游戏 - 跨 Android、Windows 与 Web 平台
 publish_to: 'none'
 version: 0.8.0
 

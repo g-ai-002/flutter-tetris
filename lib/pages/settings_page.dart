@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -6,6 +5,8 @@ import '../providers/settings_provider.dart';
 import '../services/file_system_service.dart';
 import '../services/log_service.dart';
 import '../utils/constants.dart';
+import '../utils/game_hints.dart';
+import '../utils/platform_info.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -33,13 +34,16 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _loadLogDir() async {
-    final filePath = LogService.logFilePath;
-    if (!mounted) return;
-    setState(() => _logDir = filePath.isEmpty ? '' : File(filePath).parent.path);
+    try {
+      final path = await FileSystemService.instance.getLogRootPath();
+      if (!mounted) return;
+      setState(() => _logDir = path);
+    } catch (e, stack) {
+      LogService.error('读取日志目录失败', e, stack);
+    }
   }
 
-  bool get _canOpenDir =>
-      Platform.isWindows || Platform.isMacOS || Platform.isLinux;
+  bool get _canOpenDir => isDesktopPlatform;
 
   @override
   Widget build(BuildContext context) {
@@ -105,6 +109,27 @@ class _SettingsPageState extends State<SettingsPage> {
             );
           }),
           const Divider(),
+          // 操作提示：按平台讲键盘或触屏
+          const _SectionHeader(title: '操作提示'),
+          _buildHintTile(
+            theme,
+            icon: Icons.open_with,
+            title: '移动与旋转',
+            hint: GameHints.movement,
+          ),
+          _buildHintTile(
+            theme,
+            icon: Icons.vertical_align_bottom,
+            title: '硬降',
+            hint: GameHints.hardDrop,
+          ),
+          _buildHintTile(
+            theme,
+            icon: Icons.pause_circle_outline,
+            title: '暂停与重开',
+            hint: GameHints.pause,
+          ),
+          const Divider(),
           // 关于
           const _SectionHeader(title: '关于'),
           ListTile(
@@ -112,7 +137,14 @@ class _SettingsPageState extends State<SettingsPage> {
             title: const Text('版本'),
             trailing: const Text(AppConstants.version),
           ),
-          // 日志目录
+          if (isWebPlatform)
+            ListTile(
+              leading: Icon(Icons.public, color: colorScheme.primary),
+              title: const Text('运行平台'),
+              subtitle: const Text('Web 版日志保存在内存中，刷新页面后清空'),
+              trailing: const Text('Web'),
+            ),
+          // 日志目录（Web 端没有可写目录，隐藏）
           if (_logDir.isNotEmpty)
             _buildDirTile(
               theme,
@@ -133,6 +165,24 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           const SizedBox(height: 32),
         ],
+      ),
+    );
+  }
+
+  Widget _buildHintTile(
+    ThemeData theme, {
+    required IconData icon,
+    required String title,
+    required String hint,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: theme.colorScheme.primary),
+      title: Text(title),
+      subtitle: Text(
+        hint,
+        style: theme.textTheme.bodySmall?.copyWith(
+          color: theme.colorScheme.onSurfaceVariant,
+        ),
       ),
     );
   }

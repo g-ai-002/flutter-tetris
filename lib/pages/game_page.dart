@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -5,6 +7,7 @@ import '../game/tetris_game.dart';
 import '../providers/game_provider.dart';
 import '../providers/settings_provider.dart';
 import '../utils/constants.dart';
+import '../utils/game_hints.dart';
 import '../widgets/board_slot.dart';
 import '../widgets/game_board.dart';
 import '../widgets/landscape_layout.dart';
@@ -22,6 +25,8 @@ class _GamePageState extends State<GamePage> {
   final FocusNode _focusNode = FocusNode();
   TetrisGame? _game;
   Brightness? _brightness;
+  Timer? _hintTimer;
+  bool _showHint = true;
 
   @override
   void initState() {
@@ -30,6 +35,17 @@ class _GamePageState extends State<GamePage> {
       if (mounted) {
         _focusNode.requestFocus();
       }
+    });
+    _showHintFor(const Duration(seconds: 6));
+  }
+
+  /// 开局提示只展示几秒，随后淡出，避免长期遮挡棋盘。
+  void _showHintFor(Duration duration) {
+    _hintTimer?.cancel();
+    _showHint = true;
+    _hintTimer = Timer(duration, () {
+      if (!mounted) return;
+      setState(() => _showHint = false);
     });
   }
 
@@ -44,6 +60,7 @@ class _GamePageState extends State<GamePage> {
       return;
     }
 
+    _game?.detachProvider();
     _brightness = brightness;
     final colors = Theme.of(context).colorScheme;
     _game = TetrisGame(
@@ -55,6 +72,8 @@ class _GamePageState extends State<GamePage> {
 
   @override
   void dispose() {
+    _hintTimer?.cancel();
+    _game?.detachProvider();
     _focusNode.dispose();
     super.dispose();
   }
@@ -77,6 +96,7 @@ class _GamePageState extends State<GamePage> {
       return const Scaffold();
     }
     tetris.gesturesEnabled = controlMode != ControlMode.buttons;
+    final hint = _buildHint();
 
     return Scaffold(
       appBar: AppBar(
@@ -130,16 +150,47 @@ class _GamePageState extends State<GamePage> {
                           game: provider,
                           controlMode: controlMode,
                           boardSlot: boardSlot,
+                          hint: hint,
                         )
                       : PortraitLayout(
                           game: provider,
                           controlMode: controlMode,
                           boardSlot: boardSlot,
+                          hint: hint,
                         );
                 },
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// 棋盘顶部的开局提示：按平台讲键盘或触屏，数秒后淡出。
+  Widget _buildHint() {
+    final colorScheme = Theme.of(context).colorScheme;
+    return IgnorePointer(
+      child: AnimatedOpacity(
+        opacity: _showHint ? 1 : 0,
+        duration: const Duration(milliseconds: 500),
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          decoration: BoxDecoration(
+            color: colorScheme.surface.withValues(alpha: 0.75),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: colorScheme.outline.withValues(alpha: 0.25),
+            ),
+          ),
+          child: Text(
+            GameHints.inGame,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                ),
+          ),
         ),
       ),
     );
