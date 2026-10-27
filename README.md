@@ -101,7 +101,7 @@ flutter build windows        # Windows（需在 Windows 上）
 构建 Web 版（`--base-href` 需与线上路径一致，否则资源 404）：
 
 ```bash
-flutter build web --release --base-href /flutter-tetris/v0.8.0/
+flutter build web --release --base-href /flutter-tetris/v0.9.0/
 ```
 
 ### 平台能力隔离
@@ -129,7 +129,7 @@ flutter build web --release --base-href /flutter-tetris/v0.8.0/
 
 ## 版本历史
 
-- **v0.8.x（Web 支持轮次，未升版本号）**：新增 Web 平台与条件导入（日志、文件系统、历史记录、窗口初始化）、GitHub Pages 多版本站点与 Gitea Web ZIP 产物；棋盘网格与外边框烘焙为 `Picture`；暂停/结算停掉 Flame 主循环；新增按平台自适应的操作提示。
+- **v0.9.0**：新增 Web 平台与条件导入（日志、文件系统、历史记录、窗口初始化）、GitHub Pages 多版本站点与 Gitea Web ZIP 产物；棋盘网格与外边框烘焙为 `Picture`；暂停/结算停掉 Flame 主循环；新增按平台自适应的操作提示。
 - **v0.8.x**：画布铺满整页 + 全屏手势；棋盘严格居中并新增外边框。
 - **v0.7.1**：渲染性能优化。`GamePage` 移除包住 `Scaffold` 的 `Consumer`，AppBar、横竖屏布局、信息面板与控制区各自订阅，棋盘 `GameWidget` 不再随每次下落/按键重建。
 - **v0.7.x**：迁移到 Flame 引擎。棋盘改为固定分辨率 World + 组件化渲染，自动下落与限时倒计时改由 `FlameGame.update` 驱动，新增消行横闪、落块碎屑、结束红闪与相机抖动。
