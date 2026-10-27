@@ -1,0 +1,35 @@
+{
+  "name": "俄罗斯方块游戏",
+  "short_name": "俄罗斯方块游戏",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#17181B",
+  "theme_color": "#1E88E5",
+  "description": "俄罗斯方块游戏 - 跨 Android、Windows 与 Web 平台",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "icons/Icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/Icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/Icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "icons/Icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
