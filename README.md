@@ -80,7 +80,7 @@ Pages 首次使用需在仓库 Settings → Pages 里把发布来源设为 `gh-p
 
 ### 环境要求
 
-- Flutter 3.47.7+
+- Flutter 3.47.8+
 - Android SDK 37+（编译 SDK；最低支持 Android 15，仅覆盖最新 3 个 Android 大版本）
 - Windows 10+
 - 浏览器（Chrome / Edge / Safari 均可运行 Web 版）
@@ -119,7 +119,7 @@ flutter build web --release --base-href /flutter-tetris/v0.9.0/
 
 ## 技术栈
 
-- Flutter 3.47.7, Material 3（Android / Windows / Web）
+- Flutter 3.47.8, Material 3（Android / Windows / Web）
 - provider（状态管理）
 - shared_preferences（最高分与 Web 历史记录）
 - audioplayers（音效与背景音乐）
