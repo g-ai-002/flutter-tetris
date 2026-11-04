@@ -8,6 +8,7 @@ import 'game_mode.dart';
 import 'scoring.dart';
 import 'srs.dart';
 import 'tetromino.dart';
+import 'tspin.dart';
 
 /// 对局状态。
 enum GameStatus { ready, playing, paused, over }
@@ -446,8 +447,13 @@ class TetrisController extends ChangeNotifier {
   void _lockPiece() {
     final current = _piece;
     if (current == null) return;
-    final tSpin = _detectTSpin(current);
-    final mini = tSpin && _isMiniTSpin(current);
+    final spin = detectTSpin(
+      board: board,
+      piece: current,
+      lastActionRotate: _lastActionRotate,
+    );
+    final tSpin = spin.isTSpin;
+    final mini = spin.isMini;
     final blocks = current.blocks;
     board.lock(blocks, current.type);
     _piece = null;
@@ -467,6 +473,10 @@ class TetrisController extends ChangeNotifier {
 
     final rows = board.fullRows();
     if (rows.isEmpty) {
+      // 零消 T-Spin 不计连击，但仍有基础分。
+      if (tSpin) {
+        _score += clearScore(lines: 0, level: _level, tSpin: true, mini: mini);
+      }
       _combo = 0;
       _events.add(GameEvent.lock);
       _spawnNext();
@@ -528,47 +538,6 @@ class TetrisController extends ChangeNotifier {
     _completedAt = null;
     _spawnNext();
     notifyListeners();
-  }
-
-  /// 三角检测：T 形方块落定时以中心格为基准的四个角。
-  bool _detectTSpin(ActivePiece current) {
-    if (current.type != TetrominoType.t || !_lastActionRotate) return false;
-    final corners = _cornersOf(current);
-    var occupied = 0;
-    for (final point in corners) {
-      if (_isBlocked(point.$1, point.$2)) occupied++;
-    }
-    return occupied >= 3;
-  }
-
-  /// 前两个角没有同时被占据时算 T-Spin Mini。
-  bool _isMiniTSpin(ActivePiece current) {
-    final corners = _cornersOf(current);
-    final fronts = switch (current.rotation) {
-      0 => [corners[0], corners[1]],
-      1 => [corners[1], corners[3]],
-      2 => [corners[2], corners[3]],
-      _ => [corners[0], corners[2]],
-    };
-    final filled = fronts.where((p) => _isBlocked(p.$1, p.$2)).length;
-    return filled < 2;
-  }
-
-  List<(int, int)> _cornersOf(ActivePiece current) {
-    final cx = current.x + 1;
-    final cy = current.y + 1;
-    return [
-      (cx - 1, cy - 1),
-      (cx + 1, cy - 1),
-      (cx - 1, cy + 1),
-      (cx + 1, cy + 1),
-    ];
-  }
-
-  bool _isBlocked(int x, int y) {
-    if (x < 0 || x >= board.columns || y >= board.rows) return true;
-    if (y < 0) return false;
-    return board.isFilled(x, y);
   }
 
   void _end({

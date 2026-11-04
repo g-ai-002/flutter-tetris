@@ -173,6 +173,33 @@ void main() {
       expect(controller.drainEvents(), contains(GameEvent.levelUp));
     });
 
+    test('零消 T-Spin 仍然计分，且不增加连击', () {
+      for (final point in const [(3, 4), (5, 4), (3, 6), (5, 6)]) {
+        controller.board.setCell(point.$1, point.$2, TetrominoType.z);
+      }
+      controller.setPieceForTest(
+        const ActivePiece(type: TetrominoType.t, x: 3, y: 4),
+      );
+      expect(controller.rotateClockwise(), isTrue);
+      expect(controller.piece!.rotation, 1);
+      controller.lockNowForTest();
+      expect(controller.lines, 0);
+      expect(controller.score, 400);
+      expect(controller.combo, 0);
+    });
+
+    test('零消 T-Spin Mini 按 Mini 计分', () {
+      for (final point in const [(3, 4), (5, 4), (3, 6)]) {
+        controller.board.setCell(point.$1, point.$2, TetrominoType.z);
+      }
+      controller.setPieceForTest(
+        const ActivePiece(type: TetrominoType.t, x: 3, y: 4),
+      );
+      expect(controller.rotateClockwise(), isTrue);
+      controller.lockNowForTest();
+      expect(controller.score, 100);
+    });
+
     test('方块完全锁在顶部时结束对局', () {
       controller.setPieceForTest(
         const ActivePiece(type: TetrominoType.o, x: 3, y: -2),
