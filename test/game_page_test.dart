@@ -1,0 +1,88 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_tetris/game/game_mode.dart';
+import 'package:flutter_tetris/pages/game_page.dart';
+import 'package:flutter_tetris/services/storage_service.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import 'test_helpers.dart';
+
+void main() {
+  late StorageService storage;
+
+  setUp(() async {
+    storage = await prepareStorage();
+  });
+
+  testWidgets('宽屏对局页展示侧栏信息与棋盘', (tester) async {
+    tester.view.physicalSize = const Size(1280, 960);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      wrapPage(
+        child: const GamePage(mode: GameMode.endless),
+        storage: storage,
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.text('经典模式'), findsOneWidget);
+    expect(find.text('HOLD 暂存'), findsOneWidget);
+    expect(find.text('NEXT'), findsOneWidget);
+    expect(find.text('分数'), findsOneWidget);
+    expect(find.text('消行'), findsOneWidget);
+    expect(find.text('等级'), findsOneWidget);
+    expect(find.byType(CustomPaint), findsWidgets);
+    expect(tester.takeException(), isNull);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('窄屏对局页展示手游操作区', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      wrapPage(
+        child: const GamePage(mode: GameMode.sprint),
+        storage: storage,
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.text('40 行竞速'), findsOneWidget);
+    expect(find.text('暂存'), findsOneWidget);
+    expect(find.text('旋转'), findsOneWidget);
+    expect(find.text('硬降'), findsOneWidget);
+    expect(find.text('左移'), findsOneWidget);
+    expect(find.text('软降'), findsOneWidget);
+    expect(find.text('右移'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('计时模式在顶栏展示剩余时间', (tester) async {
+    tester.view.physicalSize = const Size(1280, 960);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      wrapPage(
+        child: const GamePage(mode: GameMode.ultra),
+        storage: storage,
+      ),
+    );
+    await tester.pump();
+
+    expect(find.text('2 分钟计时'), findsOneWidget);
+    expect(find.textContaining('剩余 02:00'), findsWidgets);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+}
