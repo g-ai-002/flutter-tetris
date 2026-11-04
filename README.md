@@ -1,0 +1,74 @@
+# 俄罗斯方块 🧱
+
+基于 Flutter + Flame 的国风俄罗斯方块，支持 Android、Windows 与 Web。采用 Guideline 规则，内置三种玩法、本地纪录、程序化音效与五声音阶背景音乐，全程离线运行。
+
+## 功能
+
+- 🎮 三种玩法：经典无尽、40 行竞速、2 分钟计时
+- 🧩 现代规则：10×20 场地、7 包随机、SRS 旋转与踢墙、500ms 锁定延迟
+- 👻 手感细节：五个预览、幽灵落点、暂存（每次落定限一次）、软降与硬降
+- 🏆 计分体系：单/双/三/四行、T-Spin 与 Mini、连续奖励、连击、全消奖励、15 级提速
+- ✨ Flame 渲染：立体方块、消行闪光与碎屑粒子、硬降拖影、顶部危险线
+- ⌨️ 键盘操作：← → 移动、↓ 软降、空格硬降、↑/X 顺时针、Z 逆时针、C 暂存、P 暂停、R 重开
+- 📱 触屏操作：点击旋转、左右拖动移动、下滑软降、上滑暂存，并提供六键触控区
+- 🗂️ 本地纪录：各模式最高分、竞速最快用时、累计对局 / 消行 / 得分，可一键清空
+- 🔔 程序化音频：10 种运行时合成音效 + 16 秒五声音阶循环，音效 / 音乐 / 震动独立开关
+- 🈶 简体中文界面、深色模式，Windows 优先 Microsoft YaHei UI，Web 使用 soup_fonts 思源黑体
+- 📐 响应式布局：手机 / 折叠屏 / 平板 / Windows 窗口自适应，宽屏三栏、窄屏单栏
+- 🧾 日志按天写入用户目录，设置页可查看最近日志并打开所在目录
+
+## 下载
+
+v0.1.0（最新发布）：[Gitea Release](http://192.168.31.120:3020/GTech/flutter-tetris/releases/tag/v0.1.0)
+
+| 平台 | 产物 |
+| --- | --- |
+| Android (arm64) | `flutter-tetris-0.1.0-android-aarch64.apk` |
+| Windows (x64, Win10+) | `flutter-tetris-0.1.0-windows-x86_64.zip` |
+| Web | `flutter-tetris-0.1.0-web.zip`（解压后起静态服务器） |
+
+## 开发
+
+```bash
+flutter pub get
+flutter analyze
+flutter test
+```
+
+构建产物由 CI 生成：在 GitHub Actions / Gitea Actions 里手动运行 `build` 工作流，选中 `v*` Tag 时按该 Tag 的版本构建 Android / Windows / Web 并发布 Release，运行 `main` 则产出预览产物。音频在运行时合成、Web 字体来自 soup_fonts，仓库不存放字体与音频文件。本地无需安装 Android SDK 等大型工具链。
+
+## 操作说明
+
+| 操作 | 键盘 | 触屏 |
+| --- | --- | --- |
+| 左右移动 | ← / → | 左右拖动或「左移 / 右移」 |
+| 软降 | ↓ | 向下拖动或「软降」 |
+| 硬降 | 空格 | 「硬降」 |
+| 旋转 | ↑ / X（Z 逆时针） | 点击棋盘或「旋转」 |
+| 暂存 | C / Shift | 上滑或「暂存」 |
+| 暂停 | P / Esc | 顶栏暂停按钮 |
+
+## 日志位置
+
+- Windows：`文档/FlutterTetris/logs/app_yyyyMMdd.log`
+- Android：应用外部存储目录下的 `FlutterTetris/logs/`
+- Web：仅保留内存日志，可在设置页查看
+
+## 目录结构
+
+```
+lib/
+├── game/       方块定义、场地、7 包随机、SRS、计分、模式与对局控制器
+├── flame/      Flame 场地组件与游戏入口（粒子、消行、拖影）
+├── pages/      首页、对局页、设置页、纪录页与通用组件
+├── services/   日志、偏好与纪录存储、文件系统、音效合成与播放
+├── providers/  设置状态
+├── theme/      配色主题、方块配色与笔触
+└── utils/      常量、格式化、平台判断、窗口初始化
+```
+
+## 版本历史
+
+| 版本 | 说明 |
+| --- | --- |
+| v0.1.0 | 首个可玩版本：三种玩法、完整 Guideline 规则、程序化音频、本地纪录与三端发布 |
