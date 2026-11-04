@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tetris/pages/home_page.dart';
 import 'package:flutter_tetris/services/storage_service.dart';
+import 'package:flutter_tetris/utils/constants.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'test_helpers.dart';
@@ -36,7 +37,7 @@ void main() {
     expect(find.textContaining('最高 12,345 分'), findsOneWidget);
     expect(find.textContaining('最快 01:23.45'), findsOneWidget);
     expect(find.textContaining('最高 8,900 分'), findsOneWidget);
-    expect(find.textContaining('v0.1.0'), findsOneWidget);
+    expect(find.textContaining('v${AppConstants.version}'), findsOneWidget);
   });
 
   testWidgets('首页窄屏单列排布并支持切换深色模式', (tester) async {
