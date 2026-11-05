@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
+import '../../game/daily_challenge.dart';
 import '../../game/game_mode.dart';
 import '../../game/level.dart';
 import '../../game/tetris_controller.dart';
@@ -17,6 +19,7 @@ Future<void> showGameResultDialog(
   required VoidCallback onRestart,
   required VoidCallback onExit,
   LevelDefinition? level,
+  DailyChallenge? daily,
   bool hasNext = false,
   VoidCallback? onNext,
 }) {
@@ -28,6 +31,7 @@ Future<void> showGameResultDialog(
       outcome: outcome,
       bestScore: bestScore,
       level: level,
+      daily: daily,
       hasNext: hasNext,
       onRestart: () {
         Navigator.of(dialogContext).pop();
@@ -55,6 +59,7 @@ class _ResultDialog extends StatelessWidget {
     required this.onRestart,
     required this.onExit,
     this.level,
+    this.daily,
     this.hasNext = false,
     this.onNext,
   });
@@ -63,10 +68,44 @@ class _ResultDialog extends StatelessWidget {
   final RecordOutcome outcome;
   final int bestScore;
   final LevelDefinition? level;
+  final DailyChallenge? daily;
   final bool hasNext;
   final VoidCallback? onNext;
   final VoidCallback onRestart;
   final VoidCallback onExit;
+
+  String get _title {
+    if (daily != null) return '每日挑战结束';
+    if (result.won) return level == null ? '完成挑战' : '第 ${level!.id} 关完成';
+    return '游戏结束';
+  }
+
+  String get _bestLabel {
+    if (daily != null) return '当日';
+    return level == null ? '历史' : '本关';
+  }
+
+  Future<void> _share(BuildContext context) async {
+    final challenge = daily;
+    if (challenge == null) return;
+    await Clipboard.setData(
+      ClipboardData(
+        text: challenge.shareText(
+          score: result.score,
+          lines: result.lines,
+          level: result.level,
+        ),
+      ),
+    );
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('战报已复制到剪贴板'),
+        behavior: SnackBarBehavior.floating,
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -98,10 +137,7 @@ class _ResultDialog extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              Text(
-                won ? (level == null ? '完成挑战' : '第 ${level!.id} 关完成') : '游戏结束',
-                style: theme.textTheme.titleLarge,
-              ),
+              Text(_title, style: theme.textTheme.titleLarge),
               if (won && result.stars > 0) ...[
                 const SizedBox(height: 8),
                 Row(
@@ -195,13 +231,20 @@ class _ResultDialog extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                '${level == null ? '历史' : '本关'}最高 '
-                '${formatThousands(bestScore)} 分',
+                '$_bestLabel最高 ${formatThousands(bestScore)} 分',
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: colors.onSurfaceVariant,
                 ),
               ),
-              const SizedBox(height: 18),
+              if (daily != null) ...[
+                const SizedBox(height: 6),
+                TextButton.icon(
+                  onPressed: () => _share(context),
+                  icon: const Icon(Icons.ios_share_rounded, size: 16),
+                  label: const Text('复制战报'),
+                ),
+              ],
+              const SizedBox(height: 10),
               Row(
                 children: [
                   Expanded(

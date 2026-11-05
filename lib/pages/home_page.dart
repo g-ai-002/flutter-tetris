@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../game/daily_challenge.dart';
 import '../game/game_mode.dart';
 import '../game/level.dart';
 import '../providers/settings_provider.dart';
@@ -307,6 +308,8 @@ class _ModeCards extends StatelessWidget {
             cards[i],
           ],
           const SizedBox(height: 12),
+          _dailyCard(context),
+          const SizedBox(height: 12),
           _levelCard(context),
         ],
       );
@@ -322,8 +325,59 @@ class _ModeCards extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 12),
+        _dailyCard(context),
+        const SizedBox(height: 12),
         _levelCard(context),
       ],
+    );
+  }
+
+  Widget _dailyCard(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final challenge = DailyChallenge.today();
+    final record = settings.dailyRecord(challenge.key);
+    final streak = settings.dailyStreak(challenge.date);
+    final refresh = challenge.refreshIn(DateTime.now());
+    final muted = theme.textTheme.labelSmall?.copyWith(
+      color: colors.onSurfaceVariant,
+      fontFeatures: const [FontFeature.tabularFigures()],
+    );
+    return EntryTile(
+      leading: EntryBadge(icon: Icons.today_rounded, accent: colors.primary),
+      title: GameMode.daily.label,
+      subtitle:
+          '${challenge.label} ${challenge.weekdayLabel} · ${GameMode.daily.tagline}',
+      trailing: StatusChip(
+        accent: colors.primary,
+        active: record.played,
+        child: Text(
+          record.played ? '今日 ${formatThousands(record.bestScore)} 分' : '未挑战',
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: colors.primary,
+            fontWeight: FontWeight.w600,
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
+        ),
+      ),
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          builder: (_) => GamePage(mode: GameMode.daily, daily: challenge),
+        ),
+      ),
+      footer: Row(
+        children: [
+          const Icon(
+            Icons.local_fire_department_outlined,
+            size: 14,
+            color: appGold,
+          ),
+          const SizedBox(width: 4),
+          Text('连续打卡 $streak 天', style: muted),
+          const Spacer(),
+          Text('距刷新 ${formatDuration(refresh.inMilliseconds)}', style: muted),
+        ],
+      ),
     );
   }
 
@@ -402,6 +456,7 @@ class _RecordLine extends StatelessWidget {
       case GameMode.endless:
       case GameMode.ultra:
       case GameMode.level:
+      case GameMode.daily:
         final best = settings.bestScore(mode);
         text = best > 0 ? '最高 ${formatThousands(best)} 分' : '还没有纪录';
         break;

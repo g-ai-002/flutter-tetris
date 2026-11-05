@@ -12,7 +12,7 @@ class GameHud extends StatelessWidget {
   final bool compact;
 
   String get _timeLabel => switch (controller.mode) {
-    GameMode.ultra || GameMode.level => '剩余',
+    GameMode.ultra || GameMode.level || GameMode.daily => '剩余',
     _ => '用时',
   };
 
@@ -20,6 +20,7 @@ class GameHud extends StatelessWidget {
     switch (controller.mode) {
       case GameMode.ultra:
       case GameMode.level:
+      case GameMode.daily:
         return formatDuration(controller.remaining.inMilliseconds);
       case GameMode.sprint:
         return formatPreciseDuration(controller.elapsed.inMilliseconds);
@@ -143,10 +144,11 @@ class GameHud extends StatelessWidget {
             ),
           ),
         ],
-        if (controller.mode == GameMode.ultra) ...[
+        if (controller.mode == GameMode.ultra ||
+            controller.mode == GameMode.daily) ...[
           const SizedBox(height: 10),
           Text(
-            '限时 2 分钟',
+            controller.mode == GameMode.daily ? '每日挑战 · 限时 2 分钟' : '限时 2 分钟',
             style: theme.textTheme.labelSmall?.copyWith(
               color: colors.onSurfaceVariant,
             ),

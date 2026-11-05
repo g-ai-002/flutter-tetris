@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import '../flame/playfield_component.dart';
 import '../flame/tetris_game.dart';
+import '../game/daily_challenge.dart';
 import '../game/game_mode.dart';
 import '../game/level.dart';
 import '../game/tetris_controller.dart';
@@ -24,12 +25,15 @@ import 'widgets/game_rails.dart';
 import 'widgets/touch_pad.dart';
 
 class GamePage extends StatefulWidget {
-  const GamePage({super.key, required this.mode, this.level});
+  const GamePage({super.key, required this.mode, this.level, this.daily});
 
   final GameMode mode;
 
   /// 关卡模式下要挑战的关卡。
   final LevelDefinition? level;
+
+  /// 每日挑战的日期，决定本局的固定种子。
+  final DailyChallenge? daily;
 
   @override
   State<GamePage> createState() => _GamePageState();
@@ -47,16 +51,18 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _controller = TetrisController(mode: widget.mode, level: widget.level);
+    _controller = TetrisController(
+      mode: widget.mode,
+      level: widget.level,
+      daily: widget.daily,
+    );
     _game = TetrisGame(
       controller: _controller,
       style: const PlayfieldStyle(palette: BlockPalette.light),
     );
     _controller.addListener(_onControllerChanged);
     _controller.start();
-    LogService.info(
-      '开始对局: ${widget.level == null ? widget.mode.label : '第 ${widget.level!.id} 关'}',
-    );
+    LogService.info('开始对局: ${_controller.rules.title}');
   }
 
   @override
@@ -99,7 +105,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     final storage = await StorageService.instance;
     final outcome = await storage.recordResult(result);
     LogService.info(
-      '对局结束: ${result.levelId == null ? result.mode.label : '第 ${result.levelId} 关'}, '
+      '对局结束: ${_controller.rules.title}, '
       '得分 ${result.score}, 消行 ${result.lines}, 等级 ${result.level}, '
       '用时 ${result.elapsed.inMilliseconds}ms, ${result.reason}'
       '${outcome.isRecord ? '（新纪录）' : ''}',
@@ -107,16 +113,20 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     if (!mounted) return;
     context.read<SettingsProvider>().refresh();
     final level = widget.level;
+    final daily = widget.daily;
     final next = level == null ? null : nextLevelOf(level);
-    final bestScore = level == null
-        ? storage.bestScore(result.mode)
-        : storage.levelRecord(level.id).bestScore;
+    final bestScore = level != null
+        ? storage.levelRecord(level.id).bestScore
+        : daily != null
+        ? storage.dailyRecord(daily.key).bestScore
+        : storage.bestScore(result.mode);
     await showGameResultDialog(
       context,
       result: result,
       outcome: outcome,
       bestScore: bestScore,
       level: level,
+      daily: daily,
       hasNext: next != null,
       onRestart: _restart,
       onNext: next == null ? null : () => _startLevel(next),
@@ -138,9 +148,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     _resultShown = false;
     _pauseDialogOpen = false;
     _controller.restart();
-    LogService.info(
-      '重新开始: ${widget.level == null ? widget.mode.label : '第 ${widget.level!.id} 关'}',
-    );
+    LogService.info('重新开始: ${_controller.rules.title}');
     _focusNode.requestFocus();
   }
 
@@ -310,6 +318,9 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
         return '${_controller.lines} / $target 行 · '
             '剩余 ${formatDuration(_controller.remaining.inMilliseconds)}'
             '${garbage == null ? '' : ' · 垃圾行 $garbage 秒'}';
+      case GameMode.daily:
+        return '剩余 ${formatDuration(_controller.remaining.inMilliseconds)}'
+            ' · 固定牌序';
     }
   }
 
