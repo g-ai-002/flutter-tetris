@@ -1,10 +1,13 @@
+import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tetris/flame/tetris_game.dart';
 import 'package:flutter_tetris/game/daily_challenge.dart';
 import 'package:flutter_tetris/game/game_mode.dart';
 import 'package:flutter_tetris/game/garbage.dart';
 import 'package:flutter_tetris/game/level.dart';
 import 'package:flutter_tetris/pages/game_page.dart';
 import 'package:flutter_tetris/services/storage_service.dart';
+import 'package:flutter_tetris/theme/block_skin.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'test_helpers.dart';
@@ -111,6 +114,29 @@ void main() {
     expect(find.text('HOLD 暂存'), findsOneWidget);
     expect(tester.takeException(), isNull);
 
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('对局页使用所选皮肤', (tester) async {
+    tester.view.physicalSize = const Size(1280, 960);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    storage = await prepareStorage({'block_skin': BlockSkin.ink.name});
+
+    await tester.pumpWidget(
+      wrapPage(
+        child: const GamePage(mode: GameMode.endless),
+        storage: storage,
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final gameWidget = tester.widget<GameWidget<TetrisGame>>(
+      find.byType(GameWidget<TetrisGame>),
+    );
+    expect(gameWidget.game!.style.palette.skin, BlockSkin.ink);
     await tester.pumpWidget(const SizedBox.shrink());
   });
 

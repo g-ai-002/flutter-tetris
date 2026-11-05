@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tetris/pages/settings_page.dart';
 import 'package:flutter_tetris/services/storage_service.dart';
+import 'package:flutter_tetris/theme/block_skin.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'test_helpers.dart';
@@ -25,6 +26,12 @@ void main() {
     expect(find.text('外观与操作'), findsOneWidget);
     expect(find.text('音效与反馈'), findsOneWidget);
     expect(find.text('运行日志'), findsOneWidget);
+
+    expect(find.text('棋盘皮肤'), findsOneWidget);
+    await tester.tap(find.byKey(const ValueKey('skin-celadon')));
+    await tester.pump();
+    expect(storage.blockSkin, BlockSkin.celadon);
+    expect(find.text('青瓷 · 雨过天青，温润如玉'), findsOneWidget);
 
     await tester.tap(find.byKey(const ValueKey('switch-dark')));
     await tester.pump();
