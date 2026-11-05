@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../game/game_mode.dart';
+import '../game/level.dart';
 import '../providers/settings_provider.dart';
 import '../theme/app_theme.dart';
 import '../utils/formatters.dart';
@@ -38,7 +39,13 @@ class RecordsPage extends StatelessWidget {
               children: [
                 _SummaryCard(settings: settings),
                 const SizedBox(height: 12),
-                for (final mode in GameMode.values) ...[
+                _LevelSummaryCard(settings: settings),
+                const SizedBox(height: 12),
+                for (final mode in const [
+                  GameMode.endless,
+                  GameMode.sprint,
+                  GameMode.ultra,
+                ]) ...[
                   _ModeCard(settings: settings, mode: mode),
                   const SizedBox(height: 12),
                 ],
@@ -118,6 +125,56 @@ class _SummaryCard extends StatelessWidget {
   }
 }
 
+class _LevelSummaryCard extends StatelessWidget {
+  const _LevelSummaryCard({required this.settings});
+
+  final SettingsProvider settings;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final done = settings.completedLevels;
+    return SectionCard(
+      title: '关卡模式',
+      icon: Icons.flag_outlined,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(Icons.star_rounded, size: 15, color: appGold),
+          const SizedBox(width: 3),
+          Text(
+            '${settings.totalStars} / ${kLevels.length * 3}',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: colors.onSurfaceVariant,
+              fontFeatures: const [FontFeature.tabularFigures()],
+            ),
+          ),
+        ],
+      ),
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(3),
+          child: LinearProgressIndicator(
+            value: kLevels.isEmpty ? 0 : done / kLevels.length,
+            minHeight: 5,
+            backgroundColor: colors.outline.withValues(alpha: 0.35),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          done == 0
+              ? '还没有通关记录，从第 1 关开始挑战吧。'
+              : '已通关 $done / ${kLevels.length} 关',
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: colors.onSurfaceVariant,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _SummaryStat extends StatelessWidget {
   const _SummaryStat({
     required this.label,
@@ -187,6 +244,7 @@ class _ModeCard extends StatelessWidget {
       GameMode.endless => Icons.all_inclusive_rounded,
       GameMode.sprint => Icons.timer_outlined,
       GameMode.ultra => Icons.bolt_rounded,
+      GameMode.level => Icons.flag_outlined,
     };
     return SectionCard(
       title: mode.label,

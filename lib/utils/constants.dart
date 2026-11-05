@@ -6,7 +6,7 @@ class AppConstants {
 
   static const String appName = '俄罗斯方块';
   static const String appEnglishName = 'TETRIS';
-  static const String version = '0.1.1';
+  static const String version = '0.2.0';
   static const String appDirName = 'FlutterTetris';
 
   static const String prefKeyDarkMode = 'dark_mode';
@@ -20,6 +20,7 @@ class AppConstants {
   static const String prefKeyTotalLines = 'total_lines';
   static const String prefKeyTotalScore = 'total_score';
   static const String prefKeyBestSprintTime = 'best_sprint_time_ms';
+  static const String prefKeyLevelRecords = 'level_records';
 
   static String bestScoreKey(String mode) => 'best_score_$mode';
   static String bestLinesKey(String mode) => 'best_lines_$mode';

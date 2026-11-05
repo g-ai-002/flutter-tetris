@@ -12,13 +12,14 @@ class GameHud extends StatelessWidget {
   final bool compact;
 
   String get _timeLabel => switch (controller.mode) {
-    GameMode.ultra => '剩余',
+    GameMode.ultra || GameMode.level => '剩余',
     _ => '用时',
   };
 
   String get _timeValue {
     switch (controller.mode) {
       case GameMode.ultra:
+      case GameMode.level:
         return formatDuration(controller.remaining.inMilliseconds);
       case GameMode.sprint:
         return formatPreciseDuration(controller.elapsed.inMilliseconds);
@@ -69,7 +70,7 @@ class GameHud extends StatelessWidget {
             _CompactStat(label: _timeLabel, value: _timeValue, wide: true),
           ],
         ),
-        if (controller.mode == GameMode.sprint) ...[
+        if (controller.targetLines != null) ...[
           const SizedBox(height: 7),
           ClipRRect(
             borderRadius: BorderRadius.circular(3),
@@ -115,7 +116,7 @@ class GameHud extends StatelessWidget {
         _WideStat(label: '等级', value: '${controller.level}'),
         _WideStat(label: _timeLabel, value: _timeValue),
         _WideStat(label: '最高连击', value: '${controller.maxCombo}'),
-        if (controller.mode == GameMode.sprint) ...[
+        if (controller.targetLines != null) ...[
           const SizedBox(height: 10),
           ClipRRect(
             borderRadius: BorderRadius.circular(3),
@@ -127,7 +128,16 @@ class GameHud extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '${controller.lines} / 40 行',
+            '${controller.lines} / ${controller.targetLines} 行',
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: colors.onSurfaceVariant,
+            ),
+          ),
+        ],
+        if (controller.garbageInterval != null) ...[
+          const SizedBox(height: 10),
+          Text(
+            '垃圾行 ${controller.garbageSecondsLeft} 秒后上涌',
             style: theme.textTheme.labelSmall?.copyWith(
               color: colors.onSurfaceVariant,
             ),

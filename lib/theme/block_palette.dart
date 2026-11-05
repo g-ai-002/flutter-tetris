@@ -55,6 +55,10 @@ class BlockPalette {
 
   Color get dangerTint => const Color(0xFFC2453D);
 
+  /// 关卡地形与垃圾行的石灰配色，刻意降低饱和度。
+  Color get garbageBlock =>
+      dark ? const Color(0xFF7A7265) : const Color(0xFF9C9385);
+
   Color get ghostStroke => dark
       ? Colors.white.withValues(alpha: 0.30)
       : const Color(0xFF5A4A38).withValues(alpha: 0.32);

@@ -1,18 +1,77 @@
+import 'dart:convert';
+import 'dart:math' as math;
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../game/game_mode.dart';
+import '../game/level.dart';
 import '../utils/constants.dart';
 
 /// 一局结束后的纪录变化。
 class RecordOutcome {
-  const RecordOutcome({required this.newBestScore, required this.newBestTime});
+  const RecordOutcome({
+    required this.newBestScore,
+    required this.newBestTime,
+    this.newBestStars = false,
+  });
 
   final bool newBestScore;
 
-  /// 40 行竞速刷新最快用时。
+  /// 40 行竞速或关卡刷新最快用时。
   final bool newBestTime;
 
-  bool get isRecord => newBestScore || newBestTime;
+  /// 关卡刷新星级。
+  final bool newBestStars;
+
+  bool get isRecord => newBestScore || newBestTime || newBestStars;
+}
+
+/// 单个关卡的本地进度。
+class LevelRecord {
+  const LevelRecord({
+    required this.id,
+    this.completed = false,
+    this.stars = 0,
+    this.bestScore = 0,
+    this.bestTimeMs,
+  });
+
+  final int id;
+  final bool completed;
+  final int stars;
+  final int bestScore;
+  final int? bestTimeMs;
+
+  LevelRecord copyWith({
+    bool? completed,
+    int? stars,
+    int? bestScore,
+    int? bestTimeMs,
+  }) => LevelRecord(
+    id: id,
+    completed: completed ?? this.completed,
+    stars: stars ?? this.stars,
+    bestScore: bestScore ?? this.bestScore,
+    bestTimeMs: bestTimeMs ?? this.bestTimeMs,
+  );
+
+  Map<String, Object?> toJson() => {
+    'completed': completed,
+    'stars': stars,
+    'score': bestScore,
+    'time': bestTimeMs,
+  };
+
+  static LevelRecord fromJson(int id, Object? raw) {
+    if (raw is! Map) return LevelRecord(id: id);
+    return LevelRecord(
+      id: id,
+      completed: raw['completed'] == true,
+      stars: (raw['stars'] as num?)?.toInt() ?? 0,
+      bestScore: (raw['score'] as num?)?.toInt() ?? 0,
+      bestTimeMs: (raw['time'] as num?)?.toInt(),
+    );
+  }
 }
 
 /// 轻量偏好与本地纪录存储：写入失败时静默忽略，不影响游戏主流程。
@@ -89,17 +148,57 @@ class StorageService {
   int get totalLines => _p.getInt(AppConstants.prefKeyTotalLines) ?? 0;
   int get totalScore => _p.getInt(AppConstants.prefKeyTotalScore) ?? 0;
 
+  Map<int, LevelRecord> get levelRecords {
+    final raw = _p.getString(AppConstants.prefKeyLevelRecords);
+    if (raw == null || raw.isEmpty) return {};
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is! Map) return {};
+      final records = <int, LevelRecord>{};
+      for (final entry in decoded.entries) {
+        final id = int.tryParse('${entry.key}');
+        if (id == null) continue;
+        records[id] = LevelRecord.fromJson(id, entry.value);
+      }
+      return records;
+    } catch (_) {
+      return {};
+    }
+  }
+
+  LevelRecord levelRecord(int id) => levelRecords[id] ?? LevelRecord(id: id);
+
+  /// 第一关默认开放，其余关卡需通关上一关。
+  bool isLevelUnlocked(int id) =>
+      id <= 1 || (levelRecords[id - 1]?.completed ?? false);
+
+  int get completedLevels =>
+      kLevels.where((level) => levelRecord(level.id).completed).length;
+
+  int get totalStars =>
+      kLevels.fold(0, (sum, level) => sum + levelRecord(level.id).stars);
+
   /// 写入一局结果并返回纪录变化；纪录比较在写入前完成。
   Future<RecordOutcome> recordResult(GameResult result) async {
-    final oldScore = bestScore(result.mode);
+    final levelId = result.levelId;
+    final oldLevel = levelId == null
+        ? const LevelRecord(id: 0)
+        : levelRecord(levelId);
+    final oldScore = levelId == null
+        ? bestScore(result.mode)
+        : oldLevel.bestScore;
     final oldLines = bestLines(result.mode);
-    final oldTime = bestSprintTimeMs;
+    final oldTime = levelId == null ? bestSprintTimeMs : oldLevel.bestTimeMs;
 
     final newBestScore = result.score > oldScore;
-    final newBestTime =
-        result.mode == GameMode.sprint &&
+    final faster =
         result.won &&
         (oldTime == null || result.elapsed.inMilliseconds < oldTime);
+    final newBestTime = levelId == null
+        ? result.mode == GameMode.sprint && faster
+        : faster;
+    final newBestStars =
+        levelId != null && result.won && result.stars > oldLevel.stars;
 
     await _write((p) async {
       await p.setInt(AppConstants.prefKeyGamesPlayed, gamesPlayed + 1);
@@ -109,6 +208,30 @@ class StorageService {
         AppConstants.playsKey(result.mode.name),
         plays(result.mode) + 1,
       );
+
+      if (levelId != null) {
+        final records = levelRecords;
+        final previous = records[levelId] ?? LevelRecord(id: levelId);
+        final bestTime = faster
+            ? result.elapsed.inMilliseconds
+            : previous.bestTimeMs;
+        records[levelId] = LevelRecord(
+          id: levelId,
+          completed: previous.completed || result.won,
+          stars: math.max(previous.stars, result.won ? result.stars : 0),
+          bestScore: math.max(previous.bestScore, result.score),
+          bestTimeMs: bestTime,
+        );
+        await p.setString(
+          AppConstants.prefKeyLevelRecords,
+          jsonEncode({
+            for (final entry in records.entries)
+              '${entry.key}': entry.value.toJson(),
+          }),
+        );
+        return true;
+      }
+
       if (newBestScore) {
         await p.setInt(
           AppConstants.bestScoreKey(result.mode.name),
@@ -130,7 +253,11 @@ class StorageService {
       return true;
     });
 
-    return RecordOutcome(newBestScore: newBestScore, newBestTime: newBestTime);
+    return RecordOutcome(
+      newBestScore: newBestScore,
+      newBestTime: newBestTime,
+      newBestStars: newBestStars,
+    );
   }
 
   /// 清空纪录与累计统计，保留界面偏好。
@@ -141,6 +268,7 @@ class StorageService {
       await p.remove(AppConstants.playsKey(mode.name));
     }
     await p.remove(AppConstants.prefKeyBestSprintTime);
+    await p.remove(AppConstants.prefKeyLevelRecords);
     await p.remove(AppConstants.prefKeyGamesPlayed);
     await p.remove(AppConstants.prefKeyTotalLines);
     await p.remove(AppConstants.prefKeyTotalScore);

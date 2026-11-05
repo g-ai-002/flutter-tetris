@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../game/game_mode.dart';
+import '../../game/level.dart';
 import '../../game/tetris_controller.dart';
 import '../../services/storage_service.dart';
 import '../../theme/app_theme.dart';
@@ -15,6 +16,9 @@ Future<void> showGameResultDialog(
   required int bestScore,
   required VoidCallback onRestart,
   required VoidCallback onExit,
+  LevelDefinition? level,
+  bool hasNext = false,
+  VoidCallback? onNext,
 }) {
   return showDialog<void>(
     context: context,
@@ -23,10 +27,18 @@ Future<void> showGameResultDialog(
       result: result,
       outcome: outcome,
       bestScore: bestScore,
+      level: level,
+      hasNext: hasNext,
       onRestart: () {
         Navigator.of(dialogContext).pop();
         onRestart();
       },
+      onNext: onNext == null
+          ? null
+          : () {
+              Navigator.of(dialogContext).pop();
+              onNext();
+            },
       onExit: () {
         Navigator.of(dialogContext).pop();
         onExit();
@@ -42,11 +54,17 @@ class _ResultDialog extends StatelessWidget {
     required this.bestScore,
     required this.onRestart,
     required this.onExit,
+    this.level,
+    this.hasNext = false,
+    this.onNext,
   });
 
   final GameResult result;
   final RecordOutcome outcome;
   final int bestScore;
+  final LevelDefinition? level;
+  final bool hasNext;
+  final VoidCallback? onNext;
   final VoidCallback onRestart;
   final VoidCallback onExit;
 
@@ -80,7 +98,28 @@ class _ResultDialog extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              Text(won ? '完成挑战' : '游戏结束', style: theme.textTheme.titleLarge),
+              Text(
+                won ? (level == null ? '完成挑战' : '第 ${level!.id} 关完成') : '游戏结束',
+                style: theme.textTheme.titleLarge,
+              ),
+              if (won && result.stars > 0) ...[
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    for (var i = 0; i < 3; i++)
+                      Icon(
+                        i < result.stars
+                            ? Icons.star_rounded
+                            : Icons.star_outline_rounded,
+                        size: 28,
+                        color: i < result.stars
+                            ? appGold
+                            : colors.outline.withValues(alpha: 0.7),
+                      ),
+                  ],
+                ),
+              ],
               const SizedBox(height: 4),
               Text(
                 result.reason,
@@ -118,7 +157,11 @@ class _ResultDialog extends StatelessWidget {
                   accent: appGold,
                   filled: true,
                   child: Text(
-                    outcome.newBestTime ? '新的最快纪录' : '新的最高分',
+                    outcome.newBestStars
+                        ? '新的星级纪录'
+                        : outcome.newBestTime
+                        ? '新的最快纪录'
+                        : '新的最高分',
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
@@ -152,7 +195,8 @@ class _ResultDialog extends StatelessWidget {
               ),
               const SizedBox(height: 10),
               Text(
-                '历史最高 ${formatThousands(bestScore)} 分',
+                '${level == null ? '历史' : '本关'}最高 '
+                '${formatThousands(bestScore)} 分',
                 style: theme.textTheme.labelSmall?.copyWith(
                   color: colors.onSurfaceVariant,
                 ),
@@ -163,14 +207,14 @@ class _ResultDialog extends StatelessWidget {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: onExit,
-                      child: const Text('返回首页'),
+                      child: Text(level == null ? '返回首页' : '返回关卡'),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: FilledButton(
-                      onPressed: onRestart,
-                      child: const Text('再来一局'),
+                      onPressed: hasNext && onNext != null ? onNext : onRestart,
+                      child: Text(hasNext && onNext != null ? '下一关' : '再来一局'),
                     ),
                   ),
                 ],
@@ -226,48 +270,52 @@ Future<void> showPauseDialog(
   return showDialog<void>(
     context: context,
     barrierDismissible: false,
-    builder: (dialogContext) => AlertDialog(
-      title: const Text('已暂停'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            '${controller.mode.label} · 分数 ${formatThousands(controller.score)}',
-          ),
-          const SizedBox(height: 6),
-          Text(
-            '消行 ${controller.lines} · 等级 ${controller.level}',
-            style: Theme.of(dialogContext).textTheme.bodySmall?.copyWith(
-              color: Theme.of(dialogContext).colorScheme.onSurfaceVariant,
+    builder: (dialogContext) {
+      final level = controller.levelDef;
+      final label = level == null
+          ? controller.mode.label
+          : '第 ${level.id} 关 · ${level.name}';
+      return AlertDialog(
+        title: const Text('已暂停'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('$label · 分数 ${formatThousands(controller.score)}'),
+            const SizedBox(height: 6),
+            Text(
+              '消行 ${controller.lines} · 等级 ${controller.level}',
+              style: Theme.of(dialogContext).textTheme.bodySmall?.copyWith(
+                color: Theme.of(dialogContext).colorScheme.onSurfaceVariant,
+              ),
             ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              onExit();
+            },
+            child: Text(level == null ? '返回首页' : '返回关卡'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              onRestart();
+            },
+            child: const Text('重新开始'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              controller.resume();
+            },
+            child: const Text('继续游戏'),
           ),
         ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(dialogContext).pop();
-            onExit();
-          },
-          child: const Text('返回首页'),
-        ),
-        TextButton(
-          onPressed: () {
-            Navigator.of(dialogContext).pop();
-            onRestart();
-          },
-          child: const Text('重新开始'),
-        ),
-        FilledButton(
-          onPressed: () {
-            Navigator.of(dialogContext).pop();
-            controller.resume();
-          },
-          child: const Text('继续游戏'),
-        ),
-      ],
-    ),
+      );
+    },
   );
 }
 

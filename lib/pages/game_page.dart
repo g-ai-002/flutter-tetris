@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import '../flame/playfield_component.dart';
 import '../flame/tetris_game.dart';
 import '../game/game_mode.dart';
+import '../game/level.dart';
 import '../game/tetris_controller.dart';
 import '../providers/settings_provider.dart';
 import '../services/log_service.dart';
@@ -24,9 +25,12 @@ import 'widgets/status_chip.dart';
 import 'widgets/touch_pad.dart';
 
 class GamePage extends StatefulWidget {
-  const GamePage({super.key, required this.mode});
+  const GamePage({super.key, required this.mode, this.level});
 
   final GameMode mode;
+
+  /// 关卡模式下要挑战的关卡。
+  final LevelDefinition? level;
 
   @override
   State<GamePage> createState() => _GamePageState();
@@ -44,14 +48,16 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _controller = TetrisController(mode: widget.mode);
+    _controller = TetrisController(mode: widget.mode, level: widget.level);
     _game = TetrisGame(
       controller: _controller,
       style: const PlayfieldStyle(palette: BlockPalette.light),
     );
     _controller.addListener(_onControllerChanged);
     _controller.start();
-    LogService.info('开始对局: ${widget.mode.label}');
+    LogService.info(
+      '开始对局: ${widget.level == null ? widget.mode.label : '第 ${widget.level!.id} 关'}',
+    );
   }
 
   @override
@@ -94,28 +100,48 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     final storage = await StorageService.instance;
     final outcome = await storage.recordResult(result);
     LogService.info(
-      '对局结束: ${result.mode.label}, 得分 ${result.score}, '
-      '消行 ${result.lines}, 等级 ${result.level}, '
+      '对局结束: ${result.levelId == null ? result.mode.label : '第 ${result.levelId} 关'}, '
+      '得分 ${result.score}, 消行 ${result.lines}, 等级 ${result.level}, '
       '用时 ${result.elapsed.inMilliseconds}ms, ${result.reason}'
       '${outcome.isRecord ? '（新纪录）' : ''}',
     );
     if (!mounted) return;
+    context.read<SettingsProvider>().refresh();
+    final level = widget.level;
+    final next = level == null ? null : nextLevelOf(level);
+    final bestScore = level == null
+        ? storage.bestScore(result.mode)
+        : storage.levelRecord(level.id).bestScore;
     await showGameResultDialog(
       context,
       result: result,
       outcome: outcome,
-      bestScore: storage.bestScore(result.mode),
+      bestScore: bestScore,
+      level: level,
+      hasNext: next != null,
       onRestart: _restart,
+      onNext: next == null ? null : () => _startLevel(next),
       onExit: _exit,
     );
-    _focusNode.requestFocus();
+    if (mounted) _focusNode.requestFocus();
+  }
+
+  void _startLevel(LevelDefinition next) {
+    if (!mounted) return;
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute<void>(
+        builder: (_) => GamePage(mode: GameMode.level, level: next),
+      ),
+    );
   }
 
   void _restart() {
     _resultShown = false;
     _pauseDialogOpen = false;
     _controller.restart();
-    LogService.info('重新开始: ${widget.mode.label}');
+    LogService.info(
+      '重新开始: ${widget.level == null ? widget.mode.label : '第 ${widget.level!.id} 关'}',
+    );
     _focusNode.requestFocus();
   }
 
@@ -218,7 +244,13 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
             builder: (context, _) => Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(widget.mode.label),
+                Text(
+                  widget.level == null
+                      ? widget.mode.label
+                      : '第 ${widget.level!.id} 关 · ${widget.level!.name}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
                 Text(
                   _subtitle(),
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -275,6 +307,12 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
         return '${_controller.lines} / 40 行 · 第 ${_controller.level} 级';
       case GameMode.ultra:
         return '剩余 ${formatDuration(_controller.remaining.inMilliseconds)}';
+      case GameMode.level:
+        final target = _controller.targetLines ?? 0;
+        final garbage = _controller.garbageSecondsLeft;
+        return '${_controller.lines} / $target 行 · '
+            '剩余 ${formatDuration(_controller.remaining.inMilliseconds)}'
+            '${garbage == null ? '' : ' · 垃圾行 $garbage 秒'}';
     }
   }
 

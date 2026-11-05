@@ -99,7 +99,9 @@ class PlayfieldComponent extends PositionComponent {
         final type = board.at(x, row);
         if (type == null) continue;
         final center = _cellCenter(x, row);
-        final color = palette.colorOf(type);
+        final color = board.isGarbage(x, row)
+            ? palette.garbageBlock
+            : palette.colorOf(type);
         final count = rows.length >= 4 ? 2 : 1;
         for (var i = 0; i < count; i++) {
           _particles.add(
@@ -274,7 +276,10 @@ class PlayfieldComponent extends PositionComponent {
       for (var x = 0; x < board.columns; x++) {
         final type = board.at(x, y);
         if (type == null) continue;
-        paintBlock(canvas, _cellRect(x, y), palette.colorOf(type));
+        final color = board.isGarbage(x, y)
+            ? palette.garbageBlock
+            : palette.colorOf(type);
+        paintBlock(canvas, _cellRect(x, y), color);
       }
     }
   }

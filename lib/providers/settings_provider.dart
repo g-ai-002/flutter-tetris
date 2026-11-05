@@ -54,7 +54,15 @@ class SettingsProvider extends ChangeNotifier {
   int get totalLines => _storage.totalLines;
   int get totalScore => _storage.totalScore;
 
+  LevelRecord levelRecord(int id) => _storage.levelRecord(id);
+  bool isLevelUnlocked(int id) => _storage.isLevelUnlocked(id);
+  int get completedLevels => _storage.completedLevels;
+  int get totalStars => _storage.totalStars;
+
   Future<void> clearRecords() => _update(_storage.clearRecords);
+
+  /// 对局写入纪录后刷新依赖本地数据的界面。
+  void refresh() => notifyListeners();
 
   void _syncFeedback() =>
       SoundService.configure(sound: soundEnabled, haptics: hapticsEnabled);

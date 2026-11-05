@@ -4,15 +4,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../game/game_mode.dart';
+import '../game/level.dart';
 import '../providers/settings_provider.dart';
 import '../theme/app_theme.dart';
 import '../utils/constants.dart';
 import '../utils/formatters.dart';
 import 'game_page.dart';
+import 'level_select_page.dart';
 import 'records_page.dart';
 import 'settings_page.dart';
 import 'widgets/entry_tile.dart';
 import 'widgets/hero_board_preview.dart';
+import 'widgets/status_chip.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -303,16 +306,58 @@ class _ModeCards extends StatelessWidget {
             if (i > 0) const SizedBox(height: 12),
             cards[i],
           ],
+          const SizedBox(height: 12),
+          _levelCard(context),
         ],
       );
     }
     final cardWidth = (contentWidth - 24) / 3;
-    return Wrap(
-      spacing: 12,
-      runSpacing: 12,
+    return Column(
       children: [
-        for (final card in cards) SizedBox(width: cardWidth, child: card),
+        Wrap(
+          spacing: 12,
+          runSpacing: 12,
+          children: [
+            for (final card in cards) SizedBox(width: cardWidth, child: card),
+          ],
+        ),
+        const SizedBox(height: 12),
+        _levelCard(context),
       ],
+    );
+  }
+
+  Widget _levelCard(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return EntryTile(
+      leading: const EntryBadge(icon: Icons.flag_rounded, accent: appJade),
+      title: GameMode.level.label,
+      subtitle: GameMode.level.tagline,
+      trailing: StatusChip(
+        accent: appJade,
+        child: Text(
+          '${settings.completedLevels}/${kLevels.length}',
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            color: appJade,
+            fontWeight: FontWeight.w600,
+            fontFeatures: const [FontFeature.tabularFigures()],
+          ),
+        ),
+      ),
+      onTap: () => Navigator.of(
+        context,
+      ).push(MaterialPageRoute<void>(builder: (_) => const LevelSelectPage())),
+      footer: Row(
+        children: [
+          const Icon(Icons.star_rounded, size: 14, color: appGold),
+          const SizedBox(width: 4),
+          Text(
+            '已通关 ${settings.completedLevels} 关 · 累计 ${settings.totalStars} 星',
+            style: Theme.of(context).textTheme.labelSmall
+                ?.copyWith(color: colors.onSurfaceVariant),
+          ),
+        ],
+      ),
     );
   }
 
@@ -356,6 +401,7 @@ class _RecordLine extends StatelessWidget {
         break;
       case GameMode.endless:
       case GameMode.ultra:
+      case GameMode.level:
         final best = settings.bestScore(mode);
         text = best > 0 ? '最高 ${formatThousands(best)} 分' : '还没有纪录';
         break;
