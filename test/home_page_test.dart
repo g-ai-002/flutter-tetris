@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_tetris/game/daily_challenge.dart';
 import 'package:flutter_tetris/pages/home_page.dart';
 import 'package:flutter_tetris/services/storage_service.dart';
 import 'package:flutter_tetris/utils/constants.dart';
@@ -8,8 +11,10 @@ import 'test_helpers.dart';
 
 void main() {
   late StorageService storage;
+  late String todayKey;
 
   setUp(() async {
+    todayKey = DailyChallenge.today().key;
     storage = await prepareStorage({
       'best_score_endless': 12345,
       'plays_endless': 3,
@@ -17,6 +22,9 @@ void main() {
       'plays_sprint': 2,
       'best_score_ultra': 8900,
       'plays_ultra': 1,
+      'daily_records': jsonEncode({
+        todayKey: {'score': 4321, 'lines': 30, 'level': 4, 'plays': 2},
+      }),
     });
   });
 
@@ -35,6 +43,9 @@ void main() {
     expect(find.text('40 行竞速'), findsOneWidget);
     expect(find.text('2 分钟计时'), findsOneWidget);
     expect(find.text('关卡模式'), findsOneWidget);
+    expect(find.text('每日挑战'), findsOneWidget);
+    expect(find.textContaining('今日 4,321 分'), findsOneWidget);
+    expect(find.text('连续打卡 1 天'), findsOneWidget);
     expect(find.textContaining('最高 12,345 分'), findsOneWidget);
     expect(find.textContaining('最快 01:23.45'), findsOneWidget);
     expect(find.textContaining('最高 8,900 分'), findsOneWidget);

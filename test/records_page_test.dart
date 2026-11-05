@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_tetris/game/daily_challenge.dart';
 import 'package:flutter_tetris/pages/records_page.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -65,6 +68,34 @@ void main() {
     expect(storage.gamesPlayed, 0);
     expect(find.text('还没有对局记录，去玩一局吧。'), findsNWidgets(3));
     expect(find.text('0'), findsWidgets);
+  });
+
+  testWidgets('纪录页展示每日挑战与七日记录', (tester) async {
+    tester.view.physicalSize = const Size(900, 1400);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final today = DailyChallenge.today();
+    final yesterday = DailyChallenge.forDate(
+      DateTime(today.date.year, today.date.month, today.date.day - 1),
+    );
+    final storage = await prepareStorage({
+      'daily_records': jsonEncode({
+        today.key: {'score': 5432, 'lines': 21, 'level': 3, 'plays': 2},
+        yesterday.key: {'score': 3200, 'lines': 15, 'level': 2, 'plays': 1},
+      }),
+    });
+
+    await tester.pumpWidget(
+      wrapPage(child: const RecordsPage(), storage: storage),
+    );
+
+    expect(find.text('每日挑战'), findsOneWidget);
+    expect(find.textContaining('今日最高 5,432 分'), findsOneWidget);
+    expect(find.text('连续 2 天'), findsOneWidget);
+    expect(find.text('今天 · ${today.weekdayLabel}'), findsOneWidget);
+    expect(find.text('21 行 · 2 次'), findsOneWidget);
+    expect(find.text('3,200 分'), findsOneWidget);
   });
 
   testWidgets('没有纪录时展示空提示且不显示清空按钮', (tester) async {

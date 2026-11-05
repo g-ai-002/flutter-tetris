@@ -1,3 +1,4 @@
+import 'package:flutter_tetris/game/daily_challenge.dart';
 import 'package:flutter_tetris/game/game_mode.dart';
 import 'package:flutter_tetris/game/garbage.dart';
 import 'package:flutter_tetris/game/level.dart';
@@ -390,6 +391,56 @@ void main() {
       expect(controller.board.filledCount, 9);
       expect(controller.garbageSecondsLeft, isNotNull);
       expect(controller.status, GameStatus.playing);
+    });
+
+    test('每日挑战使用当天种子，同一日期重开序列一致', () {
+      final daily = DailyChallenge.forDate(DateTime(2026, 11, 5));
+      final controller = TetrisController(
+        mode: GameMode.daily,
+        daily: daily,
+        autoTick: false,
+      );
+      addTearDown(controller.dispose);
+      controller.start();
+
+      List<TetrominoType> sequence() => [
+        controller.piece!.type,
+        ...controller.nextQueue.take(4),
+      ];
+      final first = sequence();
+      expect(controller.limit, const Duration(seconds: 120));
+      expect(controller.targetLines, isNull);
+
+      controller.restart();
+      expect(sequence(), first);
+
+      advance(controller, 120000);
+      expect(controller.status, GameStatus.over);
+      expect(controller.result!.challengeKey, daily.key);
+      expect(controller.result!.mode, GameMode.daily);
+    });
+
+    test('不同日期的每日挑战使用不同种子', () {
+      final today = DailyChallenge.forDate(DateTime(2026, 11, 5));
+      final tomorrow = DailyChallenge.forDate(DateTime(2026, 11, 6));
+      final first = TetrisController(
+        mode: GameMode.daily,
+        daily: today,
+        autoTick: false,
+      );
+      final second = TetrisController(
+        mode: GameMode.daily,
+        daily: tomorrow,
+        autoTick: false,
+      );
+      addTearDown(first.dispose);
+      addTearDown(second.dispose);
+      first.start();
+      second.start();
+
+      final left = first.nextQueue.toList();
+      final right = second.nextQueue.toList();
+      expect(left, isNot(right));
     });
   });
 }

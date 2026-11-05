@@ -1,3 +1,4 @@
+import 'package:flutter_tetris/game/daily_challenge.dart';
 import 'package:flutter_tetris/game/game_mode.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -14,6 +15,7 @@ GameResult result({
   bool won = false,
   int? levelId,
   int stars = 0,
+  String? challengeKey,
 }) {
   return GameResult(
     mode: mode,
@@ -27,6 +29,7 @@ GameResult result({
     reason: won ? '完成 40 行' : '方块堆到了顶部',
     levelId: levelId,
     stars: stars,
+    challengeKey: challengeKey,
   );
 }
 
@@ -210,6 +213,56 @@ void main() {
       expect(storage.completedLevels, 0);
       expect(storage.totalStars, 0);
       expect(storage.levelRecord(1).completed, isFalse);
+    });
+
+    test('每日挑战按日期记录成绩与连续打卡', () async {
+      final storage = await prepareStorage();
+      final today = DailyChallenge.today();
+      final yesterday = DailyChallenge.forDate(
+        DateTime(today.date.year, today.date.month, today.date.day - 1),
+      );
+
+      final first = await storage.recordResult(
+        result(
+          mode: GameMode.daily,
+          score: 1500,
+          lines: 12,
+          level: 3,
+          challengeKey: today.key,
+        ),
+      );
+      expect(first.newBestScore, isTrue);
+      expect(storage.dailyRecord(today.key).bestScore, 1500);
+      expect(storage.dailyRecord(today.key).bestLines, 12);
+      expect(storage.dailyRecord(today.key).plays, 1);
+      expect(storage.bestScore(GameMode.daily), 1500);
+      expect(storage.dailyStreak(today.date), 1);
+
+      final lower = await storage.recordResult(
+        result(
+          mode: GameMode.daily,
+          score: 900,
+          lines: 8,
+          challengeKey: today.key,
+        ),
+      );
+      expect(lower.newBestScore, isFalse);
+      expect(storage.dailyRecord(today.key).bestScore, 1500);
+      expect(storage.dailyRecord(today.key).plays, 2);
+
+      await storage.recordResult(
+        result(
+          mode: GameMode.daily,
+          score: 600,
+          lines: 5,
+          challengeKey: yesterday.key,
+        ),
+      );
+      expect(storage.dailyStreak(today.date), 2);
+
+      await storage.clearRecords();
+      expect(storage.dailyRecord(today.key).played, isFalse);
+      expect(storage.dailyStreak(today.date), 0);
     });
   });
 }

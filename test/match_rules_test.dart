@@ -1,3 +1,4 @@
+import 'package:flutter_tetris/game/daily_challenge.dart';
 import 'package:flutter_tetris/game/game_mode.dart';
 import 'package:flutter_tetris/game/garbage.dart';
 import 'package:flutter_tetris/game/level.dart';
@@ -53,6 +54,19 @@ void main() {
       expect(rules.garbage?.rowsPerRise, 1);
       expect(rules.starsFor(const Duration(seconds: 30)), 3);
       expect(rules.starsFor(const Duration(seconds: 110)), 1);
+    });
+
+    test('每日挑战提供日期标题、固定种子与两分钟限时', () {
+      final daily = DailyChallenge.forDate(DateTime(2026, 11, 5));
+      final rules = MatchRules(mode: GameMode.daily, daily: daily);
+      expect(rules.title, '每日挑战 · 11 月 5 日');
+      expect(rules.isDaily, isTrue);
+      expect(rules.isLevel, isFalse);
+      expect(rules.seed, daily.seed);
+      expect(rules.targetLines, isNull);
+      expect(rules.timeLimit, const Duration(seconds: 120));
+      expect(rules.terrain, isEmpty);
+      expect(rules.starsFor(Duration.zero), 0);
     });
 
     test('关卡没有垃圾行时规则为空', () {

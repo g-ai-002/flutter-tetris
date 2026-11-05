@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tetris/game/daily_challenge.dart';
 import 'package:flutter_tetris/game/game_mode.dart';
 import 'package:flutter_tetris/game/garbage.dart';
 import 'package:flutter_tetris/game/level.dart';
@@ -85,6 +86,31 @@ void main() {
 
     expect(find.text('2 分钟计时'), findsOneWidget);
     expect(find.textContaining('剩余 02:00'), findsWidgets);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('每日挑战展示日期、剩余时间与固定种子提示', (tester) async {
+    tester.view.physicalSize = const Size(1280, 960);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final daily = DailyChallenge.forDate(DateTime(2026, 11, 5));
+
+    await tester.pumpWidget(
+      wrapPage(
+        child: GamePage(mode: GameMode.daily, daily: daily),
+        storage: storage,
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.text('每日挑战 · 11 月 5 日'), findsOneWidget);
+    expect(find.textContaining('固定牌序'), findsWidgets);
+    expect(find.textContaining('剩余 02:00'), findsWidgets);
+    expect(find.text('HOLD 暂存'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
     await tester.pumpWidget(const SizedBox.shrink());
   });
 
