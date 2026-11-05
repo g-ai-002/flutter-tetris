@@ -9,7 +9,8 @@ class Board {
       _cells = List.generate(
         rows,
         (_) => List<TetrominoType?>.filled(columns, null),
-      );
+      ),
+      _garbage = List.generate(rows, (_) => List<bool>.filled(columns, false));
 
   final int columns;
   final int rows;
@@ -19,6 +20,9 @@ class Board {
 
   List<List<TetrominoType?>> _cells;
 
+  /// 与 [_cells] 同形的垃圾格标记，仅用于配色区分。
+  List<List<bool>> _garbage;
+
   /// 只读访问某一格，越界返回 null。
   TetrominoType? at(int x, int y) {
     if (x < 0 || x >= columns || y < 0 || y >= rows) return null;
@@ -26,6 +30,12 @@ class Board {
   }
 
   bool isFilled(int x, int y) => at(x, y) != null;
+
+  /// 该格是否为预设地形或上涌产生的垃圾块。
+  bool isGarbage(int x, int y) {
+    if (x < 0 || x >= columns || y < 0 || y >= rows) return false;
+    return _garbage[y][x];
+  }
 
   /// 方块是否可以放置：左右不越界、不穿过底部、不与已落定的格子重叠。
   bool fits(Iterable<Block> blocks) {
@@ -43,6 +53,7 @@ class Board {
         continue;
       }
       _cells[block.y][block.x] = type;
+      _garbage[block.y][block.x] = false;
     }
   }
 
@@ -70,10 +81,67 @@ class Board {
       for (var y = 0; y < rows; y++)
         if (!removed.contains(y)) _cells[y],
     ];
+    final keptGarbage = <List<bool>>[
+      for (var y = 0; y < rows; y++)
+        if (!removed.contains(y)) _garbage[y],
+    ];
     while (kept.length < rows) {
       kept.insert(0, List<TetrominoType?>.filled(columns, null));
+      keptGarbage.insert(0, List<bool>.filled(columns, false));
     }
     _cells = kept;
+    _garbage = keptGarbage;
+  }
+
+  /// 载入关卡地形，从底部向上贴齐；字符含义见 [LevelDefinition.terrain]。
+  void loadTerrain(List<String> terrain) {
+    reset();
+    final top = rows - terrain.length;
+    for (var row = 0; row < terrain.length; row++) {
+      final y = top + row;
+      final cells = terrain[row];
+      for (var x = 0; x < columns && x < cells.length; x++) {
+        final code = cells[x];
+        if (code == '.') continue;
+        final garbage = code == '#';
+        final type = garbage ? TetrominoType.o : _typeFromCode(code);
+        if (type == null) continue;
+        _cells[y][x] = type;
+        _garbage[y][x] = garbage;
+      }
+    }
+  }
+
+  /// 垃圾行整体上涌：每行留一个缺口，顶部被挤出时返回 true。
+  bool raiseGarbage(List<int> holes) {
+    final count = holes.length;
+    if (count <= 0 || count >= rows) return true;
+    var overflow = false;
+    for (var y = 0; y < count; y++) {
+      for (var x = 0; x < columns; x++) {
+        if (_cells[y][x] != null) overflow = true;
+      }
+    }
+    for (var y = 0; y < rows - count; y++) {
+      _cells[y] = _cells[y + count];
+      _garbage[y] = _garbage[y + count];
+    }
+    for (var i = 0; i < count; i++) {
+      final y = rows - count + i;
+      _cells[y] = List<TetrominoType?>.filled(columns, TetrominoType.o);
+      _garbage[y] = List<bool>.filled(columns, true);
+      final hole = holes[i].clamp(0, columns - 1);
+      _cells[y][hole] = null;
+      _garbage[y][hole] = false;
+    }
+    return overflow;
+  }
+
+  static TetrominoType? _typeFromCode(String code) {
+    for (final type in TetrominoType.values) {
+      if (type.code == code) return type;
+    }
+    return null;
   }
 
   int get filledCount {
@@ -100,9 +168,10 @@ class Board {
 
   /// 测试与调试用：直接放置一格。
   @visibleForTesting
-  void setCell(int x, int y, TetrominoType? type) {
+  void setCell(int x, int y, TetrominoType? type, {bool garbage = false}) {
     if (x < 0 || x >= columns || y < 0 || y >= rows) return;
     _cells[y][x] = type;
+    _garbage[y][x] = type != null && garbage;
   }
 
   void reset() {
@@ -110,6 +179,7 @@ class Board {
       rows,
       (_) => List<TetrominoType?>.filled(columns, null),
     );
+    _garbage = List.generate(rows, (_) => List<bool>.filled(columns, false));
   }
 
   /// 测试与调试用：把棋盘渲染成字符画，`.` 为空，字母为方块类型。

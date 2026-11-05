@@ -1,10 +1,12 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 
 import 'bag.dart';
 import 'board.dart';
 import 'game_mode.dart';
+import 'level.dart';
 import 'scoring.dart';
 import 'srs.dart';
 import 'tetromino.dart';
@@ -33,12 +35,15 @@ enum GameEvent {
 class TetrisController extends ChangeNotifier {
   TetrisController({
     required this.mode,
+    LevelDefinition? level,
     int? seed,
     this.autoTick = true,
     this.lockDelay = const Duration(milliseconds: 500),
     this.clearDelay = const Duration(milliseconds: 260),
     this.tickInterval = const Duration(milliseconds: 16),
-  }) : _bag = SevenBag(seed: seed),
+  }) : levelDef = level,
+       _bag = SevenBag(seed: seed ?? level?.seed),
+       _garbageRandom = Random((level?.seed ?? 0) * 31 + 17),
        board = Board() {
     _lastTick = DateTime.now();
   }
@@ -46,6 +51,10 @@ class TetrisController extends ChangeNotifier {
   static const int maxLockResets = 15;
 
   final GameMode mode;
+
+  /// 关卡模式下生效的关卡规则，其他模式为 null。
+  final LevelDefinition? levelDef;
+
   final Board board;
   final Duration lockDelay;
   final Duration clearDelay;
@@ -53,6 +62,7 @@ class TetrisController extends ChangeNotifier {
 
   final bool autoTick;
   final SevenBag _bag;
+  Random _garbageRandom;
   final List<GameEvent> _events = [];
 
   Timer? _timer;
@@ -67,6 +77,7 @@ class TetrisController extends ChangeNotifier {
   int _score = 0;
   int _lines = 0;
   int _level = 1;
+  int _startLevel = 1;
   int _combo = 0;
   int _maxCombo = 0;
   int _pieces = 0;
@@ -77,6 +88,9 @@ class TetrisController extends ChangeNotifier {
   Duration _lockElapsed = Duration.zero;
   int _lockResets = 0;
   bool _grounded = false;
+
+  Duration _garbageElapsed = Duration.zero;
+  int _garbageRises = 0;
 
   List<int> _clearingRows = const [];
   Duration _clearElapsed = Duration.zero;
@@ -126,11 +140,18 @@ class TetrisController extends ChangeNotifier {
   bool get canControl =>
       _status == GameStatus.playing && _piece != null && !isClearing;
 
-  Duration get timeLimit => mode.timeLimit ?? Duration.zero;
+  /// 当前对局的目标行数：竞速为 40，关卡取自关卡定义。
+  int? get targetLines => levelDef?.targetLines ?? mode.targetLines;
+
+  /// 当前对局的限时：计时模式 120 秒，关卡取自关卡定义。
+  Duration? get limit => levelDef?.timeLimit ?? mode.timeLimit;
+
+  Duration get timeLimit => limit ?? Duration.zero;
+
   Duration get remaining {
-    final limit = mode.timeLimit;
-    if (limit == null) return Duration.zero;
-    final value = limit - _elapsed;
+    final total = limit;
+    if (total == null) return Duration.zero;
+    final value = total - _elapsed;
     return value.isNegative ? Duration.zero : value;
   }
 
@@ -145,11 +166,22 @@ class TetrisController extends ChangeNotifier {
     return ghost;
   }
 
-  /// 已完成的进度（0~1），用于 40 行竞速的进度条。
+  /// 已完成的进度（0~1），用于目标行数进度条。
   double get progress {
-    final target = mode.targetLines;
+    final target = targetLines;
     if (target == null) return 0;
     return (_lines / target).clamp(0.0, 1.0);
+  }
+
+  Duration? get garbageInterval => levelDef?.garbageInterval;
+  int get garbageRises => _garbageRises;
+
+  /// 距下一次垃圾行上涌还有多少秒，未启用时为 null。
+  int? get garbageSecondsLeft {
+    final interval = garbageInterval;
+    if (interval == null) return null;
+    final left = interval - _garbageElapsed;
+    return left.isNegative ? 0 : left.inSeconds;
   }
 
   Duration get gravity => gravityForLevel(_level);
@@ -283,7 +315,7 @@ class TetrisController extends ChangeNotifier {
   void debugSetStats({int? lines, Duration? elapsed}) {
     if (lines != null) {
       _lines = lines;
-      _level = levelForLines(lines);
+      _level = levelForLines(lines, startLevel: _startLevel);
     }
     if (elapsed != null) _elapsed = elapsed;
   }
@@ -309,9 +341,9 @@ class TetrisController extends ChangeNotifier {
     }
     _elapsed += step;
 
-    final limit = mode.timeLimit;
-    if (limit != null && _elapsed >= limit) {
-      _elapsed = limit;
+    final deadline = limit;
+    if (deadline != null && _elapsed >= deadline) {
+      _elapsed = deadline;
       _end(won: false, reason: '时间到');
       return;
     }
@@ -350,7 +382,52 @@ class TetrisController extends ChangeNotifier {
         return;
       }
     }
+    _updateGarbage(step);
     _notifyIfTimeChanged();
+  }
+
+  /// 按关卡设定定期把整行垃圾从底部顶上，并把当前方块一并抬起。
+  void _updateGarbage(Duration step) {
+    final interval = garbageInterval;
+    if (interval == null || interval <= Duration.zero) return;
+    _garbageElapsed += step;
+    while (_garbageElapsed >= interval) {
+      _garbageElapsed -= interval;
+      _raiseGarbage();
+      if (_status != GameStatus.playing) return;
+    }
+  }
+
+  void _raiseGarbage() {
+    final level = levelDef;
+    if (level == null) return;
+    final count = level.garbageRowsPerRise;
+    final holes = [
+      for (var i = 0; i < count; i++) _garbageRandom.nextInt(board.columns),
+    ];
+    final overflow = board.raiseGarbage(holes);
+    _garbageRises++;
+    if (overflow) {
+      _end(won: false, reason: '垃圾行顶到了顶部');
+      return;
+    }
+    final current = _piece;
+    if (current != null) {
+      var lifted = current;
+      var steps = 0;
+      while (!board.fits(lifted.blocks) && steps <= count + 1) {
+        lifted = lifted.copyWith(y: lifted.y - 1);
+        steps++;
+      }
+      if (!board.fits(lifted.blocks)) {
+        _end(won: false, reason: '垃圾行顶到了顶部');
+        return;
+      }
+      _piece = lifted;
+      _refreshGrounded();
+    }
+    _events.add(GameEvent.lock);
+    notifyListeners();
   }
 
   void _startTicker() {
@@ -499,7 +576,7 @@ class TetrisController extends ChangeNotifier {
     _combo++;
     if (_combo > _maxCombo) _maxCombo = _combo;
     _lines += rows.length;
-    final newLevel = levelForLines(_lines);
+    final newLevel = levelForLines(_lines, startLevel: _startLevel);
     if (newLevel > _level) {
       _level = newLevel;
       _events.add(GameEvent.levelUp);
@@ -514,7 +591,7 @@ class TetrisController extends ChangeNotifier {
     _clearElapsed = Duration.zero;
     _clearSequence++;
 
-    final target = mode.targetLines;
+    final target = targetLines;
     if (target != null && _lines >= target && _completedAt == null) {
       _completedAt = _elapsed;
     }
@@ -526,7 +603,7 @@ class TetrisController extends ChangeNotifier {
     _clearingRows = const [];
     _clearElapsed = Duration.zero;
 
-    final target = mode.targetLines;
+    final target = targetLines;
     if (target != null && _lines >= target) {
       _end(
         won: true,
@@ -550,6 +627,8 @@ class TetrisController extends ChangeNotifier {
     _timer?.cancel();
     _timer = null;
     _clearingRows = const [];
+    final finishedAt = elapsedOverride ?? _elapsed;
+    final level = levelDef;
     _result = GameResult(
       mode: mode,
       score: _score,
@@ -557,9 +636,11 @@ class TetrisController extends ChangeNotifier {
       level: _level,
       pieces: _pieces,
       maxCombo: _maxCombo,
-      elapsed: elapsedOverride ?? _elapsed,
+      elapsed: finishedAt,
       won: won,
       reason: reason,
+      levelId: level?.id,
+      stars: won && level != null ? level.starsFor(finishedAt) : 0,
     );
     _events.add(won ? GameEvent.win : GameEvent.gameOver);
     notifyListeners();
@@ -574,14 +655,18 @@ class TetrisController extends ChangeNotifier {
 
   void _resetState() {
     board.reset();
-    _bag.reset();
+    final level = levelDef;
+    if (level != null) board.loadTerrain(level.terrain);
+    _bag.reset(seed: level?.seed);
+    _garbageRandom = Random((level?.seed ?? 0) * 31 + 17);
     _next.clear();
     _piece = null;
     _hold = null;
     _holdUsed = false;
     _score = 0;
     _lines = 0;
-    _level = 1;
+    _startLevel = level?.startLevel ?? 1;
+    _level = _startLevel;
     _combo = 0;
     _maxCombo = 0;
     _pieces = 0;
@@ -591,6 +676,8 @@ class TetrisController extends ChangeNotifier {
     _lockElapsed = Duration.zero;
     _lockResets = 0;
     _grounded = false;
+    _garbageElapsed = Duration.zero;
+    _garbageRises = 0;
     _clearingRows = const [];
     _clearElapsed = Duration.zero;
     _completedAt = null;

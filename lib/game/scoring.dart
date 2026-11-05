@@ -49,8 +49,11 @@ int clearScore({
 }
 
 /// 等级：每消 10 行提升一级，最高 15 级，避免速度失控。
-int levelForLines(int lines) {
-  final level = 1 + lines ~/ 10;
+///
+/// [startLevel] 用于关卡模式从更高的起始等级开始。
+int levelForLines(int lines, {int startLevel = 1}) {
+  final base = startLevel < 1 ? 1 : startLevel;
+  final level = base + lines ~/ 10;
   return level > 15 ? 15 : level;
 }
 
