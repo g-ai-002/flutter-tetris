@@ -1,6 +1,8 @@
 /// 关卡模式：预设地形、限时目标与垃圾行上涌。
 library;
 
+import 'garbage.dart';
+
 /// 单个关卡的完整规则。
 ///
 /// [terrain] 从下往上贴底摆放，每行 10 个字符：`.` 为空，`#` 为垃圾块，
@@ -15,12 +17,11 @@ class LevelDefinition {
     required this.terrain,
     required this.seed,
     this.startLevel = 1,
-    this.garbageInterval,
-    this.garbageRowsPerRise = 1,
+    this.garbage,
   }) : assert(id > 0),
        assert(targetLines > 0),
        assert(startLevel > 0),
-       assert(garbageRowsPerRise > 0);
+       assert(seed > 0);
 
   final int id;
   final String name;
@@ -30,16 +31,13 @@ class LevelDefinition {
   final List<String> terrain;
   final int startLevel;
 
-  /// 垃圾行每次上涌的行数。
-  final int garbageRowsPerRise;
-
-  /// 垃圾行上涌间隔，null 表示本关不涨垃圾行。
-  final Duration? garbageInterval;
+  /// 垃圾行上涌规则，null 表示本关不涨垃圾行。
+  final GarbageRule? garbage;
 
   /// 固定随机种子，保证每关的方块序列与垃圾行缺口可复现。
   final int seed;
 
-  bool get hasGarbageRise => garbageInterval != null;
+  bool get hasGarbageRise => garbage != null;
 
   /// 按剩余时间比例评星：剩余不少于 35% 得三星，不少于 12% 得两星。
   int starsFor(Duration elapsed) {
@@ -97,7 +95,7 @@ const List<LevelDefinition> kLevels = [
     targetLines: 10,
     timeLimit: Duration(seconds: 110),
     terrain: ['#.####.###', '##.######.'],
-    garbageInterval: Duration(seconds: 30),
+    garbage: GarbageRule(interval: Duration(seconds: 30)),
     seed: 105,
   ),
   LevelDefinition(
@@ -116,7 +114,7 @@ const List<LevelDefinition> kLevels = [
     targetLines: 15,
     timeLimit: Duration(seconds: 120),
     terrain: ['##.###.##.', '###.####.#', '#.####.###'],
-    garbageInterval: Duration(seconds: 24),
+    garbage: GarbageRule(interval: Duration(seconds: 24)),
     seed: 107,
   ),
   LevelDefinition(
@@ -135,7 +133,7 @@ const List<LevelDefinition> kLevels = [
     targetLines: 18,
     timeLimit: Duration(seconds: 140),
     terrain: ['###.##.###', '####.#####', '##.######.', '###.####.#'],
-    garbageInterval: Duration(seconds: 20),
+    garbage: GarbageRule(interval: Duration(seconds: 20)),
     seed: 109,
   ),
   LevelDefinition(
@@ -160,7 +158,7 @@ const List<LevelDefinition> kLevels = [
     targetLines: 22,
     timeLimit: Duration(seconds: 150),
     terrain: ['####..####', '##.####.##', '###.######', '#.####.###'],
-    garbageInterval: Duration(seconds: 18),
+    garbage: GarbageRule(interval: Duration(seconds: 18)),
     seed: 111,
   ),
   LevelDefinition(
@@ -177,7 +175,7 @@ const List<LevelDefinition> kLevels = [
       '###.##.###',
     ],
     startLevel: 3,
-    garbageInterval: Duration(seconds: 20),
+    garbage: GarbageRule(interval: Duration(seconds: 20)),
     seed: 112,
   ),
 ];

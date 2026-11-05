@@ -1,12 +1,13 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 
 import 'bag.dart';
 import 'board.dart';
 import 'game_mode.dart';
+import 'garbage.dart';
 import 'level.dart';
+import 'match_rules.dart';
 import 'scoring.dart';
 import 'srs.dart';
 import 'tetromino.dart';
@@ -34,26 +35,48 @@ enum GameEvent {
 /// 默认自带 16ms 定时器驱动；单元测试可关闭自动计时，手动调用 [tick]。
 class TetrisController extends ChangeNotifier {
   TetrisController({
-    required this.mode,
+    required GameMode mode,
     LevelDefinition? level,
     int? seed,
-    this.autoTick = true,
-    this.lockDelay = const Duration(milliseconds: 500),
-    this.clearDelay = const Duration(milliseconds: 260),
-    this.tickInterval = const Duration(milliseconds: 16),
-  }) : levelDef = level,
-       _bag = SevenBag(seed: seed ?? level?.seed),
-       _garbageRandom = Random((level?.seed ?? 0) * 31 + 17),
+    bool autoTick = true,
+    Duration lockDelay = const Duration(milliseconds: 500),
+    Duration clearDelay = const Duration(milliseconds: 260),
+    Duration tickInterval = const Duration(milliseconds: 16),
+  }) : this._(
+         rules: MatchRules(mode: mode, level: level),
+         seed: seed ?? level?.seed,
+         autoTick: autoTick,
+         lockDelay: lockDelay,
+         clearDelay: clearDelay,
+         tickInterval: tickInterval,
+       );
+
+  TetrisController._({
+    required this.rules,
+    required int? seed,
+    required this.autoTick,
+    required this.lockDelay,
+    required this.clearDelay,
+    required this.tickInterval,
+  }) : _seed = seed,
+       _bag = SevenBag(seed: seed),
+       _garbage = GarbageSpawner(
+         rule: rules.garbage,
+         seed: (seed ?? 0) * 31 + 17,
+       ),
        board = Board() {
     _lastTick = DateTime.now();
   }
 
   static const int maxLockResets = 15;
 
-  final GameMode mode;
+  /// 本局玩法与关卡规则。
+  final MatchRules rules;
+
+  GameMode get mode => rules.mode;
 
   /// 关卡模式下生效的关卡规则，其他模式为 null。
-  final LevelDefinition? levelDef;
+  LevelDefinition? get levelDef => rules.level;
 
   final Board board;
   final Duration lockDelay;
@@ -61,8 +84,9 @@ class TetrisController extends ChangeNotifier {
   final Duration tickInterval;
 
   final bool autoTick;
+  final int? _seed;
   final SevenBag _bag;
-  Random _garbageRandom;
+  final GarbageSpawner _garbage;
   final List<GameEvent> _events = [];
 
   Timer? _timer;
@@ -88,9 +112,6 @@ class TetrisController extends ChangeNotifier {
   Duration _lockElapsed = Duration.zero;
   int _lockResets = 0;
   bool _grounded = false;
-
-  Duration _garbageElapsed = Duration.zero;
-  int _garbageRises = 0;
 
   List<int> _clearingRows = const [];
   Duration _clearElapsed = Duration.zero;
@@ -141,10 +162,10 @@ class TetrisController extends ChangeNotifier {
       _status == GameStatus.playing && _piece != null && !isClearing;
 
   /// 当前对局的目标行数：竞速为 40，关卡取自关卡定义。
-  int? get targetLines => levelDef?.targetLines ?? mode.targetLines;
+  int? get targetLines => rules.targetLines;
 
   /// 当前对局的限时：计时模式 120 秒，关卡取自关卡定义。
-  Duration? get limit => levelDef?.timeLimit ?? mode.timeLimit;
+  Duration? get limit => rules.timeLimit;
 
   Duration get timeLimit => limit ?? Duration.zero;
 
@@ -173,16 +194,11 @@ class TetrisController extends ChangeNotifier {
     return (_lines / target).clamp(0.0, 1.0);
   }
 
-  Duration? get garbageInterval => levelDef?.garbageInterval;
-  int get garbageRises => _garbageRises;
+  Duration? get garbageInterval => rules.garbage?.interval;
+  int get garbageRises => _garbage.rises;
 
   /// 距下一次垃圾行上涌还有多少秒，未启用时为 null。
-  int? get garbageSecondsLeft {
-    final interval = garbageInterval;
-    if (interval == null) return null;
-    final left = interval - _garbageElapsed;
-    return left.isNegative ? 0 : left.inSeconds;
-  }
+  int? get garbageSecondsLeft => _garbage.secondsLeft;
 
   Duration get gravity => gravityForLevel(_level);
 
@@ -388,25 +404,15 @@ class TetrisController extends ChangeNotifier {
 
   /// 按关卡设定定期把整行垃圾从底部顶上，并把当前方块一并抬起。
   void _updateGarbage(Duration step) {
-    final interval = garbageInterval;
-    if (interval == null || interval <= Duration.zero) return;
-    _garbageElapsed += step;
-    while (_garbageElapsed >= interval) {
-      _garbageElapsed -= interval;
-      _raiseGarbage();
+    for (final holes in _garbage.advance(step, board.columns)) {
+      _raiseGarbage(holes);
       if (_status != GameStatus.playing) return;
     }
   }
 
-  void _raiseGarbage() {
-    final level = levelDef;
-    if (level == null) return;
-    final count = level.garbageRowsPerRise;
-    final holes = [
-      for (var i = 0; i < count; i++) _garbageRandom.nextInt(board.columns),
-    ];
+  void _raiseGarbage(List<int> holes) {
+    if (holes.isEmpty) return;
     final overflow = board.raiseGarbage(holes);
-    _garbageRises++;
     if (overflow) {
       _end(won: false, reason: '垃圾行顶到了顶部');
       return;
@@ -415,7 +421,7 @@ class TetrisController extends ChangeNotifier {
     if (current != null) {
       var lifted = current;
       var steps = 0;
-      while (!board.fits(lifted.blocks) && steps <= count + 1) {
+      while (!board.fits(lifted.blocks) && steps <= holes.length + 1) {
         lifted = lifted.copyWith(y: lifted.y - 1);
         steps++;
       }
@@ -628,9 +634,8 @@ class TetrisController extends ChangeNotifier {
     _timer = null;
     _clearingRows = const [];
     final finishedAt = elapsedOverride ?? _elapsed;
-    final level = levelDef;
     _result = GameResult(
-      mode: mode,
+      mode: rules.mode,
       score: _score,
       lines: _lines,
       level: _level,
@@ -639,8 +644,8 @@ class TetrisController extends ChangeNotifier {
       elapsed: finishedAt,
       won: won,
       reason: reason,
-      levelId: level?.id,
-      stars: won && level != null ? level.starsFor(finishedAt) : 0,
+      levelId: rules.levelId,
+      stars: won ? rules.starsFor(finishedAt) : 0,
     );
     _events.add(won ? GameEvent.win : GameEvent.gameOver);
     notifyListeners();
@@ -654,18 +659,20 @@ class TetrisController extends ChangeNotifier {
   }
 
   void _resetState() {
-    board.reset();
-    final level = levelDef;
-    if (level != null) board.loadTerrain(level.terrain);
-    _bag.reset(seed: level?.seed);
-    _garbageRandom = Random((level?.seed ?? 0) * 31 + 17);
+    if (rules.terrain.isEmpty) {
+      board.reset();
+    } else {
+      board.loadTerrain(rules.terrain);
+    }
+    _bag.reset(seed: _seed);
+    _garbage.reset();
     _next.clear();
     _piece = null;
     _hold = null;
     _holdUsed = false;
     _score = 0;
     _lines = 0;
-    _startLevel = level?.startLevel ?? 1;
+    _startLevel = rules.startLevel;
     _level = _startLevel;
     _combo = 0;
     _maxCombo = 0;
@@ -676,8 +683,6 @@ class TetrisController extends ChangeNotifier {
     _lockElapsed = Duration.zero;
     _lockResets = 0;
     _grounded = false;
-    _garbageElapsed = Duration.zero;
-    _garbageRises = 0;
     _clearingRows = const [];
     _clearElapsed = Duration.zero;
     _completedAt = null;

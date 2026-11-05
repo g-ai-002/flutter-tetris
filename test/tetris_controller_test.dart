@@ -1,4 +1,5 @@
 import 'package:flutter_tetris/game/game_mode.dart';
+import 'package:flutter_tetris/game/garbage.dart';
 import 'package:flutter_tetris/game/level.dart';
 import 'package:flutter_tetris/game/tetromino.dart';
 import 'package:flutter_tetris/game/tetris_controller.dart';
@@ -30,6 +31,16 @@ void main() {
       expect(controller.score, 0);
       expect(controller.lines, 0);
       expect(controller.level, 1);
+    });
+
+    test('固定种子让方块序列在重开后复现', () {
+      List<TetrominoType> sequence() => [
+        controller.piece!.type,
+        ...controller.nextQueue.take(3),
+      ];
+      final first = sequence();
+      controller.restart();
+      expect(sequence(), first);
     });
 
     test('左右移动受墙限制', () {
@@ -363,7 +374,7 @@ void main() {
         targetLines: 99,
         timeLimit: Duration(seconds: 60),
         terrain: [],
-        garbageInterval: Duration(seconds: 1),
+        garbage: GarbageRule(interval: Duration(seconds: 1)),
         seed: 10,
       );
       final controller = TetrisController(
