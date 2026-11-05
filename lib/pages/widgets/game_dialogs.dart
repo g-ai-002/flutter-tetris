@@ -8,6 +8,7 @@ import '../../game/tetris_controller.dart';
 import '../../services/storage_service.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
+import 'star_rating.dart';
 import 'status_chip.dart';
 
 /// 终局结算弹窗：成绩、纪录与再来一局。
@@ -140,21 +141,7 @@ class _ResultDialog extends StatelessWidget {
               Text(_title, style: theme.textTheme.titleLarge),
               if (won && result.stars > 0) ...[
                 const SizedBox(height: 8),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    for (var i = 0; i < 3; i++)
-                      Icon(
-                        i < result.stars
-                            ? Icons.star_rounded
-                            : Icons.star_outline_rounded,
-                        size: 28,
-                        color: i < result.stars
-                            ? appGold
-                            : colors.outline.withValues(alpha: 0.7),
-                      ),
-                  ],
-                ),
+                StarRating(stars: result.stars, size: 28),
               ],
               const SizedBox(height: 4),
               Text(

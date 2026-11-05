@@ -8,6 +8,7 @@ import '../game/game_mode.dart';
 import '../game/level.dart';
 import '../providers/settings_provider.dart';
 import '../theme/app_theme.dart';
+import '../theme/mode_visuals.dart';
 import '../utils/constants.dart';
 import '../utils/formatters.dart';
 import 'game_page.dart';
@@ -276,29 +277,10 @@ class _ModeCards extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     final cards = <Widget>[
-      _modeCard(
-        context: context,
-        settings: settings,
-        mode: GameMode.endless,
-        icon: Icons.all_inclusive_rounded,
-        accent: colors.primary,
-      ),
-      _modeCard(
-        context: context,
-        settings: settings,
-        mode: GameMode.sprint,
-        icon: Icons.timer_outlined,
-        accent: appJade,
-      ),
-      _modeCard(
-        context: context,
-        settings: settings,
-        mode: GameMode.ultra,
-        icon: Icons.bolt_rounded,
-        accent: appGold,
-      ),
+      _modeCard(context: context, settings: settings, mode: GameMode.endless),
+      _modeCard(context: context, settings: settings, mode: GameMode.sprint),
+      _modeCard(context: context, settings: settings, mode: GameMode.ultra),
     ];
     if (!wide) {
       return Column(
@@ -419,11 +401,10 @@ class _ModeCards extends StatelessWidget {
     required BuildContext context,
     required SettingsProvider settings,
     required GameMode mode,
-    required IconData icon,
-    required Color accent,
   }) {
+    final visual = modeVisualFor(mode, Theme.of(context).colorScheme);
     return EntryTile(
-      leading: EntryBadge(icon: icon, accent: accent),
+      leading: EntryBadge(icon: visual.icon, accent: visual.accent),
       title: mode.label,
       subtitle: mode.tagline,
       onTap: () => Navigator.of(context)

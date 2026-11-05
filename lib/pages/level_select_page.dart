@@ -10,6 +10,7 @@ import '../theme/app_theme.dart';
 import '../utils/formatters.dart';
 import 'game_page.dart';
 import 'widgets/section_card.dart';
+import 'widgets/star_rating.dart';
 
 /// 关卡选择：展示通关进度、星级与每关目标。
 class LevelSelectPage extends StatelessWidget {
@@ -230,7 +231,7 @@ class _LevelTile extends StatelessWidget {
                             ),
                     ),
                     const Spacer(),
-                    _Stars(stars: record.stars),
+                    StarRating(stars: record.stars, size: 14),
                   ],
                 ),
                 const SizedBox(height: 9),
@@ -282,28 +283,6 @@ class _LevelTile extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class _Stars extends StatelessWidget {
-  const _Stars({required this.stars});
-
-  final int stars;
-
-  @override
-  Widget build(BuildContext context) {
-    final outline = Theme.of(context).colorScheme.outline;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        for (var i = 0; i < 3; i++)
-          Icon(
-            i < stars ? Icons.star_rounded : Icons.star_outline_rounded,
-            size: 14,
-            color: i < stars ? appGold : outline,
-          ),
-      ],
     );
   }
 }
