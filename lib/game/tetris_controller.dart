@@ -9,6 +9,7 @@ import 'game_mode.dart';
 import 'garbage.dart';
 import 'level.dart';
 import 'match_rules.dart';
+import 'scoreboard.dart';
 import 'scoring.dart';
 import 'srs.dart';
 import 'tetromino.dart';
@@ -66,6 +67,7 @@ class TetrisController extends ChangeNotifier {
          rule: rules.garbage,
          seed: (seed ?? 0) * 31 + 17,
        ),
+       _scoreBoard = ScoreBoard(startLevel: rules.startLevel),
        board = Board() {
     _lastTick = DateTime.now();
   }
@@ -89,6 +91,7 @@ class TetrisController extends ChangeNotifier {
   final int? _seed;
   final SevenBag _bag;
   final GarbageSpawner _garbage;
+  final ScoreBoard _scoreBoard;
   final List<GameEvent> _events = [];
 
   Timer? _timer;
@@ -99,15 +102,6 @@ class TetrisController extends ChangeNotifier {
   TetrominoType? _hold;
   bool _holdUsed = false;
   final List<TetrominoType> _next = [];
-
-  int _score = 0;
-  int _lines = 0;
-  int _level = 1;
-  int _startLevel = 1;
-  int _combo = 0;
-  int _maxCombo = 0;
-  int _pieces = 0;
-  bool _backToBack = false;
 
   Duration _elapsed = Duration.zero;
   Duration _gravityAccumulator = Duration.zero;
@@ -138,13 +132,13 @@ class TetrisController extends ChangeNotifier {
   bool get canHold => _status == GameStatus.playing && !_holdUsed;
   List<TetrominoType> get nextQueue => List.unmodifiable(_next);
 
-  int get score => _score;
-  int get lines => _lines;
-  int get level => _level;
-  int get combo => _combo;
-  int get maxCombo => _maxCombo;
-  int get pieces => _pieces;
-  bool get backToBack => _backToBack;
+  int get score => _scoreBoard.score;
+  int get lines => _scoreBoard.lines;
+  int get level => _scoreBoard.level;
+  int get combo => _scoreBoard.combo;
+  int get maxCombo => _scoreBoard.maxCombo;
+  int get pieces => _scoreBoard.pieces;
+  bool get backToBack => _scoreBoard.backToBack;
   Duration get elapsed => _elapsed;
   GameResult? get result => _result;
   bool get isPlaying => _status == GameStatus.playing;
@@ -193,7 +187,7 @@ class TetrisController extends ChangeNotifier {
   double get progress {
     final target = targetLines;
     if (target == null) return 0;
-    return (_lines / target).clamp(0.0, 1.0);
+    return (lines / target).clamp(0.0, 1.0);
   }
 
   Duration? get garbageInterval => rules.garbage?.interval;
@@ -202,7 +196,7 @@ class TetrisController extends ChangeNotifier {
   /// 距下一次垃圾行上涌还有多少秒，未启用时为 null。
   int? get garbageSecondsLeft => _garbage.secondsLeft;
 
-  Duration get gravity => gravityForLevel(_level);
+  Duration get gravity => gravityForLevel(level);
 
   int get stackHeight => board.stackHeight;
 
@@ -284,7 +278,7 @@ class TetrisController extends ChangeNotifier {
       return;
     }
     _piece = moved;
-    _score += 1;
+    _scoreBoard.addDropScore(1, pointsPerCell: 1);
     _gravityAccumulator = Duration.zero;
     _lastActionRotate = false;
     _refreshGrounded();
@@ -301,7 +295,7 @@ class TetrisController extends ChangeNotifier {
       distance++;
     }
     _piece = current;
-    _score += distance * 2;
+    _scoreBoard.addDropScore(distance, pointsPerCell: 2);
     _hardDropColumn = current.x;
     _hardDropRows = distance;
     _hardDropSequence++;
@@ -331,10 +325,7 @@ class TetrisController extends ChangeNotifier {
 
   @visibleForTesting
   void debugSetStats({int? lines, Duration? elapsed}) {
-    if (lines != null) {
-      _lines = lines;
-      _level = levelForLines(lines, startLevel: _startLevel);
-    }
+    if (lines != null) _scoreBoard.setLinesForTest(lines);
     if (elapsed != null) _elapsed = elapsed;
   }
 
@@ -378,7 +369,7 @@ class TetrisController extends ChangeNotifier {
     var current = activePiece;
 
     _gravityAccumulator += step;
-    final interval = gravityForLevel(_level);
+    final interval = gravityForLevel(level);
     while (_gravityAccumulator >= interval) {
       _gravityAccumulator -= interval;
       final moved = current.copyWith(y: current.y + 1);
@@ -542,7 +533,7 @@ class TetrisController extends ChangeNotifier {
     final blocks = current.blocks;
     board.lock(blocks, current.type);
     _piece = null;
-    _pieces++;
+    _scoreBoard.countPiece();
     _lastLockedBlocks = blocks;
     _lastLockedType = current.type;
     _lockSequence++;
@@ -557,40 +548,22 @@ class TetrisController extends ChangeNotifier {
     }
 
     final rows = board.fullRows();
+    final perfect =
+        rows.isNotEmpty && board.filledCount == rows.length * board.columns;
+    final clear = _scoreBoard.registerClear(
+      rows: rows.length,
+      tSpin: tSpin,
+      mini: mini,
+      perfectClear: perfect,
+    );
     if (rows.isEmpty) {
-      // 零消 T-Spin 不计连击，但仍有基础分。
-      if (tSpin) {
-        _score += clearScore(lines: 0, level: _level, tSpin: true, mini: mini);
-      }
-      _combo = 0;
       _events.add(GameEvent.lock);
       _spawnNext();
       notifyListeners();
       return;
     }
 
-    final difficult = tSpin || rows.length == 4;
-    final b2bActive = difficult && _backToBack;
-    final perfect = board.filledCount == rows.length * board.columns;
-    _score += clearScore(
-      lines: rows.length,
-      level: _level,
-      tSpin: tSpin,
-      mini: mini,
-      backToBack: b2bActive,
-      perfectClear: perfect,
-      combo: _combo,
-    );
-    _combo++;
-    if (_combo > _maxCombo) _maxCombo = _combo;
-    _lines += rows.length;
-    final newLevel = levelForLines(_lines, startLevel: _startLevel);
-    if (newLevel > _level) {
-      _level = newLevel;
-      _events.add(GameEvent.levelUp);
-    }
-    _backToBack = difficult;
-
+    if (clear.levelUp) _events.add(GameEvent.levelUp);
     _events.add(GameEvent.lock);
     _events.add(rows.length == 4 ? GameEvent.tetris : GameEvent.lineClear);
     if (perfect) _events.add(GameEvent.perfectClear);
@@ -600,7 +573,7 @@ class TetrisController extends ChangeNotifier {
     _clearSequence++;
 
     final target = targetLines;
-    if (target != null && _lines >= target && _completedAt == null) {
+    if (target != null && lines >= target && _completedAt == null) {
       _completedAt = _elapsed;
     }
     notifyListeners();
@@ -612,7 +585,7 @@ class TetrisController extends ChangeNotifier {
     _clearElapsed = Duration.zero;
 
     final target = targetLines;
-    if (target != null && _lines >= target) {
+    if (target != null && lines >= target) {
       _end(
         won: true,
         reason: '完成 $target 行',
@@ -638,11 +611,11 @@ class TetrisController extends ChangeNotifier {
     final finishedAt = elapsedOverride ?? _elapsed;
     _result = GameResult(
       mode: rules.mode,
-      score: _score,
-      lines: _lines,
-      level: _level,
-      pieces: _pieces,
-      maxCombo: _maxCombo,
+      score: score,
+      lines: lines,
+      level: level,
+      pieces: pieces,
+      maxCombo: maxCombo,
       elapsed: finishedAt,
       won: won,
       reason: reason,
@@ -673,14 +646,7 @@ class TetrisController extends ChangeNotifier {
     _piece = null;
     _hold = null;
     _holdUsed = false;
-    _score = 0;
-    _lines = 0;
-    _startLevel = rules.startLevel;
-    _level = _startLevel;
-    _combo = 0;
-    _maxCombo = 0;
-    _pieces = 0;
-    _backToBack = false;
+    _scoreBoard.reset(startLevel: rules.startLevel);
     _elapsed = Duration.zero;
     _gravityAccumulator = Duration.zero;
     _lockElapsed = Duration.zero;
