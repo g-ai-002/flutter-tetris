@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 
 import 'bag.dart';
 import 'board.dart';
+import 'daily_challenge.dart';
 import 'game_mode.dart';
 import 'garbage.dart';
 import 'level.dart';
@@ -37,14 +38,15 @@ class TetrisController extends ChangeNotifier {
   TetrisController({
     required GameMode mode,
     LevelDefinition? level,
+    DailyChallenge? daily,
     int? seed,
     bool autoTick = true,
     Duration lockDelay = const Duration(milliseconds: 500),
     Duration clearDelay = const Duration(milliseconds: 260),
     Duration tickInterval = const Duration(milliseconds: 16),
   }) : this._(
-         rules: MatchRules(mode: mode, level: level),
-         seed: seed ?? level?.seed,
+         rules: MatchRules(mode: mode, level: level, daily: daily),
+         seed: seed ?? daily?.seed ?? level?.seed,
          autoTick: autoTick,
          lockDelay: lockDelay,
          clearDelay: clearDelay,
@@ -646,6 +648,7 @@ class TetrisController extends ChangeNotifier {
       reason: reason,
       levelId: rules.levelId,
       stars: won ? rules.starsFor(finishedAt) : 0,
+      challengeKey: rules.daily?.key,
     );
     _events.add(won ? GameEvent.win : GameEvent.gameOver);
     notifyListeners();

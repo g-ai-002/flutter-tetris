@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../game/game_mode.dart';
+import '../services/daily_progress.dart';
 import '../services/level_progress.dart';
 import '../services/music_service.dart';
 import '../services/sound_service.dart';
@@ -59,6 +60,10 @@ class SettingsProvider extends ChangeNotifier {
   bool isLevelUnlocked(int id) => _storage.isLevelUnlocked(id);
   int get completedLevels => _storage.completedLevels;
   int get totalStars => _storage.totalStars;
+
+  DailyRecord dailyRecord(String key) => _storage.dailyRecord(key);
+  int dailyStreak([DateTime? now]) =>
+      _storage.dailyStreak(now ?? DateTime.now());
 
   Future<void> clearRecords() => _update(_storage.clearRecords);
 

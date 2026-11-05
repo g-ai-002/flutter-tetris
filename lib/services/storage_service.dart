@@ -2,6 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../game/game_mode.dart';
 import '../utils/constants.dart';
+import 'daily_progress.dart';
 import 'level_progress.dart';
 
 /// 一局结束后的纪录变化。
@@ -102,6 +103,15 @@ class StorageService {
 
   LevelRecord levelRecord(int id) => levelProgress.record(id);
 
+  DailyProgress get dailyProgress =>
+      DailyProgress.decode(_p.getString(AppConstants.prefKeyDailyRecords));
+
+  /// 指定日期（`yyyyMMdd`）的每日挑战成绩。
+  DailyRecord dailyRecord(String key) => dailyProgress.record(key);
+
+  /// 连续打卡天数，今天还没玩时从昨天开始计算。
+  int dailyStreak(DateTime now) => dailyProgress.streak(now);
+
   /// 第一关默认开放，其余关卡需通关上一关。
   bool isLevelUnlocked(int id) => levelProgress.isUnlocked(id);
 
@@ -113,6 +123,9 @@ class StorageService {
   Future<RecordOutcome> recordResult(GameResult result) async {
     final levelId = result.levelId;
     final levelMerge = levelId == null ? null : levelProgress.merge(result);
+    final dailyMerge = result.challengeKey == null
+        ? null
+        : dailyProgress.merge(result);
     final oldLevel = levelId == null
         ? const LevelRecord(id: 0)
         : levelRecord(levelId);
@@ -122,7 +135,8 @@ class StorageService {
     final oldLines = bestLines(result.mode);
     final oldTime = levelId == null ? bestSprintTimeMs : oldLevel.bestTimeMs;
 
-    final newBestScore = result.score > oldScore;
+    final newModeBestScore = result.score > oldScore;
+    final newBestScore = dailyMerge?.newBestScore ?? newModeBestScore;
     final faster =
         result.won &&
         (oldTime == null || result.elapsed.inMilliseconds < oldTime);
@@ -140,6 +154,12 @@ class StorageService {
         plays(result.mode) + 1,
       );
 
+      if (dailyMerge != null) {
+        await p.setString(
+          AppConstants.prefKeyDailyRecords,
+          dailyMerge.progress.encode(),
+        );
+      }
       if (levelMerge != null) {
         await p.setString(
           AppConstants.prefKeyLevelRecords,
@@ -148,7 +168,7 @@ class StorageService {
         return true;
       }
 
-      if (newBestScore) {
+      if (newModeBestScore) {
         await p.setInt(
           AppConstants.bestScoreKey(result.mode.name),
           result.score,
@@ -185,6 +205,7 @@ class StorageService {
     }
     await p.remove(AppConstants.prefKeyBestSprintTime);
     await p.remove(AppConstants.prefKeyLevelRecords);
+    await p.remove(AppConstants.prefKeyDailyRecords);
     await p.remove(AppConstants.prefKeyGamesPlayed);
     await p.remove(AppConstants.prefKeyTotalLines);
     await p.remove(AppConstants.prefKeyTotalScore);
