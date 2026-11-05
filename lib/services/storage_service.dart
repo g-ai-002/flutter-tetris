@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../game/game_mode.dart';
+import '../theme/block_skin.dart';
 import '../utils/constants.dart';
 import 'daily_progress.dart';
 import 'level_progress.dart';
@@ -62,6 +63,11 @@ class StorageService {
   bool get darkMode => _p.getBool(AppConstants.prefKeyDarkMode) ?? false;
   Future<void> setDarkMode(bool value) =>
       _write((p) => p.setBool(AppConstants.prefKeyDarkMode, value));
+
+  BlockSkin get blockSkin =>
+      BlockSkin.fromName(_p.getString(AppConstants.prefKeyBlockSkin));
+  Future<void> setBlockSkin(BlockSkin value) =>
+      _write((p) => p.setString(AppConstants.prefKeyBlockSkin, value.name));
 
   bool get soundEnabled => _p.getBool(AppConstants.prefKeySound) ?? true;
   Future<void> setSoundEnabled(bool value) =>

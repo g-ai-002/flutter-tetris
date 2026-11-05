@@ -10,6 +10,7 @@ class AppConstants {
   static const String appDirName = 'FlutterTetris';
 
   static const String prefKeyDarkMode = 'dark_mode';
+  static const String prefKeyBlockSkin = 'block_skin';
   static const String prefKeySound = 'sound_enabled';
   static const String prefKeyMusic = 'music_enabled';
   static const String prefKeyHaptics = 'haptics_enabled';

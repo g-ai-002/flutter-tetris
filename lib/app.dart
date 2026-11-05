@@ -63,8 +63,14 @@ class _TetrisAppState extends State<TetrisApp> with WidgetsBindingObserver {
           return MaterialApp(
             title: AppConstants.appName,
             debugShowCheckedModeBanner: false,
-            theme: buildLightTheme(fontFamily: fontFamily),
-            darkTheme: buildDarkTheme(fontFamily: fontFamily),
+            theme: buildLightTheme(
+              fontFamily: fontFamily,
+              skin: settings.blockSkin,
+            ),
+            darkTheme: buildDarkTheme(
+              fontFamily: fontFamily,
+              skin: settings.blockSkin,
+            ),
             themeMode: settings.darkMode ? ThemeMode.dark : ThemeMode.light,
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,

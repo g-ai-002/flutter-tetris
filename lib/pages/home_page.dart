@@ -28,6 +28,7 @@ class HomePage extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
+    final palette = settings.blockSkin.palette(dark: isDark);
 
     return Scaffold(
       body: Container(
@@ -35,9 +36,7 @@ class HomePage extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: isDark
-                ? const [Color(0xFF201B14), Color(0xFF121009)]
-                : const [Color(0xFFFCF6E9), Color(0xFFF0E3CC)],
+            colors: [palette.screenTop, palette.screenBottom],
           ),
         ),
         child: SafeArea(
@@ -181,9 +180,7 @@ class _Hero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = settings.darkMode
-        ? BlockPalette.darkPalette
-        : BlockPalette.light;
+    final palette = settings.blockSkin.palette(dark: settings.darkMode);
     final preview = HeroBoardPreview(palette: palette);
     final text = _HeroText(wide: wide);
     if (!wide) {

@@ -8,6 +8,7 @@ import '../services/level_progress.dart';
 import '../services/music_service.dart';
 import '../services/sound_service.dart';
 import '../services/storage_service.dart';
+import '../theme/block_skin.dart';
 
 /// 用户偏好：主题、幽灵块、网格、音效与背景音乐。
 class SettingsProvider extends ChangeNotifier {
@@ -20,6 +21,10 @@ class SettingsProvider extends ChangeNotifier {
   bool get darkMode => _storage.darkMode;
   Future<void> setDarkMode(bool value) =>
       _update(() => _storage.setDarkMode(value));
+
+  BlockSkin get blockSkin => _storage.blockSkin;
+  Future<void> setBlockSkin(BlockSkin value) =>
+      _update(() => _storage.setBlockSkin(value));
 
   bool get showGhost => _storage.showGhost;
   Future<void> setShowGhost(bool value) =>

@@ -56,9 +56,12 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
       level: widget.level,
       daily: widget.daily,
     );
+    final settings = context.read<SettingsProvider>();
     _game = TetrisGame(
       controller: _controller,
-      style: const PlayfieldStyle(palette: BlockPalette.light),
+      style: PlayfieldStyle(
+        palette: settings.blockSkin.palette(dark: settings.darkMode),
+      ),
     );
     _controller.addListener(_onControllerChanged);
     _controller.start();
@@ -232,7 +235,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsProvider>();
     final darkness = Theme.of(context).brightness == Brightness.dark;
-    final palette = darkness ? BlockPalette.darkPalette : BlockPalette.light;
+    final palette = settings.blockSkin.palette(dark: darkness);
     _game.style = PlayfieldStyle(
       palette: palette,
       showGhost: settings.showGhost,

@@ -24,11 +24,13 @@ class PlayfieldStyle {
   bool operator ==(Object other) =>
       other is PlayfieldStyle &&
       other.palette.dark == palette.dark &&
+      other.palette.skin == palette.skin &&
       other.showGhost == showGhost &&
       other.showGrid == showGrid;
 
   @override
-  int get hashCode => Object.hash(palette.dark, showGhost, showGrid);
+  int get hashCode =>
+      Object.hash(palette.dark, palette.skin, showGhost, showGrid);
 }
 
 /// Flame 渲染的游戏场地：网格、落定方块、幽灵块、消行动画与粒子特效。
@@ -232,9 +234,7 @@ class PlayfieldComponent extends PositionComponent {
     final gradient = LinearGradient(
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
-      colors: palette.dark
-          ? const [Color(0xFF23201A), Color(0xFF15120E)]
-          : const [Color(0xFFFDFAF2), Color(0xFFF7EEDC)],
+      colors: [palette.boardTop, palette.boardBottom],
     );
     canvas.drawRect(rect, Paint()..shader = gradient.createShader(rect));
   }

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../game/tetromino.dart';
 import '../providers/settings_provider.dart';
 import '../services/file_system_service.dart';
 import '../services/log_service.dart';
+import '../theme/block_palette.dart';
 import '../utils/constants.dart';
 import '../utils/platform_info.dart';
 import 'widgets/game_dialogs.dart';
@@ -30,6 +32,38 @@ class SettingsPage extends StatelessWidget {
                   title: '外观与操作',
                   icon: Icons.palette_outlined,
                   children: [
+                    Text('棋盘皮肤', style: theme.textTheme.bodyMedium),
+                    const SizedBox(height: 2),
+                    Text(
+                      '方块配色与界面强调色一同切换',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        for (final skin in BlockSkin.values)
+                          _SkinOption(
+                            skin: skin,
+                            selected: settings.blockSkin == skin,
+                            dark: settings.darkMode,
+                            onTap: () => settings.setBlockSkin(skin),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${settings.blockSkin.label} · ${settings.blockSkin.description}',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                    Divider(color: colors.outline.withValues(alpha: 0.6)),
+                    const SizedBox(height: 14),
                     _SwitchRow(
                       title: '深色模式',
                       subtitle: '暖墨底色，夜间堆叠更护眼',
@@ -248,6 +282,87 @@ class SettingsPage extends StatelessWidget {
                     ),
                   ),
                 ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SkinOption extends StatelessWidget {
+  const _SkinOption({
+    required this.skin,
+    required this.selected,
+    required this.dark,
+    required this.onTap,
+  });
+
+  final BlockSkin skin;
+  final bool selected;
+  final bool dark;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final palette = skin.palette(dark: dark);
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: '${skin.label}皮肤',
+      child: InkWell(
+        key: ValueKey('skin-${skin.name}'),
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          width: 152,
+          padding: const EdgeInsets.fromLTRB(10, 9, 10, 9),
+          decoration: BoxDecoration(
+            color: selected
+                ? palette.primaryContainer
+                : theme.colorScheme.surface,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: selected ? palette.accent : theme.colorScheme.outline,
+              width: selected ? 1.5 : 1,
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  for (var i = 0; i < TetrominoType.values.length; i++) ...[
+                    if (i > 0) const SizedBox(width: 2),
+                    Container(
+                      width: 9,
+                      height: 9,
+                      decoration: BoxDecoration(
+                        color: palette.colorOf(TetrominoType.values[i]),
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              const SizedBox(height: 7),
+              Row(
+                children: [
+                  Text(
+                    skin.label,
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  const Spacer(),
+                  if (selected)
+                    Icon(Icons.check_rounded, size: 14, color: palette.accent),
+                ],
               ),
             ],
           ),

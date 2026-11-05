@@ -1,86 +1,72 @@
 import 'package:flutter/material.dart';
 
+import 'block_palette.dart';
+
 export 'block_painting.dart';
 export 'block_palette.dart';
 
-/// 中国红 + 宣纸底色的视觉基调。
+/// 中国红 + 宣纸底色的视觉基调，用于不随皮肤变化的点缀。
 const Color appRed = Color(0xFFB03A2E);
 const Color appGold = Color(0xFFC9A227);
 const Color appInk = Color(0xFF2E2A24);
 const Color appJade = Color(0xFF3F6B5B);
 const Color appWood = Color(0xFF8B6239);
 
-ThemeData buildLightTheme({String? fontFamily}) {
-  const scheme = ColorScheme.light(
-    primary: Color(0xFFB03A2E),
-    onPrimary: Color(0xFFFFF8F2),
-    primaryContainer: Color(0xFFF6DED7),
-    onPrimaryContainer: Color(0xFF5A1A10),
-    secondary: Color(0xFF7A6146),
-    onSecondary: Color(0xFFFFF8F2),
-    surface: Color(0xFFFFFBF2),
-    onSurface: Color(0xFF2E2A24),
-    surfaceContainerHighest: Color(0xFFF3EBDC),
-    onSurfaceVariant: Color(0xFF7C7062),
-    outline: Color(0xFFE3D7C3),
-    outlineVariant: Color(0xFFEFE6D6),
-    error: Color(0xFFB3261E),
-    surfaceTint: Colors.transparent,
-    tertiary: Color(0xFF3F6B5B),
-  );
-
-  return _buildBase(
-    colorScheme: scheme,
-    scaffoldColor: const Color(0xFFF6EFE1),
-    fontFamily: fontFamily,
-  );
-}
-
-ThemeData buildDarkTheme({String? fontFamily}) {
-  const scheme = ColorScheme.dark(
-    primary: Color(0xFFE08A72),
-    onPrimary: Color(0xFF3A1109),
-    primaryContainer: Color(0xFF5A2318),
-    onPrimaryContainer: Color(0xFFF8DCD2),
-    secondary: Color(0xFFC6AA85),
-    onSecondary: Color(0xFF3A2A16),
-    surface: Color(0xFF221E18),
-    onSurface: Color(0xFFEFE6D8),
-    surfaceContainerHighest: Color(0xFF2D2720),
-    onSurfaceVariant: Color(0xFFA99C8A),
-    outline: Color(0xFF3D362C),
-    outlineVariant: Color(0xFF332D24),
-    error: Color(0xFFF2B8B5),
-    onError: Color(0xFF3A0A08),
-    surfaceTint: Colors.transparent,
-    tertiary: Color(0xFF8FBFAE),
-  );
-
-  return _buildBase(
-    colorScheme: scheme,
-    scaffoldColor: const Color(0xFF17140F),
-    fontFamily: fontFamily,
-  );
-}
-
-ThemeData _buildBase({
-  required ColorScheme colorScheme,
-  required Color scaffoldColor,
+ThemeData buildLightTheme({
   String? fontFamily,
-}) {
-  final base = ThemeData(
+  BlockSkin skin = BlockSkin.paper,
+}) => _buildBase(
+  palette: BlockPalette.of(skin, dark: false),
+  fontFamily: fontFamily,
+);
+
+ThemeData buildDarkTheme({
+  String? fontFamily,
+  BlockSkin skin = BlockSkin.paper,
+}) => _buildBase(
+  palette: BlockPalette.of(skin, dark: true),
+  fontFamily: fontFamily,
+);
+
+ThemeData _buildBase({required BlockPalette palette, String? fontFamily}) {
+  final base = palette.dark
+      ? const ColorScheme.dark()
+      : const ColorScheme.light();
+  final colorScheme = base.copyWith(
+    primary: palette.accent,
+    onPrimary: palette.onAccent,
+    primaryContainer: palette.primaryContainer,
+    onPrimaryContainer: palette.onPrimaryContainer,
+    secondary: palette.secondary,
+    onSecondary: palette.onAccent,
+    secondaryContainer: palette.secondaryContainer,
+    onSecondaryContainer: palette.onSurface,
+    tertiary: palette.tertiary,
+    onTertiary: palette.onAccent,
+    error: palette.error,
+    onError: palette.onError,
+    surface: palette.surface,
+    onSurface: palette.onSurface,
+    surfaceContainerHighest: palette.surfaceHighest,
+    onSurfaceVariant: palette.onSurfaceVariant,
+    outline: palette.outline,
+    outlineVariant: palette.outlineVariant,
+    surfaceTint: Colors.transparent,
+  );
+
+  final baseTheme = ThemeData(
     useMaterial3: true,
     colorScheme: colorScheme,
-    scaffoldBackgroundColor: scaffoldColor,
+    scaffoldBackgroundColor: palette.backdrop,
     fontFamily: fontFamily,
   );
-  final textTheme = base.textTheme.apply(
+  final textTheme = baseTheme.textTheme.apply(
     bodyColor: colorScheme.onSurface,
     displayColor: colorScheme.onSurface,
     fontFamily: fontFamily,
   );
 
-  return base.copyWith(
+  return baseTheme.copyWith(
     textTheme: textTheme.copyWith(
       headlineMedium: textTheme.headlineMedium?.copyWith(
         fontWeight: FontWeight.w700,
