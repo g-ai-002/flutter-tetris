@@ -1,4 +1,5 @@
 import 'package:flutter_tetris/game/game_mode.dart';
+import 'package:flutter_tetris/game/level.dart';
 import 'package:flutter_tetris/game/tetromino.dart';
 import 'package:flutter_tetris/game/tetris_controller.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -263,6 +264,121 @@ void main() {
       expect(controller.result!.reason, '时间到');
       expect(controller.result!.elapsed, const Duration(seconds: 120));
       expect(controller.mode.timeLimit, const Duration(seconds: 120));
+    });
+  });
+
+  group('关卡模式', () {
+    test('开局载入地形、起始等级与限时', () {
+      const level = LevelDefinition(
+        id: 90,
+        name: '地形测试',
+        brief: '',
+        targetLines: 2,
+        timeLimit: Duration(seconds: 60),
+        terrain: ['###.######'],
+        startLevel: 4,
+        seed: 7,
+      );
+      final controller = TetrisController(
+        mode: GameMode.level,
+        level: level,
+        autoTick: false,
+      );
+      addTearDown(controller.dispose);
+      controller.start();
+
+      expect(controller.levelDef, same(level));
+      expect(controller.board.filledCount, 9);
+      expect(controller.board.isGarbage(0, 20), isTrue);
+      expect(controller.level, 4);
+      expect(controller.targetLines, 2);
+      expect(controller.remaining, const Duration(seconds: 60));
+      expect(controller.garbageInterval, isNull);
+    });
+
+    test('完成目标行数即通关并按剩余时间评星', () {
+      const level = LevelDefinition(
+        id: 91,
+        name: '一行政略',
+        brief: '',
+        targetLines: 1,
+        timeLimit: Duration(seconds: 30),
+        terrain: [],
+        seed: 8,
+      );
+      final controller = TetrisController(
+        mode: GameMode.level,
+        level: level,
+        autoTick: false,
+      );
+      addTearDown(controller.dispose);
+      controller.start();
+      for (var x = 4; x < 10; x++) {
+        controller.board.setCell(x, 20, TetrominoType.z);
+      }
+      controller.setPieceForTest(
+        const ActivePiece(type: TetrominoType.i, x: 0, y: 19),
+      );
+      controller.hardDrop();
+      advance(controller, 300);
+
+      final result = controller.result!;
+      expect(controller.status, GameStatus.over);
+      expect(result.won, isTrue);
+      expect(result.levelId, 91);
+      expect(result.stars, 3);
+      expect(result.reason, '完成 1 行');
+    });
+
+    test('关卡限时到点结束', () {
+      const level = LevelDefinition(
+        id: 92,
+        name: '限时测试',
+        brief: '',
+        targetLines: 99,
+        timeLimit: Duration(seconds: 2),
+        terrain: [],
+        seed: 9,
+      );
+      final controller = TetrisController(
+        mode: GameMode.level,
+        level: level,
+        autoTick: false,
+      );
+      addTearDown(controller.dispose);
+      controller.start();
+      advance(controller, 2100);
+
+      expect(controller.status, GameStatus.over);
+      expect(controller.result!.reason, '时间到');
+      expect(controller.result!.won, isFalse);
+      expect(controller.result!.levelId, 92);
+    });
+
+    test('垃圾行按间隔上涌并抬起当前方块', () {
+      const level = LevelDefinition(
+        id: 93,
+        name: '上涌测试',
+        brief: '',
+        targetLines: 99,
+        timeLimit: Duration(seconds: 60),
+        terrain: [],
+        garbageInterval: Duration(seconds: 1),
+        seed: 10,
+      );
+      final controller = TetrisController(
+        mode: GameMode.level,
+        level: level,
+        autoTick: false,
+      );
+      addTearDown(controller.dispose);
+      controller.start();
+      advance(controller, 1100);
+
+      expect(controller.garbageRises, 1);
+      expect(controller.board.filledCount, 9);
+      expect(controller.garbageSecondsLeft, isNotNull);
+      expect(controller.status, GameStatus.playing);
     });
   });
 }

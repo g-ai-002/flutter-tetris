@@ -12,6 +12,8 @@ GameResult result({
   int maxCombo = 2,
   int elapsedMs = 60000,
   bool won = false,
+  int? levelId,
+  int stars = 0,
 }) {
   return GameResult(
     mode: mode,
@@ -23,6 +25,8 @@ GameResult result({
     elapsed: Duration(milliseconds: elapsedMs),
     won: won,
     reason: won ? '完成 40 行' : '方块堆到了顶部',
+    levelId: levelId,
+    stars: stars,
   );
 }
 
@@ -131,6 +135,81 @@ void main() {
       expect(storage.totalLines, 0);
       expect(storage.totalScore, 0);
       expect(storage.darkMode, isTrue);
+    });
+
+    test('关卡纪录保存星级、最高分并解锁下一关', () async {
+      final storage = await prepareStorage();
+      expect(storage.isLevelUnlocked(1), isTrue);
+      expect(storage.isLevelUnlocked(2), isFalse);
+
+      final first = await storage.recordResult(
+        result(
+          mode: GameMode.level,
+          levelId: 1,
+          score: 1000,
+          lines: 3,
+          won: true,
+          stars: 2,
+          elapsedMs: 45000,
+        ),
+      );
+      expect(first.newBestScore, isTrue);
+      expect(first.newBestStars, isTrue);
+      expect(storage.levelRecord(1).completed, isTrue);
+      expect(storage.levelRecord(1).stars, 2);
+      expect(storage.levelRecord(1).bestScore, 1000);
+      expect(storage.levelRecord(1).bestTimeMs, 45000);
+      expect(storage.isLevelUnlocked(2), isTrue);
+      expect(storage.completedLevels, 1);
+      expect(storage.totalStars, 2);
+
+      final better = await storage.recordResult(
+        result(
+          mode: GameMode.level,
+          levelId: 1,
+          score: 800,
+          lines: 3,
+          won: true,
+          stars: 3,
+          elapsedMs: 30000,
+        ),
+      );
+      expect(better.newBestScore, isFalse);
+      expect(better.newBestStars, isTrue);
+      expect(better.newBestTime, isTrue);
+      expect(storage.levelRecord(1).stars, 3);
+      expect(storage.levelRecord(1).bestScore, 1000);
+      expect(storage.levelRecord(1).bestTimeMs, 30000);
+      expect(storage.totalStars, 3);
+    });
+
+    test('关卡失败不写入通关与星级', () async {
+      final storage = await prepareStorage();
+      final outcome = await storage.recordResult(
+        result(mode: GameMode.level, levelId: 2, score: 300, lines: 4),
+      );
+      expect(outcome.newBestStars, isFalse);
+      expect(storage.levelRecord(2).completed, isFalse);
+      expect(storage.levelRecord(2).stars, 0);
+      expect(storage.isLevelUnlocked(2), isFalse);
+    });
+
+    test('清空纪录同时删除关卡进度', () async {
+      final storage = await prepareStorage();
+      await storage.recordResult(
+        result(
+          mode: GameMode.level,
+          levelId: 1,
+          won: true,
+          stars: 3,
+          elapsedMs: 20000,
+        ),
+      );
+      expect(storage.completedLevels, 1);
+      await storage.clearRecords();
+      expect(storage.completedLevels, 0);
+      expect(storage.totalStars, 0);
+      expect(storage.levelRecord(1).completed, isFalse);
     });
   });
 }

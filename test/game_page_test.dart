@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tetris/game/game_mode.dart';
+import 'package:flutter_tetris/game/level.dart';
 import 'package:flutter_tetris/pages/game_page.dart';
 import 'package:flutter_tetris/services/storage_service.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -83,6 +84,41 @@ void main() {
 
     expect(find.text('2 分钟计时'), findsOneWidget);
     expect(find.textContaining('剩余 02:00'), findsWidgets);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('关卡模式展示关卡名、目标与剩余时间', (tester) async {
+    tester.view.physicalSize = const Size(1280, 960);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    const level = LevelDefinition(
+      id: 5,
+      name: '落子无悔',
+      brief: '',
+      targetLines: 10,
+      timeLimit: Duration(seconds: 110),
+      terrain: ['#.####.###', '##.######.'],
+      garbageInterval: Duration(seconds: 30),
+      seed: 105,
+    );
+
+    await tester.pumpWidget(
+      wrapPage(
+        child: const GamePage(mode: GameMode.level, level: level),
+        storage: storage,
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.text('第 5 关 · 落子无悔'), findsOneWidget);
+    expect(find.text('0 / 10 行'), findsOneWidget);
+    expect(find.textContaining('剩余 01:50'), findsWidgets);
+    expect(find.textContaining('垃圾行'), findsWidgets);
+    expect(tester.takeException(), isNull);
+
     await tester.pumpWidget(const SizedBox.shrink());
   });
 }

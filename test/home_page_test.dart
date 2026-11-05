@@ -34,10 +34,27 @@ void main() {
     expect(find.text('经典模式'), findsOneWidget);
     expect(find.text('40 行竞速'), findsOneWidget);
     expect(find.text('2 分钟计时'), findsOneWidget);
+    expect(find.text('关卡模式'), findsOneWidget);
     expect(find.textContaining('最高 12,345 分'), findsOneWidget);
     expect(find.textContaining('最快 01:23.45'), findsOneWidget);
     expect(find.textContaining('最高 8,900 分'), findsOneWidget);
     expect(find.textContaining('v${AppConstants.version}'), findsOneWidget);
+  });
+
+  testWidgets('首页可以打开关卡选择页', (tester) async {
+    tester.view.physicalSize = const Size(1280, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      wrapPage(child: const HomePage(), storage: storage),
+    );
+
+    await tester.tap(find.text('关卡模式'));
+    await tester.pumpAndSettle();
+    expect(find.text('挑战进度'), findsOneWidget);
+    expect(find.text('初入长安'), findsOneWidget);
   });
 
   testWidgets('首页窄屏单列排布并支持切换深色模式', (tester) async {

@@ -84,5 +84,46 @@ void main() {
       expect(lines.last.startsWith('J'), isTrue);
       expect(lines.first.length, 10);
     });
+
+    test('载入关卡地形时贴底摆放并标记垃圾格', () {
+      board.loadTerrain(['##.######.', '###.######']);
+      expect(board.at(0, 20), TetrominoType.o);
+      expect(board.at(3, 20), isNull);
+      expect(board.isGarbage(0, 20), isTrue);
+      expect(board.at(0, 19), TetrominoType.o);
+      expect(board.at(2, 19), isNull);
+      expect(board.filledCount, 17);
+
+      board.loadTerrain(['IIIIIIIIII']);
+      expect(board.at(0, 20), TetrominoType.i);
+      expect(board.isGarbage(0, 20), isFalse);
+    });
+
+    test('删除满行时垃圾标记一起下移', () {
+      board.loadTerrain(['##.######.', '###.######']);
+      board.setCell(3, 20, TetrominoType.t);
+      expect(board.fullRows(), [20]);
+      board.removeRows([20]);
+      expect(board.at(0, 20), TetrominoType.o);
+      expect(board.isGarbage(0, 20), isTrue);
+      expect(board.at(2, 20), isNull);
+      expect(board.isGarbage(2, 20), isFalse);
+    });
+
+    test('垃圾行上涌时整体上移并保留缺口', () {
+      board.loadTerrain(['###.######']);
+      expect(board.raiseGarbage([4]), isFalse);
+      expect(board.isGarbage(4, 20), isFalse);
+      expect(board.at(4, 20), isNull);
+      expect(board.isGarbage(0, 20), isTrue);
+      expect(board.at(0, 19), TetrominoType.o);
+      expect(board.at(3, 19), isNull);
+      expect(board.filledCount, 18);
+    });
+
+    test('顶部被垃圾行挤出时返回溢出', () {
+      board.setCell(0, 0, TetrominoType.t);
+      expect(board.raiseGarbage([5]), isTrue);
+    });
   });
 }
