@@ -22,13 +22,13 @@
 
 ## 下载
 
-v0.3.0（最新发布）：[Gitea Release](http://192.168.31.120:3020/GTech/flutter-tetris/releases/tag/v0.3.0)
+v0.3.1（最新发布）：[Gitea Release](http://192.168.31.120:3020/GTech/flutter-tetris/releases/tag/v0.3.1)
 
 | 平台 | 产物 |
 | --- | --- |
-| Android (arm64) | `flutter-tetris-0.3.0-android-aarch64.apk` |
-| Windows (x64, Win10+) | `flutter-tetris-0.3.0-windows-x86_64.zip` |
-| Web | `flutter-tetris-0.3.0-web.zip`（解压后起静态服务器） |
+| Android (arm64) | `flutter-tetris-0.3.1-android-aarch64.apk` |
+| Windows (x64, Win10+) | `flutter-tetris-0.3.1-windows-x86_64.zip` |
+| Web | `flutter-tetris-0.3.1-web.zip`（解压后起静态服务器） |
 
 ## 开发
 
@@ -61,12 +61,12 @@ flutter test
 
 ```
 lib/
-├── game/       方块定义、场地、关卡、7 包随机、SRS、计分、模式与对局控制器
+├── game/       方块定义、场地、关卡、7 包随机、SRS、计分板、模式与对局控制器
 ├── flame/      Flame 场地组件与游戏入口（粒子、消行、拖影）
 ├── pages/      首页、关卡选择、对局页、设置页、纪录页与通用组件
 ├── services/   日志、偏好与纪录存储、文件系统、音效合成与播放
 ├── providers/  设置状态
-├── theme/      配色主题、方块配色与笔触
+├── theme/      配色主题、方块配色、玩法视觉映射与笔触
 └── utils/      常量、格式化、平台判断、窗口初始化
 ```
 
@@ -74,8 +74,8 @@ lib/
 
 | 版本 | 说明 |
 | --- | --- |
+| v0.3.1 | 重构计分累计、玩法视觉与纪录页组件，新增计分板与通用星级组件 |
 | v0.3.0 | 新增每日挑战：日期种子、三端一致牌序、当日纪录、连续打卡、战报复制与七日种子重玩 |
 | v0.2.1 | 重构关卡规则、垃圾行生成与进度模型，修复固定种子重开失效 |
 | v0.2.0 | 新增 12 关关卡模式：预设地形、垃圾行上涌、限时目标、逐关解锁与三星评价 |
 | v0.1.1 | 修复 T-Spin 零消计分，抽出独立三角判定并补齐用例 |
-| v0.1.0 | 首个可玩版本：三种玩法、完整 Guideline 规则、程序化音频、本地纪录与三端发布 |
