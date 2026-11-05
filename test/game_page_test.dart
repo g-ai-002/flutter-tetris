@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tetris/game/game_mode.dart';
+import 'package:flutter_tetris/game/garbage.dart';
 import 'package:flutter_tetris/game/level.dart';
 import 'package:flutter_tetris/pages/game_page.dart';
 import 'package:flutter_tetris/services/storage_service.dart';
@@ -100,7 +101,7 @@ void main() {
       targetLines: 10,
       timeLimit: Duration(seconds: 110),
       terrain: ['#.####.###', '##.######.'],
-      garbageInterval: Duration(seconds: 30),
+      garbage: GarbageRule(interval: Duration(seconds: 30)),
       seed: 105,
     );
 

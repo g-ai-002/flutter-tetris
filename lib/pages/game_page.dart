@@ -13,15 +13,14 @@ import '../providers/settings_provider.dart';
 import '../services/log_service.dart';
 import '../services/sound_service.dart';
 import '../services/storage_service.dart';
-import '../theme/app_theme.dart';
+import '../theme/block_palette.dart';
 import '../utils/formatters.dart';
 import '../utils/platform_info.dart';
 import 'widgets/board_gestures.dart';
 import 'widgets/board_stage.dart';
 import 'widgets/game_dialogs.dart';
 import 'widgets/game_hud.dart';
-import 'widgets/piece_slot.dart';
-import 'widgets/status_chip.dart';
+import 'widgets/game_rails.dart';
 import 'widgets/touch_pad.dart';
 
 class GamePage extends StatefulWidget {
@@ -245,9 +244,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  widget.level == null
-                      ? widget.mode.label
-                      : '第 ${widget.level!.id} 关 · ${widget.level!.name}',
+                  _controller.rules.title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -339,7 +336,8 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
             width: 132,
             child: AnimatedBuilder(
               animation: _controller,
-              builder: (context, _) => _buildLeftRail(palette),
+              builder: (context, _) =>
+                  GameLeftRail(controller: _controller, palette: palette),
             ),
           ),
           const SizedBox(width: 16),
@@ -349,80 +347,12 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
             width: 124,
             child: AnimatedBuilder(
               animation: _controller,
-              builder: (context, _) => _buildRightRail(palette),
+              builder: (context, _) =>
+                  GameRightRail(controller: _controller, palette: palette),
             ),
           ),
         ],
       ),
-    );
-  }
-
-  Widget _buildLeftRail(BlockPalette palette) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        PieceSlot(
-          label: 'HOLD 暂存',
-          type: _controller.holdType,
-          palette: palette,
-          size: 62,
-          onTap: _controller.canHold ? _controller.hold : null,
-          hint: _controller.canHold ? 'C / 点击' : null,
-        ),
-        const SizedBox(height: 18),
-        Divider(color: Theme.of(context).colorScheme.outline),
-        const SizedBox(height: 14),
-        GameHud(controller: _controller),
-      ],
-    );
-  }
-
-  Widget _buildRightRail(BlockPalette palette) {
-    final next = _controller.nextQueue;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'NEXT',
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-            letterSpacing: 2,
-          ),
-        ),
-        const SizedBox(height: 8),
-        for (var i = 0; i < 5 && i < next.length; i++) ...[
-          if (i > 0) const SizedBox(height: 7),
-          PieceSlot(
-            label: '',
-            type: next[i],
-            palette: palette,
-            size: i == 0 ? 52 : 44,
-            showLabel: false,
-          ),
-        ],
-        const Spacer(),
-        if (_controller.combo >= 2) ...[
-          StatusChip(
-            accent: Theme.of(context).colorScheme.primary,
-            filled: true,
-            child: Text(
-              '连击 ×${_controller.combo}',
-              style: Theme.of(context).textTheme.labelSmall
-                  ?.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
-            ),
-          ),
-          const SizedBox(height: 6),
-        ],
-        if (_controller.backToBack)
-          StatusChip(
-            accent: appGold,
-            child: Text(
-              '连续奖励',
-              style: Theme.of(context).textTheme.labelSmall
-                  ?.copyWith(color: appGold, fontWeight: FontWeight.w600),
-            ),
-          ),
-      ],
     );
   }
 
@@ -448,7 +378,10 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
                   width: 58,
                   child: AnimatedBuilder(
                     animation: _controller,
-                    builder: (context, _) => _buildCompactRail(palette),
+                    builder: (context, _) => GameCompactRail(
+                      controller: _controller,
+                      palette: palette,
+                    ),
                   ),
                 ),
               ],
@@ -456,117 +389,13 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
           ),
         ),
         if (isDesktopPlatform)
-          const _KeyboardHint()
+          const GameKeyboardHint()
         else
           AnimatedBuilder(
             animation: _controller,
             builder: (context, _) => TouchPad(controller: _controller),
           ),
       ],
-    );
-  }
-
-  Widget _buildCompactRail(BlockPalette palette) {
-    final next = _controller.nextQueue;
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      alignment: Alignment.topCenter,
-      child: SizedBox(
-        width: 56,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            PieceSlot(
-              label: 'HOLD',
-              type: _controller.holdType,
-              palette: palette,
-              showLabel: false,
-              onTap: _controller.canHold ? _controller.hold : null,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'NEXT',
-              style: TextStyle(
-                fontSize: 8,
-                letterSpacing: 1.2,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 4),
-            for (var i = 0; i < 3 && i < next.length; i++) ...[
-              if (i > 0) const SizedBox(height: 5),
-              PieceSlot(
-                label: '',
-                type: next[i],
-                palette: palette,
-                size: 38,
-                showLabel: false,
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _KeyboardHint extends StatelessWidget {
-  const _KeyboardHint();
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 2, 16, 10),
-      child: Wrap(
-        alignment: WrapAlignment.center,
-        spacing: 4,
-        runSpacing: 4,
-        children: [
-          for (final item in const [
-            ('←→', '移动'),
-            ('↓', '软降'),
-            ('空格', '硬降'),
-            ('↑', '旋转'),
-            ('C', '暂存'),
-            ('P', '暂停'),
-          ])
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 5,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colors.surfaceContainerHighest.withValues(
-                      alpha: 0.7,
-                    ),
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(
-                      color: colors.outline.withValues(alpha: 0.7),
-                    ),
-                  ),
-                  child: Text(
-                    item.$1,
-                    style: theme.textTheme.labelSmall?.copyWith(fontSize: 9.5),
-                  ),
-                ),
-                const SizedBox(width: 3),
-                Text(
-                  item.$2,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    fontSize: 9.5,
-                    color: colors.onSurfaceVariant,
-                  ),
-                ),
-                const SizedBox(width: 6),
-              ],
-            ),
-        ],
-      ),
     );
   }
 }
