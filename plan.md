@@ -37,6 +37,21 @@
 
 ---
 
+### v0.2.1 (PATCH) — 2026-11-05
+
+- **状态**: 已开发 ✅（待发布）
+- **目标**: 重构 0.2.0 的关卡增量代码，收敛规则来源、垃圾行生成与关卡进度，并修复固定种子重开失效。
+- **任务**:
+  - [x] 新增 `MatchRules`：目标行数、限时、起始等级、地形与评星统一由规则快照提供
+  - [x] 新增 `GarbageRule` / `GarbageSpawner`：上涌计时与可复现缺口生成从控制器抽出
+  - [x] 新增 `LevelProgress`：关卡进度的解析、解锁、合并与序列化独立于偏好存储
+  - [x] 对局页拆分 `GameLeftRail` / `GameRightRail` / `GameCompactRail` / `GameKeyboardHint`
+  - [x] 修复显式随机种子在开局与重开时被覆盖的问题
+  - [x] 补充规则、垃圾行、关卡进度与种子复现用例
+  - [x] 版本号升级至 0.2.1
+
+---
+
 ### v0.2.0 (MINOR) — 2026-11-05
 
 - **状态**: 已发布 ✅（[Gitea Release](http://192.168.31.120:3020/GTech/flutter-tetris/releases/tag/v0.2.0)）

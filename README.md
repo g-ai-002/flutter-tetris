@@ -20,13 +20,13 @@
 
 ## 下载
 
-v0.2.0（最新发布）：[Gitea Release](http://192.168.31.120:3020/GTech/flutter-tetris/releases/tag/v0.2.0)
+v0.2.1（最新发布）：[Gitea Release](http://192.168.31.120:3020/GTech/flutter-tetris/releases/tag/v0.2.1)
 
 | 平台 | 产物 |
 | --- | --- |
-| Android (arm64) | `flutter-tetris-0.2.0-android-aarch64.apk` |
-| Windows (x64, Win10+) | `flutter-tetris-0.2.0-windows-x86_64.zip` |
-| Web | `flutter-tetris-0.2.0-web.zip`（解压后起静态服务器） |
+| Android (arm64) | `flutter-tetris-0.2.1-android-aarch64.apk` |
+| Windows (x64, Win10+) | `flutter-tetris-0.2.1-windows-x86_64.zip` |
+| Web | `flutter-tetris-0.2.1-web.zip`（解压后起静态服务器） |
 
 ## 开发
 
@@ -72,6 +72,7 @@ lib/
 
 | 版本 | 说明 |
 | --- | --- |
+| v0.2.1 | 重构关卡规则、垃圾行生成与进度模型，修复固定种子重开失效 |
 | v0.2.0 | 新增 12 关关卡模式：预设地形、垃圾行上涌、限时目标、逐关解锁与三星评价 |
 | v0.1.1 | 修复 T-Spin 零消计分，抽出独立三角判定并补齐用例 |
 | v0.1.0 | 首个可玩版本：三种玩法、完整 Guideline 规则、程序化音频、本地纪录与三端发布 |
