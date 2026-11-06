@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../game/tetromino.dart';
 import '../providers/settings_provider.dart';
 import '../services/file_system_service.dart';
-import '../services/log_service.dart';
 import '../theme/block_palette.dart';
 import '../utils/constants.dart';
 import '../utils/platform_info.dart';
 import 'widgets/game_dialogs.dart';
+import 'widgets/log_viewer_dialog.dart';
 import 'widgets/section_card.dart';
+import 'widgets/setting_rows.dart';
+import 'widgets/skin_option_card.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -46,7 +47,7 @@ class SettingsPage extends StatelessWidget {
                       runSpacing: 8,
                       children: [
                         for (final skin in BlockSkin.values)
-                          _SkinOption(
+                          SkinOptionCard(
                             skin: skin,
                             selected: settings.blockSkin == skin,
                             dark: settings.darkMode,
@@ -64,7 +65,7 @@ class SettingsPage extends StatelessWidget {
                     const SizedBox(height: 14),
                     Divider(color: colors.outline.withValues(alpha: 0.6)),
                     const SizedBox(height: 14),
-                    _SwitchRow(
+                    SettingSwitchRow(
                       title: '深色模式',
                       subtitle: '暖墨底色，夜间堆叠更护眼',
                       value: settings.darkMode,
@@ -72,7 +73,7 @@ class SettingsPage extends StatelessWidget {
                       switchKey: const ValueKey('switch-dark'),
                     ),
                     const SizedBox(height: 10),
-                    _SwitchRow(
+                    SettingSwitchRow(
                       title: '幽灵方块',
                       subtitle: '在落点显示当前位置的轮廓',
                       value: settings.showGhost,
@@ -80,7 +81,7 @@ class SettingsPage extends StatelessWidget {
                       switchKey: const ValueKey('switch-ghost'),
                     ),
                     const SizedBox(height: 10),
-                    _SwitchRow(
+                    SettingSwitchRow(
                       title: '网格线',
                       subtitle: '显示场地内的浅色网格，便于判断列位',
                       value: settings.showGrid,
@@ -94,7 +95,7 @@ class SettingsPage extends StatelessWidget {
                   title: '音效与反馈',
                   icon: Icons.graphic_eq_rounded,
                   children: [
-                    _SwitchRow(
+                    SettingSwitchRow(
                       title: '游戏音效',
                       subtitle: '移动、旋转、消行与终局音效',
                       value: settings.soundEnabled,
@@ -102,7 +103,7 @@ class SettingsPage extends StatelessWidget {
                       switchKey: const ValueKey('switch-sound'),
                     ),
                     const SizedBox(height: 10),
-                    _SwitchRow(
+                    SettingSwitchRow(
                       title: '背景音乐',
                       subtitle: '五声音阶循环，运行时合成，可随时关闭',
                       value: settings.musicEnabled,
@@ -110,7 +111,7 @@ class SettingsPage extends StatelessWidget {
                       switchKey: const ValueKey('switch-music'),
                     ),
                     const SizedBox(height: 10),
-                    _SwitchRow(
+                    SettingSwitchRow(
                       title: '震动反馈',
                       subtitle: '消行与终局时给出不同强度的触感',
                       value: settings.hapticsEnabled,
@@ -170,7 +171,7 @@ class SettingsPage extends StatelessWidget {
                       runSpacing: 8,
                       children: [
                         OutlinedButton.icon(
-                          onPressed: () => _showLogs(context),
+                          onPressed: () => showLogViewerDialog(context),
                           icon: const Icon(Icons.article_outlined, size: 17),
                           label: const Text('查看日志'),
                         ),
@@ -200,14 +201,14 @@ class SettingsPage extends StatelessWidget {
                   title: '关于',
                   icon: Icons.info_outline,
                   children: [
-                    const _AboutRow(
+                    const SettingAboutRow(
                       label: '版本',
                       value: 'v${AppConstants.version}',
                     ),
                     const SizedBox(height: 8),
-                    const _AboutRow(label: '引擎', value: 'Flutter + Flame'),
+                    const SettingAboutRow(label: '引擎', value: 'Flutter + Flame'),
                     const SizedBox(height: 8),
-                    const _AboutRow(
+                    const SettingAboutRow(
                       label: '平台',
                       value: 'Android / Windows / Web',
                     ),
@@ -227,218 +228,6 @@ class SettingsPage extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  void _showLogs(BuildContext context) {
-    final lines = LogService.getRecentLogs(300);
-    showDialog<void>(
-      context: context,
-      builder: (dialogContext) => Dialog(
-        child: SizedBox(
-          width: 680,
-          height: 480,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(18, 14, 10, 10),
-                child: Row(
-                  children: [
-                    Text(
-                      '最近日志',
-                      style: Theme.of(dialogContext).textTheme.titleSmall,
-                    ),
-                    const Spacer(),
-                    IconButton(
-                      onPressed: () => Navigator.of(dialogContext).pop(),
-                      icon: const Icon(Icons.close, size: 20),
-                      tooltip: '关闭',
-                    ),
-                  ],
-                ),
-              ),
-              Divider(
-                color: Theme.of(dialogContext).colorScheme.outline
-                    .withValues(alpha: 0.5),
-              ),
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  color: Theme.of(dialogContext)
-                      .colorScheme
-                      .surfaceContainerHighest
-                      .withValues(alpha: 0.5),
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(14),
-                    child: SelectableText(
-                      lines.isEmpty ? '暂无日志' : lines.join('\n'),
-                      style: TextStyle(
-                        fontSize: 11.5,
-                        height: 1.55,
-                        color: Theme.of(dialogContext).colorScheme.onSurface,
-                        fontFamily: 'Consolas',
-                        fontFamilyFallback: const ['Menlo', 'monospace'],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SkinOption extends StatelessWidget {
-  const _SkinOption({
-    required this.skin,
-    required this.selected,
-    required this.dark,
-    required this.onTap,
-  });
-
-  final BlockSkin skin;
-  final bool selected;
-  final bool dark;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final palette = skin.palette(dark: dark);
-    return Semantics(
-      button: true,
-      selected: selected,
-      label: '${skin.label}皮肤',
-      child: InkWell(
-        key: ValueKey('skin-${skin.name}'),
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(10),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          width: 152,
-          padding: const EdgeInsets.fromLTRB(10, 9, 10, 9),
-          decoration: BoxDecoration(
-            color: selected
-                ? palette.primaryContainer
-                : theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: selected ? palette.accent : theme.colorScheme.outline,
-              width: selected ? 1.5 : 1,
-            ),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                children: [
-                  for (var i = 0; i < TetrominoType.values.length; i++) ...[
-                    if (i > 0) const SizedBox(width: 2),
-                    Container(
-                      width: 9,
-                      height: 9,
-                      decoration: BoxDecoration(
-                        color: palette.colorOf(TetrominoType.values[i]),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-              const SizedBox(height: 7),
-              Row(
-                children: [
-                  Text(
-                    skin.label,
-                    style: theme.textTheme.labelMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                  ),
-                  const Spacer(),
-                  if (selected)
-                    Icon(Icons.check_rounded, size: 14, color: palette.accent),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _SwitchRow extends StatelessWidget {
-  const _SwitchRow({
-    required this.title,
-    required this.subtitle,
-    required this.value,
-    required this.onChanged,
-    this.switchKey,
-  });
-
-  final String title;
-  final String subtitle;
-  final bool value;
-  final ValueChanged<bool> onChanged;
-  final Key? switchKey;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: theme.textTheme.bodyMedium),
-              const SizedBox(height: 2),
-              Text(
-                subtitle,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colors.onSurfaceVariant,
-                ),
-              ),
-            ],
-          ),
-        ),
-        Switch.adaptive(
-          key: switchKey,
-          value: value,
-          onChanged: onChanged,
-          activeTrackColor: colors.primary,
-        ),
-      ],
-    );
-  }
-}
-
-class _AboutRow extends StatelessWidget {
-  const _AboutRow({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Row(
-      children: [
-        Text(
-          label,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ),
-        const Spacer(),
-        Text(value, style: theme.textTheme.bodySmall),
-      ],
     );
   }
 }
