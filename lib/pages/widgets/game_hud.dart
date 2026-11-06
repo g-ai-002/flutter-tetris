@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../game/game_mode.dart';
 import '../../game/tetris_controller.dart';
 import '../../utils/formatters.dart';
+import 'stat_value.dart';
 
 /// 分数、行数、等级与时间的展示，宽屏侧栏与窄屏顶栏共用。
 class GameHud extends StatelessWidget {
@@ -11,22 +12,17 @@ class GameHud extends StatelessWidget {
   final TetrisController controller;
   final bool compact;
 
-  String get _timeLabel => switch (controller.mode) {
-    GameMode.ultra || GameMode.level || GameMode.daily => '剩余',
-    _ => '用时',
-  };
+  /// 有剩余时间的玩法显示倒计时，其余显示已用时间。
+  String get _timeLabel => controller.limit == null ? '用时' : '剩余';
 
   String get _timeValue {
-    switch (controller.mode) {
-      case GameMode.ultra:
-      case GameMode.level:
-      case GameMode.daily:
-        return formatDuration(controller.remaining.inMilliseconds);
-      case GameMode.sprint:
-        return formatPreciseDuration(controller.elapsed.inMilliseconds);
-      case GameMode.endless:
-        return formatDuration(controller.elapsed.inMilliseconds);
+    if (controller.limit != null) {
+      return formatDuration(controller.remaining.inMilliseconds);
     }
+    if (controller.mode == GameMode.sprint) {
+      return formatPreciseDuration(controller.elapsed.inMilliseconds);
+    }
+    return formatDuration(controller.elapsed.inMilliseconds);
   }
 
   @override
@@ -68,7 +64,7 @@ class GameHud extends StatelessWidget {
             ),
             _CompactStat(label: '行', value: '${controller.lines}'),
             _CompactStat(label: '级', value: '${controller.level}'),
-            _CompactStat(label: _timeLabel, value: _timeValue, wide: true),
+            _CompactStat(label: _timeLabel, value: _timeValue, narrow: true),
           ],
         ),
         if (controller.targetLines != null) ...[
@@ -163,38 +159,24 @@ class _CompactStat extends StatelessWidget {
   const _CompactStat({
     required this.label,
     required this.value,
-    this.wide = false,
+    this.narrow = false,
   });
 
   final String label;
   final String value;
-  final bool wide;
+  final bool narrow;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
     return Padding(
       padding: const EdgeInsets.only(left: 14),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: theme.textTheme.labelSmall?.copyWith(
-              color: colors.onSurfaceVariant,
-            ),
-          ),
-          Text(
-            value,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-              fontFeatures: const [FontFeature.tabularFigures()],
-              fontSize: wide ? 12.5 : 14,
-            ),
-          ),
-        ],
+      child: StatValue(
+        label: label,
+        value: value,
+        labelFirst: true,
+        alignment: CrossAxisAlignment.end,
+        valueStyle: Theme.of(context).textTheme.titleSmall
+            ?.copyWith(fontSize: narrow ? 12.5 : 14),
       ),
     );
   }
@@ -208,28 +190,9 @@ class _WideStat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        children: [
-          Text(
-            label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colors.onSurfaceVariant,
-            ),
-          ),
-          const Spacer(),
-          Text(
-            value,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              fontFeatures: const [FontFeature.tabularFigures()],
-            ),
-          ),
-        ],
-      ),
+      child: StatValue.inline(label: label, value: value),
     );
   }
 }
