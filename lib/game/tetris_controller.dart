@@ -101,7 +101,6 @@ class TetrisController extends ChangeNotifier {
   ActivePiece? _piece;
   TetrominoType? _hold;
   bool _holdUsed = false;
-  final List<TetrominoType> _next = [];
 
   Duration _elapsed = Duration.zero;
   Duration _gravityAccumulator = Duration.zero;
@@ -130,7 +129,9 @@ class TetrisController extends ChangeNotifier {
   ActivePiece? get piece => _piece;
   TetrominoType? get holdType => _hold;
   bool get canHold => _status == GameStatus.playing && !_holdUsed;
-  List<TetrominoType> get nextQueue => List.unmodifiable(_next);
+
+  /// 接下来的五个方块，直接取自七包队列，不额外维护预览列表。
+  List<TetrominoType> get nextQueue => _bag.peek(5);
 
   int get score => _scoreBoard.score;
   int get lines => _scoreBoard.lines;
@@ -223,7 +224,6 @@ class TetrisController extends ChangeNotifier {
   void start() {
     _resetState();
     _status = GameStatus.playing;
-    _refillQueue();
     _spawnNext();
     _startTicker();
     notifyListeners();
@@ -494,17 +494,8 @@ class TetrisController extends ChangeNotifier {
     if (!_grounded) _lockElapsed = Duration.zero;
   }
 
-  void _refillQueue() {
-    while (_next.length < 5) {
-      _next.add(_bag.next());
-    }
-  }
-
   void _spawnNext() {
-    _refillQueue();
-    final type = _next.removeAt(0);
-    _refillQueue();
-    _spawnType(type);
+    _spawnType(_bag.next());
   }
 
   bool _spawnType(TetrominoType type) {
@@ -648,7 +639,6 @@ class TetrisController extends ChangeNotifier {
     }
     _bag.reset(seed: _seed);
     _garbage.reset();
-    _next.clear();
     _piece = null;
     _hold = null;
     _holdUsed = false;
