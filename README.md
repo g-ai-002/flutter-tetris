@@ -23,13 +23,13 @@
 
 ## 下载
 
-v0.4.0（最新发布）：[Gitea Release](http://192.168.31.120:3020/GTech/flutter-tetris/releases/tag/v0.4.0)
+v0.4.1（最新发布）：[Gitea Release](http://192.168.31.120:3020/GTech/flutter-tetris/releases/tag/v0.4.1)
 
 | 平台 | 产物 |
 | --- | --- |
-| Android (arm64) | `flutter-tetris-0.4.0-android-aarch64.apk` |
-| Windows (x64, Win10+) | `flutter-tetris-0.4.0-windows-x86_64.zip` |
-| Web | `flutter-tetris-0.4.0-web.zip`（解压后起静态服务器） |
+| Android (arm64) | `flutter-tetris-0.4.1-android-aarch64.apk` |
+| Windows (x64, Win10+) | `flutter-tetris-0.4.1-windows-x86_64.zip` |
+| Web | `flutter-tetris-0.4.1-web.zip`（解压后起静态服务器） |
 
 ## 开发
 
@@ -75,8 +75,8 @@ lib/
 
 | 版本 | 说明 |
 | --- | --- |
+| v0.4.1 | 收敛皮肤渐变与设置页组件，修复首页窄屏页脚溢出和缩略棋盘不跟随皮肤 |
 | v0.4.0 | 新增宣纸 / 青瓷 / 敦煌 / 水墨四套皮肤，棋盘与界面强调色同步切换 |
 | v0.3.1 | 重构计分累计、玩法视觉与纪录页组件，新增计分板与通用星级组件 |
 | v0.3.0 | 新增每日挑战：日期种子、三端一致牌序、当日纪录、连续打卡、战报复制与七日种子重玩 |
 | v0.2.1 | 重构关卡规则、垃圾行生成与进度模型，修复固定种子重开失效 |
-| v0.2.0 | 新增 12 关关卡模式：预设地形、垃圾行上涌、限时目标、逐关解锁与三星评价 |
