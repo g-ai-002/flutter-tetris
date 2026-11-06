@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 
 import '../game/tetromino.dart';
+import 'block_palette.dart';
 
 /// 方块绘制：棋盘组件与小尺寸预览共用同一套笔触。
+
+/// 绘制棋盘底色，场地与首页缩略棋盘共用同一套皮肤渐变。
+void paintBoardBackground(Canvas canvas, Rect rect, BlockPalette palette) {
+  canvas.drawRect(
+    rect,
+    Paint()..shader = palette.boardGradient.createShader(rect),
+  );
+}
 
 /// 绘制一块已落定的方块。
 ///

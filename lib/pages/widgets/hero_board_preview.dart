@@ -64,17 +64,7 @@ class _HeroBoardPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final rect = Offset.zero & size;
-    canvas.drawRect(
-      rect,
-      Paint()
-        ..shader = LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: palette.dark
-              ? const [Color(0xFF24201A), Color(0xFF14110D)]
-              : const [Color(0xFFFDF8EC), Color(0xFFF5EAD7)],
-        ).createShader(rect),
-    );
+    paintBoardBackground(canvas, rect, palette);
 
     final cell = size.width / 10;
     final gridPaint = Paint()
@@ -169,5 +159,5 @@ class _HeroBoardPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _HeroBoardPainter oldDelegate) =>
-      oldDelegate.palette.dark != palette.dark;
+      oldDelegate.palette != palette;
 }

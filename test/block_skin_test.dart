@@ -24,6 +24,14 @@ void main() {
           expect(colors.length, TetrominoType.values.length);
           expect(palette.legend.length, TetrominoType.values.length);
           expect(palette.boardTop, isNot(palette.boardBottom));
+          expect(palette.screenGradient.colors, [
+            palette.screenTop,
+            palette.screenBottom,
+          ]);
+          expect(palette.boardGradient.colors, [
+            palette.boardTop,
+            palette.boardBottom,
+          ]);
         }
       }
     });

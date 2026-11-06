@@ -231,12 +231,7 @@ class PlayfieldComponent extends PositionComponent {
   }
 
   void _paintBackground(Canvas canvas, Rect rect, BlockPalette palette) {
-    final gradient = LinearGradient(
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-      colors: [palette.boardTop, palette.boardBottom],
-    );
-    canvas.drawRect(rect, Paint()..shader = gradient.createShader(rect));
+    paintBoardBackground(canvas, rect, palette);
   }
 
   void _paintGrid(Canvas canvas, BlockPalette palette) {

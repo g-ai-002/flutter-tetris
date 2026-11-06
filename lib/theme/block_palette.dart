@@ -63,6 +63,20 @@ class BlockPalette {
 
   Color get boardBackground => boardBottom;
 
+  /// 首页等整屏背景的纵向渐变。
+  LinearGradient get screenGradient => LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [screenTop, screenBottom],
+  );
+
+  /// 棋盘底色的纵向渐变，Flame 场地与首页缩略棋盘共用。
+  LinearGradient get boardGradient => LinearGradient(
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+    colors: [boardTop, boardBottom],
+  );
+
   Color get boardBorder => Color.lerp(boardBottom, accent, dark ? 0.30 : 0.22)!;
 
   Color get gridLine => accent.withValues(alpha: dark ? 0.07 : 0.09);

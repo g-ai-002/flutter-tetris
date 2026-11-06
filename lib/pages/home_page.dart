@@ -32,13 +32,7 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [palette.screenTop, palette.screenBottom],
-          ),
-        ),
+        decoration: BoxDecoration(gradient: palette.screenGradient),
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
@@ -180,7 +174,8 @@ class _Hero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final palette = settings.blockSkin.palette(dark: settings.darkMode);
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final palette = settings.blockSkin.palette(dark: dark);
     final preview = HeroBoardPreview(palette: palette);
     final text = _HeroText(wide: wide);
     if (!wide) {
@@ -344,16 +339,23 @@ class _ModeCards extends StatelessWidget {
           builder: (_) => GamePage(mode: GameMode.daily, daily: challenge),
         ),
       ),
-      footer: Row(
+      footer: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        spacing: 12,
+        runSpacing: 2,
         children: [
-          const Icon(
-            Icons.local_fire_department_outlined,
-            size: 14,
-            color: appGold,
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.local_fire_department_outlined,
+                size: 14,
+                color: appGold,
+              ),
+              const SizedBox(width: 4),
+              Text('连续打卡 $streak 天', style: muted),
+            ],
           ),
-          const SizedBox(width: 4),
-          Text('连续打卡 $streak 天', style: muted),
-          const Spacer(),
           Text('距刷新 ${formatDuration(refresh.inMilliseconds)}', style: muted),
         ],
       ),
@@ -384,10 +386,15 @@ class _ModeCards extends StatelessWidget {
         children: [
           const Icon(Icons.star_rounded, size: 14, color: appGold),
           const SizedBox(width: 4),
-          Text(
-            '已通关 ${settings.completedLevels} 关 · 累计 ${settings.totalStars} 星',
-            style: Theme.of(context).textTheme.labelSmall
-                ?.copyWith(color: colors.onSurfaceVariant),
+          Expanded(
+            child: Text(
+              '已通关 ${settings.completedLevels} 关 · 累计 ${settings.totalStars} 星',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+            ),
           ),
         ],
       ),
