@@ -241,6 +241,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     final settings = context.watch<SettingsProvider>();
     final darkness = Theme.of(context).brightness == Brightness.dark;
     final palette = settings.blockSkin.palette(dark: darkness);
+    final bindings = settings.keyBindings;
     _game.style = PlayfieldStyle(
       palette: palette,
       showGhost: settings.showGhost,
@@ -305,8 +306,8 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
         body: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) => constraints.maxWidth >= 880
-                ? _buildWide(palette)
-                : _buildCompact(palette),
+                ? _buildWide(palette, bindings)
+                : _buildCompact(palette, bindings),
           ),
         ),
       ),
@@ -346,7 +347,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildWide(BlockPalette palette) {
+  Widget _buildWide(BlockPalette palette, KeyBindings bindings) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
       child: Row(
@@ -356,8 +357,11 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
             width: 132,
             child: AnimatedBuilder(
               animation: _controller,
-              builder: (context, _) =>
-                  GameLeftRail(controller: _controller, palette: palette),
+              builder: (context, _) => GameLeftRail(
+                controller: _controller,
+                palette: palette,
+                bindings: bindings,
+              ),
             ),
           ),
           const SizedBox(width: 16),
@@ -376,7 +380,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     );
   }
 
-  Widget _buildCompact(BlockPalette palette) {
+  Widget _buildCompact(BlockPalette palette, KeyBindings bindings) {
     return Column(
       children: [
         Padding(
@@ -409,7 +413,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
           ),
         ),
         if (isDesktopPlatform)
-          const GameKeyboardHint()
+          GameKeyboardHint(bindings: bindings)
         else
           AnimatedBuilder(
             animation: _controller,

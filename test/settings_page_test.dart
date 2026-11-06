@@ -28,6 +28,7 @@ void main() {
     expect(find.text('外观与操作'), findsOneWidget);
     expect(find.text('音效与反馈'), findsOneWidget);
     expect(find.text('键位与手柄'), findsOneWidget);
+    expect(find.text('硬降 Y / RB / ↑'), findsOneWidget);
 
     expect(find.text('棋盘皮肤'), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('skin-celadon')));
@@ -88,6 +89,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('玩法与操作'), findsOneWidget);
     expect(find.textContaining('堆叠方块填满整行即可消除'), findsOneWidget);
+    expect(find.text('硬降 Y / RB / ↑'), findsWidgets);
   });
 
   testWidgets('设置页可以重新绑定按键并恢复默认', (tester) async {

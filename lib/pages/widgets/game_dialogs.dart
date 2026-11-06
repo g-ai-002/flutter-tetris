@@ -11,6 +11,7 @@ import '../../providers/settings_provider.dart';
 import '../../services/storage_service.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
+import 'gamepad_guide.dart';
 import 'star_rating.dart';
 import 'status_chip.dart';
 
@@ -403,11 +404,7 @@ Future<void> showHelpDialog(BuildContext context) {
                 const SizedBox(height: 14),
                 Text('手柄', style: theme.textTheme.titleSmall),
                 const SizedBox(height: 6),
-                Text(
-                  '左摇杆 / 十字键移动与软降　A 顺时针　B 逆时针\n'
-                  'X / LB 暂存　Y / RB / 十字键上 硬降　Start 暂停',
-                  style: bodyStyle,
-                ),
+                const GamepadGuide(),
                 const SizedBox(height: 14),
                 Text('触屏与鼠标', style: theme.textTheme.titleSmall),
                 const SizedBox(height: 6),

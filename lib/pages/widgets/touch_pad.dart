@@ -1,8 +1,7 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 
 import '../../game/tetris_controller.dart';
+import '../../input/action_repeat.dart';
 
 /// 触屏操作区：上排暂存 / 旋转 / 硬降，下排左移 / 软降 / 右移。
 class TouchPad extends StatelessWidget {
@@ -122,33 +121,29 @@ class _PadButton extends StatefulWidget {
 }
 
 class _PadButtonState extends State<_PadButton> {
-  Timer? _timer;
-  Timer? _startDelay;
+  late final ActionRepeat _repeat = ActionRepeat(
+    onRepeat: () {
+      if (mounted) widget.onPressed?.call();
+    },
+  );
 
   @override
   void dispose() {
-    _stop();
+    _repeat.dispose();
     super.dispose();
-  }
-
-  void _stop() {
-    _startDelay?.cancel();
-    _startDelay = null;
-    _timer?.cancel();
-    _timer = null;
   }
 
   void _start() {
     if (widget.onPressed == null) return;
-    widget.onPressed!();
-    if (!widget.repeat) return;
-    _startDelay = Timer(const Duration(milliseconds: 220), () {
-      _timer = Timer.periodic(const Duration(milliseconds: 70), (_) {
-        if (!mounted) return;
-        widget.onPressed?.call();
-      });
-    });
+    _repeat.start(
+      interval: widget.repeat
+          ? const Duration(milliseconds: 70)
+          : Duration.zero,
+      initialDelay: const Duration(milliseconds: 220),
+    );
   }
+
+  void _stop() => _repeat.stop();
 
   @override
   Widget build(BuildContext context) {

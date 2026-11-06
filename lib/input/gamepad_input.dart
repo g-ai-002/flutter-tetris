@@ -3,23 +3,76 @@ import 'dart:async';
 import 'package:gamepads/gamepads.dart';
 
 import '../services/log_service.dart';
+import 'action_repeat.dart';
 import 'key_bindings.dart';
 
-/// 手柄按钮到游戏操作的固定映射，摇杆与十字键由 [GamepadService] 处理。
-GameAction? gamepadActionForButton(GamepadButton button) {
-  return switch (button) {
-    GamepadButton.a => GameAction.rotateClockwise,
-    GamepadButton.b => GameAction.rotateCounterClockwise,
-    GamepadButton.x || GamepadButton.leftBumper => GameAction.hold,
-    GamepadButton.y ||
-    GamepadButton.rightBumper ||
-    GamepadButton.dpadUp => GameAction.hardDrop,
-    GamepadButton.dpadLeft => GameAction.moveLeft,
-    GamepadButton.dpadRight => GameAction.moveRight,
-    GamepadButton.dpadDown => GameAction.softDrop,
-    GamepadButton.start => GameAction.pause,
-    _ => null,
-  };
+/// 标准布局手柄的固定按钮映射，摇杆与十字键的连发由 [GamepadService] 处理。
+///
+/// 界面上的手柄说明也从这张表派生，避免帮助弹窗、设置页与 README 各写一份。
+const Map<GamepadButton, GameAction> gamepadButtonActions = {
+  GamepadButton.a: GameAction.rotateClockwise,
+  GamepadButton.b: GameAction.rotateCounterClockwise,
+  GamepadButton.x: GameAction.hold,
+  GamepadButton.leftBumper: GameAction.hold,
+  GamepadButton.y: GameAction.hardDrop,
+  GamepadButton.rightBumper: GameAction.hardDrop,
+  GamepadButton.dpadUp: GameAction.hardDrop,
+  GamepadButton.dpadLeft: GameAction.moveLeft,
+  GamepadButton.dpadRight: GameAction.moveRight,
+  GamepadButton.dpadDown: GameAction.softDrop,
+  GamepadButton.start: GameAction.pause,
+};
+
+/// 手柄说明的展示顺序：移动、软降、旋转、暂存、暂停。
+const List<GameAction> gamepadGuideOrder = [
+  GameAction.moveLeft,
+  GameAction.moveRight,
+  GameAction.softDrop,
+  GameAction.hardDrop,
+  GameAction.rotateClockwise,
+  GameAction.rotateCounterClockwise,
+  GameAction.hold,
+  GameAction.pause,
+];
+
+/// 手柄按钮 → 游戏操作，未映射的按钮返回 null。
+GameAction? gamepadActionForButton(GamepadButton button) =>
+    gamepadButtonActions[button];
+
+/// 映射到 [action] 的全部按钮，按 [gamepadButtonActions] 的声明顺序返回。
+List<GamepadButton> gamepadButtonsFor(GameAction action) => [
+  for (final entry in gamepadButtonActions.entries)
+    if (entry.value == action) entry.key,
+];
+
+String formatGamepadButton(GamepadButton button) => switch (button) {
+  GamepadButton.a => 'A',
+  GamepadButton.b => 'B',
+  GamepadButton.x => 'X',
+  GamepadButton.y => 'Y',
+  GamepadButton.leftBumper => 'LB',
+  GamepadButton.rightBumper => 'RB',
+  GamepadButton.dpadUp => '↑',
+  GamepadButton.dpadDown => '↓',
+  GamepadButton.dpadLeft => '←',
+  GamepadButton.dpadRight => '→',
+  GamepadButton.start => 'Start',
+  _ => button.name,
+};
+
+/// 手柄按键在界面上的说明；未映射的操作返回 null。
+///
+/// 移动与软降同时支持左摇杆，因此在这三项后面补上「左摇杆」。
+String? gamepadLabelsFor(GameAction action) {
+  final buttons = gamepadButtonsFor(action);
+  if (buttons.isEmpty) return null;
+  final labels = buttons.map(formatGamepadButton).toList();
+  if (action == GameAction.moveLeft ||
+      action == GameAction.moveRight ||
+      action == GameAction.softDrop) {
+    labels.add('左摇杆');
+  }
+  return labels.join(' / ');
 }
 
 /// 把标准布局手柄的按钮与左摇杆转成与键盘一致的操作流。
@@ -35,7 +88,10 @@ class GamepadService {
     this.moveRepeat = const Duration(milliseconds: 110),
     this.softDropRepeat = const Duration(milliseconds: 55),
   }) : _eventStream = events,
-       _connectionStream = connections;
+       _connectionStream = connections {
+    _buttonRepeat = ActionRepeat(onRepeat: _fireButton);
+    _stickRepeat = ActionRepeat(onRepeat: _fireStick);
+  }
 
   final void Function(GameAction action) onAction;
   final double axisThreshold;
@@ -47,9 +103,9 @@ class GamepadService {
 
   StreamSubscription<NormalizedGamepadEvent>? _events;
   StreamSubscription<GamepadConnectionEvent>? _connections;
-  Timer? _buttonTimer;
+  late final ActionRepeat _buttonRepeat;
+  late final ActionRepeat _stickRepeat;
   GameAction? _buttonAction;
-  Timer? _stickTimer;
   GameAction? _stickAction;
   double _stickX = 0;
   double _stickY = 0;
@@ -148,37 +204,38 @@ class GamepadService {
   }
 
   void _startRepeat(GameAction action, {required bool onStick}) {
+    final interval = _intervalFor(action);
     if (onStick) {
       _stickAction = action;
-      onAction(action);
-      _stickTimer = Timer.periodic(
-        _intervalFor(action),
-        (_) => onAction(action),
-      );
+      _stickRepeat.start(interval: interval);
       return;
     }
     if (_buttonAction == action) return;
     _stopButtonRepeat();
     _buttonAction = action;
-    onAction(action);
-    _buttonTimer = Timer.periodic(
-      _intervalFor(action),
-      (_) => onAction(action),
-    );
+    _buttonRepeat.start(interval: interval);
+  }
+
+  void _fireButton() {
+    final action = _buttonAction;
+    if (action != null) onAction(action);
+  }
+
+  void _fireStick() {
+    final action = _stickAction;
+    if (action != null) onAction(action);
   }
 
   Duration _intervalFor(GameAction action) =>
       action == GameAction.softDrop ? softDropRepeat : moveRepeat;
 
   void _stopButtonRepeat() {
-    _buttonTimer?.cancel();
-    _buttonTimer = null;
+    _buttonRepeat.stop();
     _buttonAction = null;
   }
 
   void _stopStickRepeat() {
-    _stickTimer?.cancel();
-    _stickTimer = null;
+    _stickRepeat.stop();
     _stickAction = null;
   }
 }

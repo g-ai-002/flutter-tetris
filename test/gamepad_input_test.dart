@@ -38,6 +38,21 @@ NormalizedGamepadEvent axisEvent(GamepadAxis axis, double value) {
 }
 
 void main() {
+  test('手柄说明由映射表派生，覆盖全部展示操作', () {
+    expect(gamepadLabelsFor(GameAction.moveLeft), '← / 左摇杆');
+    expect(gamepadLabelsFor(GameAction.moveRight), '→ / 左摇杆');
+    expect(gamepadLabelsFor(GameAction.softDrop), '↓ / 左摇杆');
+    expect(gamepadLabelsFor(GameAction.hardDrop), 'Y / RB / ↑');
+    expect(gamepadLabelsFor(GameAction.hold), 'X / LB');
+    expect(gamepadLabelsFor(GameAction.rotateClockwise), 'A');
+    expect(gamepadLabelsFor(GameAction.rotateCounterClockwise), 'B');
+    expect(gamepadLabelsFor(GameAction.pause), 'Start');
+    expect(gamepadButtonsFor(GameAction.pause), [GamepadButton.start]);
+    for (final action in gamepadGuideOrder) {
+      expect(gamepadLabelsFor(action), isNotNull, reason: action.name);
+    }
+  });
+
   test('标准手柄按钮映射到对应操作', () {
     expect(gamepadActionForButton(GamepadButton.a), GameAction.rotateClockwise);
     expect(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../game/tetris_controller.dart';
+import '../../input/key_bindings.dart';
 import '../../theme/app_theme.dart';
 import 'game_hud.dart';
 import 'piece_slot.dart';
@@ -12,10 +13,12 @@ class GameLeftRail extends StatelessWidget {
     super.key,
     required this.controller,
     required this.palette,
+    required this.bindings,
   });
 
   final TetrisController controller;
   final BlockPalette palette;
+  final KeyBindings bindings;
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +31,9 @@ class GameLeftRail extends StatelessWidget {
           palette: palette,
           size: 62,
           onTap: controller.canHold ? controller.hold : null,
-          hint: controller.canHold ? 'C / 点击' : null,
+          hint: controller.canHold
+              ? '${bindings.labelsFor(GameAction.hold).first} / 点击'
+              : null,
         ),
         const SizedBox(height: 18),
         Divider(color: Theme.of(context).colorScheme.outline),
@@ -157,17 +162,25 @@ class GameCompactRail extends StatelessWidget {
   }
 }
 
-/// 桌面端的键盘提示条。
+/// 桌面端的键盘提示条，按键取自当前键位配置。
 class GameKeyboardHint extends StatelessWidget {
-  const GameKeyboardHint({super.key});
+  const GameKeyboardHint({super.key, required this.bindings});
 
-  static const List<(String, String)> _items = [
-    ('←→', '移动'),
-    ('↓', '软降'),
-    ('空格', '硬降'),
-    ('↑', '旋转'),
-    ('C', '暂存'),
-    ('P', '暂停'),
+  final KeyBindings bindings;
+
+  String _first(GameAction action) => bindings.labelsFor(action).first;
+
+  List<(GameAction, String, String)> get _items => [
+    (
+      GameAction.moveLeft,
+      '${_first(GameAction.moveLeft)}/${_first(GameAction.moveRight)}',
+      '移动',
+    ),
+    (GameAction.softDrop, _first(GameAction.softDrop), '软降'),
+    (GameAction.hardDrop, _first(GameAction.hardDrop), '硬降'),
+    (GameAction.rotateClockwise, _first(GameAction.rotateClockwise), '旋转'),
+    (GameAction.hold, _first(GameAction.hold), '暂存'),
+    (GameAction.pause, _first(GameAction.pause), '暂停'),
   ];
 
   @override
@@ -181,8 +194,9 @@ class GameKeyboardHint extends StatelessWidget {
         spacing: 4,
         runSpacing: 4,
         children: [
-          for (final (key, label) in _items)
+          for (final (action, key, label) in _items)
             Row(
+              key: ValueKey('key-hint-${action.name}'),
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(

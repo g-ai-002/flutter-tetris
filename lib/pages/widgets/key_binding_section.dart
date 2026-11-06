@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../input/key_bindings.dart';
 import '../../providers/settings_provider.dart';
+import 'gamepad_guide.dart';
 import 'section_card.dart';
 
 /// 设置页的键位与手柄区域：逐项改键、恢复默认与手柄操作说明。
@@ -67,15 +68,8 @@ class KeyBindingSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 6),
-        Text(
-          '左摇杆 / 十字键：移动与软降　A：顺时针　B：逆时针\n'
-          'X / LB：暂存　Y / RB / 十字键上：硬降　Start：暂停',
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: colors.onSurfaceVariant,
-            height: 1.7,
-          ),
-        ),
-        const SizedBox(height: 4),
+        const GamepadGuide(),
+        const SizedBox(height: 6),
         Text(
           '支持 Xbox、PlayStation 及标准布局的 USB / 蓝牙手柄；'
           'Android 需系统已识别手柄，Web 需浏览器支持 Gamepad API。',
