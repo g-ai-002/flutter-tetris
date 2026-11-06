@@ -10,6 +10,8 @@ import '../game/daily_challenge.dart';
 import '../game/game_mode.dart';
 import '../game/level.dart';
 import '../game/tetris_controller.dart';
+import '../input/gamepad_input.dart';
+import '../input/key_bindings.dart';
 import '../providers/settings_provider.dart';
 import '../services/log_service.dart';
 import '../services/sound_service.dart';
@@ -42,6 +44,7 @@ class GamePage extends StatefulWidget {
 class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
   late final TetrisController _controller;
   late final TetrisGame _game;
+  late final GamepadService _gamepad;
   final FocusNode _focusNode = FocusNode(debugLabel: 'tetris-input');
 
   bool _resultShown = false;
@@ -65,6 +68,8 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     );
     _controller.addListener(_onControllerChanged);
     _controller.start();
+    _gamepad = GamepadService(onAction: _handleAction);
+    unawaited(_gamepad.start());
     LogService.info('开始对局: ${_controller.rules.title}');
   }
 
@@ -186,46 +191,46 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
       return KeyEventResult.ignored;
     }
-    final key = event.logicalKey;
-    final firstPress = event is KeyDownEvent;
-    if (key == LogicalKeyboardKey.arrowLeft) {
-      _controller.moveLeft();
-      return KeyEventResult.handled;
-    }
-    if (key == LogicalKeyboardKey.arrowRight) {
-      _controller.moveRight();
-      return KeyEventResult.handled;
-    }
-    if (key == LogicalKeyboardKey.arrowDown) {
-      _controller.softDrop();
-      return KeyEventResult.handled;
-    }
-    if (!firstPress) return KeyEventResult.ignored;
-    if (key == LogicalKeyboardKey.arrowUp || key == LogicalKeyboardKey.keyX) {
-      _controller.rotateClockwise();
-    } else if (key == LogicalKeyboardKey.keyZ) {
-      _controller.rotateCounterClockwise();
-    } else if (key == LogicalKeyboardKey.space) {
-      _controller.hardDrop();
-    } else if (key == LogicalKeyboardKey.keyC ||
-        key == LogicalKeyboardKey.shiftLeft ||
-        key == LogicalKeyboardKey.shiftRight) {
-      _controller.hold();
-    } else if (key == LogicalKeyboardKey.keyP ||
-        key == LogicalKeyboardKey.escape) {
-      unawaited(_openPause());
-    } else if (key == LogicalKeyboardKey.keyR) {
-      _restart();
-    } else {
+    final action = context.read<SettingsProvider>().keyBindings.actionFor(
+      event.logicalKey,
+    );
+    if (action == null) return KeyEventResult.ignored;
+    if (!action.repeatable && event is! KeyDownEvent) {
       return KeyEventResult.ignored;
     }
+    _handleAction(action);
     return KeyEventResult.handled;
+  }
+
+  void _handleAction(GameAction action) {
+    if (_pauseDialogOpen || _controller.isOver) return;
+    switch (action) {
+      case GameAction.moveLeft:
+        _controller.moveLeft();
+      case GameAction.moveRight:
+        _controller.moveRight();
+      case GameAction.softDrop:
+        _controller.softDrop();
+      case GameAction.hardDrop:
+        _controller.hardDrop();
+      case GameAction.rotateClockwise:
+        _controller.rotateClockwise();
+      case GameAction.rotateCounterClockwise:
+        _controller.rotateCounterClockwise();
+      case GameAction.hold:
+        _controller.hold();
+      case GameAction.pause:
+        unawaited(_openPause());
+      case GameAction.restart:
+        _restart();
+    }
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _controller.removeListener(_onControllerChanged);
+    unawaited(_gamepad.stop());
     _controller.dispose();
     _focusNode.dispose();
     super.dispose();
@@ -243,6 +248,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     );
 
     return Focus(
+      key: const ValueKey('game-focus'),
       focusNode: _focusNode,
       autofocus: true,
       onKeyEvent: _onKey,

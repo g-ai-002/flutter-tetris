@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 import '../../game/daily_challenge.dart';
 import '../../game/game_mode.dart';
 import '../../game/level.dart';
 import '../../game/tetris_controller.dart';
+import '../../input/key_bindings.dart';
+import '../../providers/settings_provider.dart';
 import '../../services/storage_service.dart';
 import '../../theme/app_theme.dart';
 import '../../utils/formatters.dart';
@@ -351,6 +354,8 @@ Future<void> showPauseDialog(
 
 /// 规则与操作说明。
 Future<void> showHelpDialog(BuildContext context) {
+  final bindings = context.read<SettingsProvider>().keyBindings;
+  String keys(GameAction action) => bindings.labelsFor(action).join(' / ');
   return showDialog<void>(
     context: context,
     builder: (dialogContext) {
@@ -377,9 +382,30 @@ Future<void> showHelpDialog(BuildContext context) {
                 Text('键盘', style: theme.textTheme.titleSmall),
                 const SizedBox(height: 6),
                 Text(
-                  '← → 左右移动　↓ 软降　空格 硬降\n'
-                  '↑ / X 顺时针旋转　Z 逆时针旋转\n'
-                  'C / Shift 暂存　P / Esc 暂停　R 重新开始',
+                  '${keys(GameAction.moveLeft)} / '
+                  '${keys(GameAction.moveRight)} 左右移动　'
+                  '${keys(GameAction.softDrop)} 软降　'
+                  '${keys(GameAction.hardDrop)} 硬降\n'
+                  '${keys(GameAction.rotateClockwise)} 顺时针旋转　'
+                  '${keys(GameAction.rotateCounterClockwise)} 逆时针旋转\n'
+                  '${keys(GameAction.hold)} 暂存　'
+                  '${keys(GameAction.pause)} 暂停　'
+                  '${keys(GameAction.restart)} 重新开始',
+                  style: bodyStyle,
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  '可在设置页自定义键位。',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Text('手柄', style: theme.textTheme.titleSmall),
+                const SizedBox(height: 6),
+                Text(
+                  '左摇杆 / 十字键移动与软降　A 顺时针　B 逆时针\n'
+                  'X / LB 暂存　Y / RB / 十字键上 硬降　Start 暂停',
                   style: bodyStyle,
                 ),
                 const SizedBox(height: 14),
