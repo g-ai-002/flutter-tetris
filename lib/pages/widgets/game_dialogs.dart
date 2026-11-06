@@ -117,6 +117,8 @@ class _ResultDialog extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final won = result.won;
+    final unlocked = outcome.unlocked.take(3).toList();
+    final hiddenUnlocked = outcome.unlocked.length - unlocked.length;
     return Dialog(
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 380),
@@ -194,6 +196,44 @@ class _ResultDialog extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
+                ),
+              ],
+              if (unlocked.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    for (final achievement in unlocked)
+                      StatusChip(
+                        accent: appGold,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(achievement.icon, size: 12, color: appGold),
+                            const SizedBox(width: 4),
+                            Text(
+                              '新成就 · ${achievement.title}',
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: appGold,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    if (hiddenUnlocked > 0)
+                      StatusChip(
+                        accent: appGold,
+                        child: Text(
+                          '另有 $hiddenUnlocked 项',
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: appGold,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
               ],
               const SizedBox(height: 16),

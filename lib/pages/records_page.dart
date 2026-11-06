@@ -36,6 +36,8 @@ class RecordsPage extends StatelessWidget {
               children: [
                 RecordsSummaryCard(settings: settings),
                 const SizedBox(height: 12),
+                AchievementsCard(settings: settings),
+                const SizedBox(height: 12),
                 DailyRecordsCard(settings: settings),
                 const SizedBox(height: 12),
                 LevelSummaryCard(settings: settings),
@@ -72,7 +74,7 @@ class RecordsPage extends StatelessWidget {
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: const Text('清空本地纪录？'),
-        content: const Text('最高分、最快时间与累计统计都会被删除，此操作无法撤销。'),
+        content: const Text('最高分、最快时间、累计统计与成就都会被删除，此操作无法撤销。'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),

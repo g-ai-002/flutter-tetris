@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import '../game/achievement.dart';
 import '../game/game_mode.dart';
 import '../input/key_bindings.dart';
 import '../services/daily_progress.dart';
@@ -68,6 +69,9 @@ class SettingsProvider extends ChangeNotifier {
   int get gamesPlayed => _storage.gamesPlayed;
   int get totalLines => _storage.totalLines;
   int get totalScore => _storage.totalScore;
+
+  AchievementStats get achievementStats => _storage.achievementStats;
+  Set<Achievement> get unlockedAchievements => _storage.unlockedAchievements;
 
   LevelRecord levelRecord(int id) => _storage.levelRecord(id);
   bool isLevelUnlocked(int id) => _storage.isLevelUnlocked(id);
