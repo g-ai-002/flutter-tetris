@@ -33,6 +33,9 @@ class ScoreBoard {
   int _combo = 0;
   int _maxCombo = 0;
   int _pieces = 0;
+  int _tetrises = 0;
+  int _tSpins = 0;
+  int _perfectClears = 0;
   bool _backToBack = false;
 
   int get score => _score;
@@ -41,6 +44,9 @@ class ScoreBoard {
   int get combo => _combo;
   int get maxCombo => _maxCombo;
   int get pieces => _pieces;
+  int get tetrises => _tetrises;
+  int get tSpins => _tSpins;
+  int get perfectClears => _perfectClears;
   bool get backToBack => _backToBack;
 
   /// 软降或硬降按格数计分。
@@ -84,6 +90,9 @@ class ScoreBoard {
     _combo++;
     if (_combo > _maxCombo) _maxCombo = _combo;
     _lines += rows;
+    if (rows == 4) _tetrises++;
+    if (tSpin) _tSpins++;
+    if (perfectClear) _perfectClears++;
     final nextLevel = levelForLines(_lines, startLevel: _startLevel);
     final levelUp = nextLevel > _level;
     _level = nextLevel;
@@ -105,6 +114,9 @@ class ScoreBoard {
     _combo = 0;
     _maxCombo = 0;
     _pieces = 0;
+    _tetrises = 0;
+    _tSpins = 0;
+    _perfectClears = 0;
     _backToBack = false;
   }
 }

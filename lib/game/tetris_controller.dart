@@ -138,6 +138,9 @@ class TetrisController extends ChangeNotifier {
   int get combo => _scoreBoard.combo;
   int get maxCombo => _scoreBoard.maxCombo;
   int get pieces => _scoreBoard.pieces;
+  int get tetrises => _scoreBoard.tetrises;
+  int get tSpins => _scoreBoard.tSpins;
+  int get perfectClears => _scoreBoard.perfectClears;
   bool get backToBack => _scoreBoard.backToBack;
   Duration get elapsed => _elapsed;
   GameResult? get result => _result;
@@ -622,6 +625,9 @@ class TetrisController extends ChangeNotifier {
       levelId: rules.levelId,
       stars: won ? rules.starsFor(finishedAt) : 0,
       challengeKey: rules.daily?.key,
+      tetrises: tetrises,
+      tSpins: tSpins,
+      perfectClears: perfectClears,
     );
     _events.add(won ? GameEvent.win : GameEvent.gameOver);
     notifyListeners();

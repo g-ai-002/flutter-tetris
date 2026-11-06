@@ -52,6 +52,9 @@ class GameResult {
     this.levelId,
     this.stars = 0,
     this.challengeKey,
+    this.tetrises = 0,
+    this.tSpins = 0,
+    this.perfectClears = 0,
   });
 
   final GameMode mode;
@@ -73,6 +76,11 @@ class GameResult {
 
   /// 每日挑战的日期键（`yyyyMMdd`），其他模式为 null。
   final String? challengeKey;
+
+  /// 本局四行消除、T-Spin 消除与全消次数，用于累计成就进度。
+  final int tetrises;
+  final int tSpins;
+  final int perfectClears;
 
   final String reason;
 }
