@@ -7,6 +7,7 @@ import '../theme/block_palette.dart';
 import '../utils/constants.dart';
 import '../utils/platform_info.dart';
 import 'widgets/game_dialogs.dart';
+import 'widgets/key_binding_section.dart';
 import 'widgets/log_viewer_dialog.dart';
 import 'widgets/section_card.dart';
 import 'widgets/setting_rows.dart';
@@ -90,6 +91,8 @@ class SettingsPage extends StatelessWidget {
                     ),
                   ],
                 ),
+                const SizedBox(height: 12),
+                const KeyBindingSection(),
                 const SizedBox(height: 12),
                 SectionCard(
                   title: '音效与反馈',
@@ -206,7 +209,10 @@ class SettingsPage extends StatelessWidget {
                       value: 'v${AppConstants.version}',
                     ),
                     const SizedBox(height: 8),
-                    const SettingAboutRow(label: '引擎', value: 'Flutter + Flame'),
+                    const SettingAboutRow(
+                      label: '引擎',
+                      value: 'Flutter + Flame',
+                    ),
                     const SizedBox(height: 8),
                     const SettingAboutRow(
                       label: '平台',

@@ -6,7 +6,7 @@ class AppConstants {
 
   static const String appName = '俄罗斯方块';
   static const String appEnglishName = 'TETRIS';
-  static const String version = '0.4.1';
+  static const String version = '0.5.0';
   static const String appDirName = 'FlutterTetris';
 
   static const String prefKeyDarkMode = 'dark_mode';
@@ -16,6 +16,7 @@ class AppConstants {
   static const String prefKeyHaptics = 'haptics_enabled';
   static const String prefKeyShowGhost = 'show_ghost';
   static const String prefKeyShowGrid = 'show_grid';
+  static const String prefKeyKeyBindings = 'key_bindings';
 
   static const String prefKeyGamesPlayed = 'games_played';
   static const String prefKeyTotalLines = 'total_lines';

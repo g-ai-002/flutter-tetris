@@ -1,6 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../game/game_mode.dart';
+import '../input/key_bindings.dart';
 import '../theme/block_skin.dart';
 import '../utils/constants.dart';
 import 'daily_progress.dart';
@@ -88,6 +89,12 @@ class StorageService {
   bool get showGrid => _p.getBool(AppConstants.prefKeyShowGrid) ?? true;
   Future<void> setShowGrid(bool value) =>
       _write((p) => p.setBool(AppConstants.prefKeyShowGrid, value));
+
+  KeyBindings get keyBindings =>
+      KeyBindings.decode(_p.getString(AppConstants.prefKeyKeyBindings));
+  Future<void> setKeyBindings(KeyBindings value) => _write(
+    (p) => p.setString(AppConstants.prefKeyKeyBindings, value.encode()),
+  );
 
   int bestScore(GameMode mode) =>
       _p.getInt(AppConstants.bestScoreKey(mode.name)) ?? 0;

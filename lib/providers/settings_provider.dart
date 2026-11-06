@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 
 import '../game/game_mode.dart';
+import '../input/key_bindings.dart';
 import '../services/daily_progress.dart';
 import '../services/level_progress.dart';
 import '../services/music_service.dart';
@@ -33,6 +35,12 @@ class SettingsProvider extends ChangeNotifier {
   bool get showGrid => _storage.showGrid;
   Future<void> setShowGrid(bool value) =>
       _update(() => _storage.setShowGrid(value));
+
+  KeyBindings get keyBindings => _storage.keyBindings;
+  Future<void> bindKey(GameAction action, LogicalKeyboardKey key) =>
+      _update(() => _storage.setKeyBindings(keyBindings.rebind(action, key)));
+  Future<void> resetKeyBindings() =>
+      _update(() => _storage.setKeyBindings(KeyBindings.defaults()));
 
   bool get soundEnabled => _storage.soundEnabled;
   Future<void> setSoundEnabled(bool value) => _update(() async {
