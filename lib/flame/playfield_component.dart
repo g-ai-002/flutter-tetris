@@ -7,6 +7,7 @@ import '../game/tetromino.dart';
 import '../game/tetris_controller.dart';
 import '../theme/block_painting.dart';
 import '../theme/block_palette.dart';
+import 'board_effects.dart';
 
 /// 棋盘外观：调色板与网格/幽灵块开关，随主题变化实时更新。
 class PlayfieldStyle {
@@ -36,144 +37,63 @@ class PlayfieldStyle {
 /// Flame 渲染的游戏场地：网格、落定方块、幽灵块、消行动画与粒子特效。
 class PlayfieldComponent extends PositionComponent {
   PlayfieldComponent({required this.controller, required this.style})
-    : _seenClear = controller.clearSequence,
+    : effects = BoardEffects(),
+      _seenClear = controller.clearSequence,
       _seenLock = controller.lockSequence,
       _seenDrop = controller.hardDropSequence;
 
   final TetrisController controller;
   final ValueNotifier<PlayfieldStyle> style;
-
-  final List<_Particle> _particles = [];
-  final List<_Trail> _trails = [];
-  final math.Random _random = math.Random(20261104);
+  final BoardEffects effects;
 
   int _seenClear;
   int _seenLock;
   int _seenDrop;
   double _time = 0;
-  double _shake = 0;
-
-  static const int _maxParticles = 260;
 
   @override
   void update(double dt) {
     super.update(dt);
     _time += dt;
     _syncEffects();
-
-    for (final particle in _particles) {
-      particle
-        ..velocity.y += 620 * dt
-        ..position += particle.velocity * dt
-        ..life -= dt
-        ..rotation += particle.spin * dt;
-    }
-    _particles.removeWhere((particle) => particle.life <= 0);
-
-    for (final trail in _trails) {
-      trail.life -= dt;
-    }
-    _trails.removeWhere((trail) => trail.life <= 0);
-    if (_shake > 0) _shake = math.max(0, _shake - dt * 26);
+    effects.update(dt);
   }
 
   void _syncEffects() {
+    final board = controller.board;
+    final palette = style.value.palette;
     if (controller.clearSequence != _seenClear) {
       _seenClear = controller.clearSequence;
-      _spawnClearBurst(controller.lastClearRows);
-      _shake = controller.lastClearRows.length >= 4 ? 7 : 3.5;
+      effects.spawnClearBurst(
+        board: board,
+        rows: controller.lastClearRows,
+        palette: palette,
+        cellSize: _cellSize,
+      );
     }
     if (controller.lockSequence != _seenLock) {
       _seenLock = controller.lockSequence;
-      _spawnLockDust();
+      final type = controller.lastLockedType;
+      if (type != null) {
+        effects.spawnLockDust(
+          blocks: controller.lastLockedBlocks,
+          type: type,
+          palette: palette,
+          cellSize: _cellSize,
+          hiddenRows: board.hiddenRows,
+        );
+      }
     }
     if (controller.hardDropSequence != _seenDrop) {
       _seenDrop = controller.hardDropSequence;
-      _spawnDropTrail();
-    }
-  }
-
-  void _spawnClearBurst(List<int> rows) {
-    final board = controller.board;
-    final palette = style.value.palette;
-    for (final row in rows) {
-      for (var x = 0; x < board.columns; x++) {
-        final type = board.at(x, row);
-        if (type == null) continue;
-        final center = _cellCenter(x, row);
-        final color = board.isGarbage(x, row)
-            ? palette.garbageBlock
-            : palette.colorOf(type);
-        final count = rows.length >= 4 ? 2 : 1;
-        for (var i = 0; i < count; i++) {
-          _particles.add(
-            _Particle(
-              position: Vector2(center.dx, center.dy),
-              velocity: Vector2(
-                (_random.nextDouble() - 0.5) * 200,
-                -70 - _random.nextDouble() * 190,
-              ),
-              color: color,
-              life: 0.45 + _random.nextDouble() * 0.4,
-              maxLife: 0.85,
-              size: _cellSize * (0.18 + _random.nextDouble() * 0.22),
-              spin: (_random.nextDouble() - 0.5) * 12,
-            ),
-          );
-        }
-      }
-    }
-    if (_particles.length > _maxParticles) {
-      _particles.removeRange(0, _particles.length - _maxParticles);
-    }
-  }
-
-  void _spawnLockDust() {
-    final blocks = controller.lastLockedBlocks;
-    final type = controller.lastLockedType;
-    if (blocks.isEmpty || type == null) return;
-    final color = style.value.palette.colorOf(type);
-    for (final block in blocks) {
-      if (_random.nextDouble() > 0.55) continue;
-      final center = _cellCenter(block.x, block.y);
-      _particles.add(
-        _Particle(
-          position: Vector2(center.dx, center.dy + _cellSize * 0.4),
-          velocity: Vector2(
-            (_random.nextDouble() - 0.5) * 70,
-            -25 - _random.nextDouble() * 45,
-          ),
-          color: color,
-          life: 0.2 + _random.nextDouble() * 0.15,
-          maxLife: 0.35,
-          size: _cellSize * 0.10,
-          spin: 0,
-        ),
+      effects.spawnDropTrail(
+        board: board,
+        column: controller.hardDropColumn,
+        rows: controller.hardDropRows,
+        blocks: controller.lastLockedBlocks,
+        cellSize: _cellSize,
       );
     }
-  }
-
-  void _spawnDropTrail() {
-    final board = controller.board;
-    final column = controller.hardDropColumn;
-    final rows = controller.hardDropRows;
-    if (rows <= 0) return;
-    final piece = controller.lastLockedBlocks;
-    var bottom = board.rows - 1;
-    if (piece.isNotEmpty) {
-      bottom = piece.map((block) => block.y).reduce(math.max);
-    }
-    final top = math.max(board.hiddenRows, bottom - rows);
-    _trails.add(
-      _Trail(
-        x: column + 1.5,
-        fromY: top,
-        toY: bottom,
-        life: 0.18,
-        maxLife: 0.18,
-        width: _cellSize * 0.35,
-      ),
-    );
   }
 
   @override
@@ -186,10 +106,11 @@ class PlayfieldComponent extends PositionComponent {
 
     canvas.save();
     canvas.clipRRect(well);
-    if (_shake > 0.2) {
+    final shake = effects.shake;
+    if (shake > 0.2) {
       canvas.translate(
-        math.sin(_time * 70) * _shake * 0.5,
-        math.cos(_time * 55) * _shake * 0.25,
+        math.sin(_time * 70) * shake * 0.5,
+        math.cos(_time * 55) * shake * 0.25,
       );
     }
 
@@ -198,12 +119,13 @@ class PlayfieldComponent extends PositionComponent {
     _paintDangerZone(canvas, palette);
     _paintLocked(canvas, palette);
     _paintGhostAndActive(canvas, palette, currentStyle);
-
-    for (final trail in _trails) {
-      _paintTrail(canvas, trail);
-    }
+    effects.paintTrails(
+      canvas,
+      hiddenRows: controller.board.hiddenRows,
+      cellSize: _cellSize,
+    );
     _paintClearFlash(canvas, palette);
-    _paintParticles(canvas);
+    effects.paintParticles(canvas);
     canvas.restore();
   }
 
@@ -214,11 +136,6 @@ class PlayfieldComponent extends PositionComponent {
   }
 
   double get _cellSize => size.x / controller.board.columns;
-
-  Offset _cellCenter(int x, int y) => Offset(
-    (x + 0.5) * _cellSize,
-    (y - controller.board.hiddenRows + 0.5) * _cellSize,
-  );
 
   Rect _cellRect(int x, int y, {double inset = 0}) {
     final cell = _cellSize;
@@ -328,87 +245,4 @@ class PlayfieldComponent extends PositionComponent {
       );
     }
   }
-
-  void _paintTrail(Canvas canvas, _Trail trail) {
-    final alpha = (trail.life / trail.maxLife).clamp(0.0, 1.0);
-    final top = (trail.fromY - controller.board.hiddenRows) * _cellSize;
-    final bottom = (trail.toY - controller.board.hiddenRows + 1) * _cellSize;
-    final rect = Rect.fromLTWH(
-      trail.x * _cellSize - trail.width / 2,
-      top,
-      trail.width,
-      math.max(0, bottom - top),
-    );
-    canvas.drawRect(
-      rect,
-      Paint()
-        ..shader = LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Colors.white.withValues(alpha: 0),
-            Colors.white.withValues(alpha: 0.30 * alpha),
-          ],
-        ).createShader(rect),
-    );
-  }
-
-  void _paintParticles(Canvas canvas) {
-    for (final particle in _particles) {
-      final alpha = (particle.life / particle.maxLife).clamp(0.0, 1.0);
-      canvas.save();
-      canvas.translate(particle.position.x, particle.position.y);
-      canvas.rotate(particle.rotation);
-      final rect = Rect.fromCenter(
-        center: Offset.zero,
-        width: particle.size,
-        height: particle.size,
-      );
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(rect, Radius.circular(particle.size * 0.22)),
-        Paint()..color = particle.color.withValues(alpha: alpha),
-      );
-      canvas.restore();
-    }
-  }
-}
-
-class _Particle {
-  _Particle({
-    required this.position,
-    required this.velocity,
-    required this.color,
-    required this.life,
-    required this.maxLife,
-    required this.size,
-    required this.spin,
-  });
-
-  Vector2 position;
-  Vector2 velocity;
-  final Color color;
-  double life;
-  final double maxLife;
-  final double size;
-  final double spin;
-  double rotation = 0;
-}
-
-class _Trail {
-  _Trail({
-    required this.x,
-    required this.fromY,
-    required this.toY,
-    required this.life,
-    required this.maxLife,
-    required this.width,
-  });
-
-  /// 以格为单位的列号（可为小数，用于居中）。
-  final double x;
-  final int fromY;
-  final int toY;
-  double life;
-  final double maxLife;
-  final double width;
 }
