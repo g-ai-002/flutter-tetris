@@ -1,13 +1,16 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_tetris/flame/tetris_game.dart';
 import 'package:flutter_tetris/game/daily_challenge.dart';
 import 'package:flutter_tetris/game/game_mode.dart';
 import 'package:flutter_tetris/game/garbage.dart';
 import 'package:flutter_tetris/game/level.dart';
+import 'package:flutter_tetris/input/key_bindings.dart';
 import 'package:flutter_tetris/pages/game_page.dart';
 import 'package:flutter_tetris/services/storage_service.dart';
 import 'package:flutter_tetris/theme/block_skin.dart';
+import 'package:flutter_tetris/utils/constants.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'test_helpers.dart';
@@ -172,6 +175,46 @@ void main() {
     expect(find.textContaining('垃圾行'), findsWidgets);
     expect(tester.takeException(), isNull);
 
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('对局页使用自定义键位', (tester) async {
+    tester.view.physicalSize = const Size(1280, 960);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final bindings = KeyBindings.defaults().rebind(
+      GameAction.moveLeft,
+      LogicalKeyboardKey.keyA,
+    );
+    storage = await prepareStorage({
+      AppConstants.prefKeyKeyBindings: bindings.encode(),
+    });
+
+    await tester.pumpWidget(
+      wrapPage(
+        child: const GamePage(mode: GameMode.endless),
+        storage: storage,
+      ),
+    );
+    await tester.pump();
+
+    final game = tester
+        .widget<GameWidget<TetrisGame>>(find.byType(GameWidget<TetrisGame>))
+        .game!;
+    tester
+        .widget<Focus>(find.byKey(const ValueKey('game-focus')))
+        .focusNode!
+        .requestFocus();
+    await tester.pump();
+    final startX = game.controller.piece!.x;
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+    await tester.pump();
+    expect(game.controller.piece!.x, startX);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyA);
+    await tester.pump();
+    expect(game.controller.piece!.x, startX - 1);
     await tester.pumpWidget(const SizedBox.shrink());
   });
 }
