@@ -198,74 +198,17 @@ class StorageService {
     final unlockedNow = <Achievement>[];
 
     await _write((p) async {
-      await p.setInt(AppConstants.prefKeyGamesPlayed, gamesPlayed + 1);
-      await p.setInt(AppConstants.prefKeyTotalLines, totalLines + result.lines);
-      await p.setInt(AppConstants.prefKeyTotalScore, totalScore + result.score);
-      await p.setInt(
-        AppConstants.prefKeyTotalTetris,
-        totalTetris + result.tetrises,
+      await _addCareerTotals(p, result);
+      await _saveModeRecords(
+        p,
+        result,
+        levelMerge: levelMerge,
+        dailyMerge: dailyMerge,
+        newModeBestScore: newModeBestScore,
+        oldLines: oldLines,
+        newBestTime: newBestTime,
       );
-      await p.setInt(
-        AppConstants.prefKeyTotalTSpins,
-        totalTSpins + result.tSpins,
-      );
-      await p.setInt(
-        AppConstants.prefKeyTotalPerfectClears,
-        totalPerfectClears + result.perfectClears,
-      );
-      await p.setInt(
-        AppConstants.playsKey(result.mode.name),
-        plays(result.mode) + 1,
-      );
-      if (result.maxCombo > bestCombo) {
-        await p.setInt(AppConstants.prefKeyBestCombo, result.maxCombo);
-      }
-      if (result.score > bestScoreOverall) {
-        await p.setInt(AppConstants.prefKeyBestScoreOverall, result.score);
-      }
-
-      if (dailyMerge != null) {
-        await p.setString(
-          AppConstants.prefKeyDailyRecords,
-          dailyMerge.progress.encode(),
-        );
-      }
-      if (levelMerge != null) {
-        await p.setString(
-          AppConstants.prefKeyLevelRecords,
-          levelMerge.progress.encode(),
-        );
-      } else {
-        if (newModeBestScore) {
-          await p.setInt(
-            AppConstants.bestScoreKey(result.mode.name),
-            result.score,
-          );
-        }
-        if (result.lines > oldLines) {
-          await p.setInt(
-            AppConstants.bestLinesKey(result.mode.name),
-            result.lines,
-          );
-        }
-        if (newBestTime) {
-          await p.setInt(
-            AppConstants.prefKeyBestSprintTime,
-            result.elapsed.inMilliseconds,
-          );
-        }
-      }
-
-      final unlocked = unlockedAchievements;
-      final newlyUnlocked = Achievement.unlockedIn(achievementStats)
-          .difference(unlocked);
-      if (newlyUnlocked.isNotEmpty) {
-        unlockedNow.addAll(newlyUnlocked);
-        await p.setStringList(AppConstants.prefKeyAchievements, [
-          for (final achievement in {...unlocked, ...newlyUnlocked})
-            achievement.name,
-        ]);
-      }
+      unlockedNow.addAll(await _unlockAchievements(p));
       return true;
     });
 
@@ -275,6 +218,85 @@ class StorageService {
       newBestStars: newBestStars,
       unlocked: List.unmodifiable(unlockedNow),
     );
+  }
+
+  /// 生涯计数与单局极值，所有玩法都会累计。
+  Future<void> _addCareerTotals(SharedPreferences p, GameResult result) async {
+    await p.setInt(AppConstants.prefKeyGamesPlayed, gamesPlayed + 1);
+    await p.setInt(AppConstants.prefKeyTotalLines, totalLines + result.lines);
+    await p.setInt(AppConstants.prefKeyTotalScore, totalScore + result.score);
+    await p.setInt(
+      AppConstants.prefKeyTotalTetris,
+      totalTetris + result.tetrises,
+    );
+    await p.setInt(
+      AppConstants.prefKeyTotalTSpins,
+      totalTSpins + result.tSpins,
+    );
+    await p.setInt(
+      AppConstants.prefKeyTotalPerfectClears,
+      totalPerfectClears + result.perfectClears,
+    );
+    await p.setInt(
+      AppConstants.playsKey(result.mode.name),
+      plays(result.mode) + 1,
+    );
+    if (result.maxCombo > bestCombo) {
+      await p.setInt(AppConstants.prefKeyBestCombo, result.maxCombo);
+    }
+    if (result.score > bestScoreOverall) {
+      await p.setInt(AppConstants.prefKeyBestScoreOverall, result.score);
+    }
+  }
+
+  /// 关卡与每日挑战写入各自进度；经典玩法写入分模式纪录。
+  Future<void> _saveModeRecords(
+    SharedPreferences p,
+    GameResult result, {
+    required LevelProgressMerge? levelMerge,
+    required DailyProgressMerge? dailyMerge,
+    required bool newModeBestScore,
+    required int oldLines,
+    required bool newBestTime,
+  }) async {
+    if (dailyMerge != null) {
+      await p.setString(
+        AppConstants.prefKeyDailyRecords,
+        dailyMerge.progress.encode(),
+      );
+    }
+    if (levelMerge != null) {
+      await p.setString(
+        AppConstants.prefKeyLevelRecords,
+        levelMerge.progress.encode(),
+      );
+      return;
+    }
+    if (newModeBestScore) {
+      await p.setInt(AppConstants.bestScoreKey(result.mode.name), result.score);
+    }
+    if (result.lines > oldLines) {
+      await p.setInt(AppConstants.bestLinesKey(result.mode.name), result.lines);
+    }
+    if (newBestTime) {
+      await p.setInt(
+        AppConstants.prefKeyBestSprintTime,
+        result.elapsed.inMilliseconds,
+      );
+    }
+  }
+
+  /// 依据最新生涯统计解锁成就，返回本局新增的徽章。
+  Future<List<Achievement>> _unlockAchievements(SharedPreferences p) async {
+    final unlocked = unlockedAchievements;
+    final newlyUnlocked = Achievement.unlockedIn(achievementStats)
+        .difference(unlocked);
+    if (newlyUnlocked.isEmpty) return const [];
+    await p.setStringList(AppConstants.prefKeyAchievements, [
+      for (final achievement in {...unlocked, ...newlyUnlocked})
+        achievement.name,
+    ]);
+    return newlyUnlocked.toList();
   }
 
   /// 清空纪录、生涯统计与成就，保留界面偏好。
