@@ -1,3 +1,4 @@
+import 'package:flutter_tetris/game/achievement.dart';
 import 'package:flutter_tetris/game/daily_challenge.dart';
 import 'package:flutter_tetris/game/game_mode.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,6 +17,9 @@ GameResult result({
   int? levelId,
   int stars = 0,
   String? challengeKey,
+  int tetrises = 0,
+  int tSpins = 0,
+  int perfectClears = 0,
 }) {
   return GameResult(
     mode: mode,
@@ -30,6 +34,9 @@ GameResult result({
     levelId: levelId,
     stars: stars,
     challengeKey: challengeKey,
+    tetrises: tetrises,
+    tSpins: tSpins,
+    perfectClears: perfectClears,
   );
 }
 
@@ -263,6 +270,104 @@ void main() {
       await storage.clearRecords();
       expect(storage.dailyRecord(today.key).played, isFalse);
       expect(storage.dailyStreak(today.date), 0);
+    });
+
+    test('生涯统计累计四行、T-Spin、全消与最高连击', () async {
+      final storage = await prepareStorage();
+      await storage.recordResult(
+        result(
+          score: 8000,
+          lines: 20,
+          maxCombo: 9,
+          tetrises: 2,
+          tSpins: 1,
+          perfectClears: 1,
+        ),
+      );
+      await storage.recordResult(
+        result(score: 12000, lines: 4, maxCombo: 4, tetrises: 1, tSpins: 2),
+      );
+
+      expect(storage.totalTetris, 3);
+      expect(storage.totalTSpins, 3);
+      expect(storage.totalPerfectClears, 1);
+      expect(storage.bestCombo, 9);
+      expect(storage.bestScoreOverall, 12000);
+
+      final stats = storage.achievementStats;
+      expect(stats.games, 2);
+      expect(stats.totalLines, 24);
+      expect(stats.tetrises, 3);
+      expect(stats.tSpins, 3);
+      expect(stats.perfectClears, 1);
+      expect(stats.bestCombo, 9);
+      expect(stats.bestScore, 12000);
+    });
+
+    test('首局按表现解锁成就且不会重复解锁', () async {
+      final storage = await prepareStorage();
+      final first = await storage.recordResult(
+        result(maxCombo: 5, tetrises: 1, tSpins: 1, perfectClears: 1),
+      );
+      expect(
+        first.unlocked,
+        containsAll([
+          Achievement.firstGame,
+          Achievement.tetris1,
+          Achievement.tspin1,
+          Achievement.perfect1,
+          Achievement.combo5,
+        ]),
+      );
+      expect(storage.unlockedAchievements, containsAll(first.unlocked));
+
+      final second = await storage.recordResult(result(tetrises: 1));
+      expect(second.unlocked, isEmpty);
+      expect(storage.unlockedAchievements, containsAll(first.unlocked));
+    });
+
+    test('累计跨过目标后解锁成就', () async {
+      final storage = await prepareStorage({
+        'games_played': 9,
+        'total_tetris': 9,
+        'total_tspins': 9,
+        'total_lines': 99,
+      });
+      final outcome = await storage.recordResult(
+        result(score: 10000, lines: 1, maxCombo: 10, tetrises: 1, tSpins: 1),
+      );
+
+      expect(
+        outcome.unlocked,
+        containsAll([
+          Achievement.tenGames,
+          Achievement.tetris10,
+          Achievement.tspin10,
+          Achievement.lines100,
+          Achievement.combo10,
+          Achievement.score10k,
+        ]),
+      );
+      expect(storage.unlockedAchievements, containsAll(outcome.unlocked));
+      expect(storage.unlockedAchievements.length, outcome.unlocked.length);
+    });
+
+    test('清空纪录同时清空成就与生涯计数', () async {
+      final storage = await prepareStorage();
+      await storage.recordResult(
+        result(tetrises: 2, tSpins: 1, perfectClears: 1, maxCombo: 6),
+      );
+      expect(storage.unlockedAchievements, isNotEmpty);
+
+      await storage.clearRecords();
+
+      expect(storage.unlockedAchievements, isEmpty);
+      expect(storage.totalTetris, 0);
+      expect(storage.totalTSpins, 0);
+      expect(storage.totalPerfectClears, 0);
+      expect(storage.bestCombo, 0);
+      expect(storage.bestScoreOverall, 0);
+      expect(storage.achievementStats.games, 0);
     });
   });
 }

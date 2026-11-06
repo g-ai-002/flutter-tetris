@@ -9,7 +9,7 @@ import 'test_helpers.dart';
 
 void main() {
   testWidgets('纪录页展示累计数据与各模式纪录', (tester) async {
-    tester.view.physicalSize = const Size(900, 1200);
+    tester.view.physicalSize = const Size(900, 2400);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
@@ -42,7 +42,7 @@ void main() {
   });
 
   testWidgets('清空纪录后回到空状态', (tester) async {
-    tester.view.physicalSize = const Size(900, 1200);
+    tester.view.physicalSize = const Size(900, 2400);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
@@ -98,8 +98,31 @@ void main() {
     expect(find.text('3,200 分'), findsOneWidget);
   });
 
+  testWidgets('纪录页展示成就徽章与未达成进度', (tester) async {
+    tester.view.physicalSize = const Size(900, 1600);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    final storage = await prepareStorage({
+      'games_played': 3,
+      'achievements': ['firstGame'],
+    });
+
+    await tester.pumpWidget(
+      wrapPage(child: const RecordsPage(), storage: storage),
+    );
+
+    expect(find.text('成就'), findsOneWidget);
+    expect(find.text('1/20'), findsOneWidget);
+    expect(find.text('初来乍到'), findsOneWidget);
+    expect(find.text('已达成'), findsOneWidget);
+    expect(find.text('渐入佳境'), findsOneWidget);
+    expect(find.text('3/10'), findsOneWidget);
+    expect(find.text('未达成'), findsWidgets);
+  });
+
   testWidgets('没有纪录时展示空提示且不显示清空按钮', (tester) async {
-    tester.view.physicalSize = const Size(900, 1200);
+    tester.view.physicalSize = const Size(900, 2400);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);

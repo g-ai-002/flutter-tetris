@@ -141,6 +141,43 @@ void main() {
       expect(board.lines, 10);
     });
 
+    test('记录四行、T-Spin 与全消次数', () {
+      final board = ScoreBoard();
+      board.registerClear(
+        rows: 4,
+        tSpin: false,
+        mini: false,
+        perfectClear: true,
+      );
+      board.registerClear(
+        rows: 2,
+        tSpin: true,
+        mini: false,
+        perfectClear: false,
+      );
+      board.registerClear(
+        rows: 1,
+        tSpin: false,
+        mini: false,
+        perfectClear: false,
+      );
+      board.registerClear(
+        rows: 0,
+        tSpin: true,
+        mini: false,
+        perfectClear: false,
+      );
+
+      expect(board.tetrises, 1);
+      expect(board.tSpins, 1);
+      expect(board.perfectClears, 1);
+
+      board.reset(startLevel: 1);
+      expect(board.tetrises, 0);
+      expect(board.tSpins, 0);
+      expect(board.perfectClears, 0);
+    });
+
     test('重开重置全部累计状态', () {
       final board = ScoreBoard();
       board.addDropScore(2, pointsPerCell: 2);
@@ -159,6 +196,9 @@ void main() {
       expect(board.combo, 0);
       expect(board.maxCombo, 0);
       expect(board.pieces, 0);
+      expect(board.tetrises, 0);
+      expect(board.tSpins, 0);
+      expect(board.perfectClears, 0);
       expect(board.backToBack, isFalse);
     });
   });
