@@ -59,29 +59,13 @@ class GameRightRail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final next = controller.nextQueue;
     final previews = controller.rules.previewCount;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'NEXT',
-          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-            color: Theme.of(context).colorScheme.onSurfaceVariant,
-            letterSpacing: 2,
-          ),
-        ),
+        _nextLabel(context),
         const SizedBox(height: 8),
-        for (var i = 0; i < previews && i < next.length; i++) ...[
-          if (i > 0) const SizedBox(height: 7),
-          PieceSlot(
-            label: '',
-            type: next[i],
-            palette: palette,
-            size: i == 0 ? 52 : 44,
-            showLabel: false,
-          ),
-        ],
+        ..._previews(controller, palette, previews, 52, 44, 7),
         const Spacer(),
         if (controller.combo >= 2) ...[
           StatusChip(
@@ -109,63 +93,90 @@ class GameRightRail extends StatelessWidget {
   }
 }
 
-/// 窄屏右侧栏：紧凑的暂存与三个预览。
+/// 窄屏右侧栏：紧凑的暂存与三个预览，尺寸跟随栏宽。
 class GameCompactRail extends StatelessWidget {
   const GameCompactRail({
     super.key,
     required this.controller,
     required this.palette,
+    this.width = 58,
   });
 
   final TetrisController controller;
   final BlockPalette palette;
+  final double width;
 
   @override
   Widget build(BuildContext context) {
-    final next = controller.nextQueue;
     final previews = controller.rules.previewCount.clamp(0, 3);
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      alignment: Alignment.topCenter,
-      child: SizedBox(
-        width: 56,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            if (controller.rules.holdEnabled) ...[
-              PieceSlot(
-                label: 'HOLD',
-                type: controller.holdType,
-                palette: palette,
-                showLabel: false,
-                onTap: controller.canHold ? controller.hold : null,
-              ),
-              const SizedBox(height: 8),
-            ],
-            Text(
-              'NEXT',
-              style: TextStyle(
-                fontSize: 8,
-                letterSpacing: 1.2,
-                color: Theme.of(context).colorScheme.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 4),
-            for (var i = 0; i < previews && i < next.length; i++) ...[
-              if (i > 0) const SizedBox(height: 5),
-              PieceSlot(
-                label: '',
-                type: next[i],
-                palette: palette,
-                size: 38,
-                showLabel: false,
-              ),
-            ],
-          ],
+    final slot = width * 0.66;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (controller.rules.holdEnabled) ...[
+          PieceSlot(
+            label: 'HOLD',
+            type: controller.holdType,
+            palette: palette,
+            size: slot,
+            showLabel: false,
+            onTap: controller.canHold ? controller.hold : null,
+          ),
+          const SizedBox(height: 8),
+        ],
+        Text('NEXT', style: _miniLabel(context)),
+        const SizedBox(height: 4),
+        ..._previews(
+          controller,
+          palette,
+          previews,
+          slot * 0.92,
+          slot * 0.86,
+          5,
         ),
-      ),
+      ],
     );
   }
+}
+
+Widget _nextLabel(BuildContext context) {
+  return Text(
+    'NEXT',
+    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+      color: Theme.of(context).colorScheme.onSurfaceVariant,
+      letterSpacing: 2,
+    ),
+  );
+}
+
+TextStyle? _miniLabel(BuildContext context) => TextStyle(
+  fontSize: 9,
+  letterSpacing: 1.2,
+  color: Theme.of(context).colorScheme.onSurfaceVariant,
+);
+
+/// 预览队列：第一块更大，其余同尺寸，超出栏高的部分自然裁掉。
+List<Widget> _previews(
+  TetrisController controller,
+  BlockPalette palette,
+  int count,
+  double first,
+  double rest,
+  double gap,
+) {
+  final next = controller.nextQueue;
+  return [
+    for (var i = 0; i < count && i < next.length; i++) ...[
+      if (i > 0) SizedBox(height: gap),
+      PieceSlot(
+        label: '',
+        type: next[i],
+        palette: palette,
+        size: i == 0 ? first : rest,
+        showLabel: false,
+      ),
+    ],
+  ];
 }
 
 /// 桌面端的键盘提示条，按键取自当前键位配置。

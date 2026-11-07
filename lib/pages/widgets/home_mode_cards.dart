@@ -17,12 +17,10 @@ class HomeModeCards extends StatelessWidget {
   const HomeModeCards({
     super.key,
     required this.settings,
-    required this.wide,
     required this.contentWidth,
   });
 
   final SettingsProvider settings;
-  final bool wide;
   final double contentWidth;
 
   @override
@@ -33,34 +31,32 @@ class HomeModeCards extends StatelessWidget {
       _modeCard(context: context, settings: settings, mode: GameMode.ultra),
       _modeCard(context: context, settings: settings, mode: GameMode.arcade),
     ];
-    if (!wide) {
-      return Column(
-        children: [
-          for (var i = 0; i < cards.length; i++) ...[
-            if (i > 0) const SizedBox(height: 12),
-            cards[i],
-          ],
-          const SizedBox(height: 12),
-          _dailyCard(context),
-          const SizedBox(height: 12),
-          _levelCard(context),
-        ],
-      );
-    }
-    final columns = contentWidth >= 760 ? 4 : 2;
-    final cardWidth = (contentWidth - 12 * (columns - 1)) / columns;
+    final columns = contentWidth >= 880
+        ? 4
+        : contentWidth >= 520
+        ? 2
+        : 1;
+    const gap = 12.0;
+    final cardWidth = (contentWidth - gap * (columns - 1)) / columns;
     return Column(
       children: [
-        Wrap(
-          spacing: 12,
-          runSpacing: 12,
-          children: [
-            for (final card in cards) SizedBox(width: cardWidth, child: card),
-          ],
-        ),
-        const SizedBox(height: 12),
+        if (columns == 1)
+          for (var i = 0; i < cards.length; i++) ...[
+            if (i > 0) const SizedBox(height: gap),
+            cards[i],
+          ]
+        else
+          Wrap(
+            spacing: gap,
+            runSpacing: gap,
+            children: [
+              for (final card in cards)
+                SizedBox(width: cardWidth, child: card),
+            ],
+          ),
+        const SizedBox(height: gap),
         _dailyCard(context),
-        const SizedBox(height: 12),
+        const SizedBox(height: gap),
         _levelCard(context),
       ],
     );

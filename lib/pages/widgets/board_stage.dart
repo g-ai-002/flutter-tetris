@@ -7,19 +7,21 @@ import '../../flame/tetris_game.dart';
 import '../../theme/block_palette.dart';
 
 /// 棋盘舞台：10:20 的场地按可用空间取最大尺寸，外加实体感边框与投影。
+///
+/// 宽度与高度任一方向受限都能完整显示，[maxCell] 只用来避免超宽屏上棋盘过大。
 class BoardStage extends StatelessWidget {
   const BoardStage({
     super.key,
     required this.game,
     required this.gameKey,
     required this.palette,
-    this.maxWidth = 460,
+    this.maxCell = 64,
   });
 
   final TetrisGame game;
   final Key gameKey;
   final BlockPalette palette;
-  final double maxWidth;
+  final double maxCell;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,7 @@ class BoardStage extends StatelessWidget {
       builder: (context, constraints) {
         final cell = math
             .min(constraints.maxWidth / 10, constraints.maxHeight / 20)
-            .clamp(4.0, maxWidth / 10);
+            .clamp(4.0, maxCell);
         final width = cell * 10;
         final height = cell * 20;
         return Center(

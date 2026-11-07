@@ -27,34 +27,44 @@ class HomePage extends StatelessWidget {
         child: SafeArea(
           child: LayoutBuilder(
             builder: (context, constraints) {
-              final horizontal = constraints.maxWidth >= 900 ? 40.0 : 20.0;
+              final width = constraints.maxWidth;
+              final horizontal = width >= 1200
+                  ? 48.0
+                  : width >= 700
+                  ? 28.0
+                  : 16.0;
+              const maxContent = 960.0;
               final contentWidth = math.min(
-                constraints.maxWidth - horizontal * 2,
-                820.0,
+                width - horizontal * 2,
+                maxContent,
               );
-              final wide = contentWidth >= 700;
+              final tight = constraints.maxHeight < 680;
               return SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(horizontal, 14, horizontal, 24),
+                padding: EdgeInsets.fromLTRB(
+                  horizontal,
+                  tight ? 10 : 14,
+                  horizontal,
+                  tight ? 18 : 24,
+                ),
                 child: ConstrainedBox(
                   constraints: BoxConstraints(
                     minHeight: math.max(0, constraints.maxHeight - 38),
                   ),
                   child: Center(
                     child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 820),
+                      constraints: const BoxConstraints(maxWidth: maxContent),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const HomeTopBar(),
-                          const SizedBox(height: 24),
-                          HomeHero(wide: wide, settings: settings),
-                          const SizedBox(height: 30),
+                          SizedBox(height: tight ? 16 : 24),
+                          const HomeHero(),
+                          SizedBox(height: tight ? 20 : 30),
                           HomeModeCards(
                             settings: settings,
-                            wide: wide,
                             contentWidth: contentWidth,
                           ),
-                          const SizedBox(height: 24),
+                          SizedBox(height: tight ? 16 : 24),
                           Text(
                             'v${AppConstants.version} · 本地离线 · Flutter + Flame',
                             style: theme.textTheme.bodySmall?.copyWith(

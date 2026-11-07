@@ -1,56 +1,42 @@
 import 'package:flutter/material.dart';
 
-import '../../providers/settings_provider.dart';
-import '../../theme/block_palette.dart';
 import '../../utils/constants.dart';
-import 'hero_board_preview.dart';
 
-/// 首页主视觉：缩略棋盘与标题，宽屏左右排列、窄屏上下排列。
+/// 首页主视觉：朱印、标题与一行题记，任意宽度都居中排版。
 class HomeHero extends StatelessWidget {
-  const HomeHero({super.key, required this.wide, required this.settings});
-
-  final bool wide;
-  final SettingsProvider settings;
-
-  @override
-  Widget build(BuildContext context) {
-    final dark = Theme.of(context).brightness == Brightness.dark;
-    final palette = settings.blockSkin.palette(dark: dark);
-    final preview = HeroBoardPreview(palette: palette);
-    final text = _HeroText(wide: wide);
-    if (!wide) {
-      return Column(children: [preview, const SizedBox(height: 20), text]);
-    }
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        preview,
-        const SizedBox(width: 34),
-        Flexible(child: text),
-      ],
-    );
-  }
-}
-
-class _HeroText extends StatelessWidget {
-  const _HeroText({required this.wide});
-
-  final bool wide;
+  const HomeHero({super.key});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     return Column(
-      crossAxisAlignment: wide
-          ? CrossAxisAlignment.start
-          : CrossAxisAlignment.center,
+      mainAxisSize: MainAxisSize.min,
       children: [
+        Container(
+          width: 56,
+          height: 56,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: const Color(0xFFB03A2E),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: const Text(
+            '方',
+            style: TextStyle(
+              color: Color(0xFFFFF6EA),
+              fontSize: 34,
+              fontWeight: FontWeight.w700,
+              height: 1,
+            ),
+          ),
+        ),
+        const SizedBox(height: 14),
         Text(
           AppConstants.appName,
           style: theme.textTheme.headlineMedium?.copyWith(
-            fontSize: wide ? 38 : 32,
-            letterSpacing: wide ? 7 : 6,
+            fontSize: 34,
+            letterSpacing: 7,
             color: colors.onSurface,
           ),
         ),
@@ -77,7 +63,7 @@ class _HeroText extends StatelessWidget {
           '方寸之间，一局接一局',
           style: theme.textTheme.bodyMedium?.copyWith(
             color: colors.onSurfaceVariant,
-            letterSpacing: wide ? 2 : 1,
+            letterSpacing: 1,
           ),
         ),
       ],

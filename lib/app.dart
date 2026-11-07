@@ -85,7 +85,11 @@ class _TetrisAppState extends State<TetrisApp> with WidgetsBindingObserver {
               onPointerDown: kIsWeb
                   ? (_) => MusicService.retryOnInteraction()
                   : null,
-              child: child ?? const SizedBox.shrink(),
+              child: MediaQuery.withClampedTextScaling(
+                minScaleFactor: 0.9,
+                maxScaleFactor: 1.3,
+                child: child ?? const SizedBox.shrink(),
+              ),
             ),
             home: const HomePage(),
           );

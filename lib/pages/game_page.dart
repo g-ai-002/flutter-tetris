@@ -18,6 +18,8 @@ import '../services/sound_service.dart';
 import '../services/storage_service.dart';
 import '../theme/block_palette.dart';
 import '../utils/formatters.dart';
+import '../utils/game_display.dart';
+import '../utils/game_layout.dart';
 import '../utils/platform_info.dart';
 import 'widgets/board_gestures.dart';
 import 'widgets/board_stage.dart';
@@ -71,6 +73,11 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     _gamepad = GamepadService(onAction: _handleAction);
     unawaited(_gamepad.start());
     LogService.info('开始对局: ${_controller.rules.title}');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        unawaited(enterGameDisplay(size: MediaQuery.sizeOf(context)));
+      }
+    });
   }
 
   @override
@@ -78,6 +85,9 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.hidden) {
       if (_controller.isPlaying) _controller.pause();
+    } else if (state == AppLifecycleState.resumed && mounted) {
+      // 系统栏可能在后台被还原，回到前台重新进入沉浸模式。
+      unawaited(enterGameDisplay(size: MediaQuery.sizeOf(context)));
     }
   }
 
@@ -166,6 +176,17 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     if (mounted) Navigator.of(context).pop();
   }
 
+  void _togglePause() {
+    if (_pauseDialogOpen || _controller.isOver) return;
+    if (_controller.isPaused) {
+      _controller.resume();
+      _game.resumeEngine();
+      _focusNode.requestFocus();
+    } else {
+      unawaited(_openPause());
+    }
+  }
+
   Future<void> _openPause() async {
     if (!_controller.isPlaying || _pauseDialogOpen) return;
     _controller.pause();
@@ -241,6 +262,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _controller.removeListener(_onControllerChanged);
     unawaited(_gamepad.stop());
+    unawaited(exitGameDisplay());
     _controller.dispose();
     _focusNode.dispose();
     super.dispose();
@@ -257,6 +279,9 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
       showGhost: settings.showGhost && _controller.rules.ghostEnabled,
       showGrid: settings.showGrid,
     );
+    final size = MediaQuery.sizeOf(context);
+    final layout = GameLayout.of(size);
+    final short = layout.isShort(size);
 
     return Focus(
       key: const ValueKey('game-focus'),
@@ -264,63 +289,66 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
       autofocus: true,
       onKeyEvent: _onKey,
       child: Scaffold(
-        appBar: AppBar(
-          toolbarHeight: 58,
-          title: AnimatedBuilder(
-            animation: _controller,
-            builder: (context, _) => Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  _controller.rules.title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  _subtitle(),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontSize: 11,
-                    color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    fontFeatures: const [FontFeature.tabularFigures()],
-                  ),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            IconButton(
-              tooltip: '玩法与操作',
-              onPressed: () => unawaited(_openHelp()),
-              icon: const Icon(Icons.help_outline, size: 21),
-            ),
-            AnimatedBuilder(
-              animation: _controller,
-              builder: (context, _) => IconButton(
-                tooltip: _controller.isPaused ? '继续' : '暂停',
-                onPressed: _controller.isOver
-                    ? null
-                    : (_controller.isPaused
-                          ? _controller.resume
-                          : () => unawaited(_openPause())),
-                icon: Icon(
-                  _controller.isPaused
-                      ? Icons.play_arrow_rounded
-                      : Icons.pause_rounded,
-                  size: 23,
-                ),
-              ),
-            ),
-            const SizedBox(width: 4),
-          ],
-        ),
+        appBar: layout.usesSidePads ? null : _appBar(short),
         body: SafeArea(
-          child: LayoutBuilder(
-            builder: (context, constraints) => constraints.maxWidth >= 880
-                ? _buildWide(palette, bindings)
-                : _buildCompact(palette, bindings),
-          ),
+          child: switch (layout.kind) {
+            GameLayoutKind.rails => _buildRails(palette, bindings, size),
+            GameLayoutKind.sidePads => _buildSidePads(palette, size),
+            GameLayoutKind.stack => _buildStack(palette, bindings, size),
+          },
         ),
       ),
+    );
+  }
+
+  /// 顶部栏：矮窗口收起副标题，只留玩法名与操作按钮。
+  PreferredSizeWidget _appBar(bool short) {
+    final theme = Theme.of(context);
+    return AppBar(
+      toolbarHeight: short ? 46 : 58,
+      title: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, _) => Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              _controller.rules.title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+            if (!short)
+              Text(
+                _subtitle(),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontSize: 11,
+                  color: theme.colorScheme.onSurfaceVariant,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                ),
+              ),
+          ],
+        ),
+      ),
+      actions: [
+        IconButton(
+          tooltip: '玩法与操作',
+          onPressed: () => unawaited(_openHelp()),
+          icon: const Icon(Icons.help_outline, size: 21),
+        ),
+        AnimatedBuilder(
+          animation: _controller,
+          builder: (context, _) => IconButton(
+            tooltip: _controller.isPaused ? '继续' : '暂停',
+            onPressed: _controller.isOver ? null : _togglePause,
+            icon: Icon(
+              _controller.isPaused
+                  ? Icons.play_arrow_rounded
+                  : Icons.pause_rounded,
+              size: 23,
+            ),
+          ),
+        ),
+        const SizedBox(width: 4),
+      ],
     );
   }
 
@@ -365,41 +393,128 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     builder: (context, _) => builder(),
   );
 
-  Widget _buildWide(BlockPalette palette, KeyBindings bindings) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          SizedBox(
-            width: 132,
-            child: _bound(
-              () => GameLeftRail(
-                controller: _controller,
-                palette: palette,
-                bindings: bindings,
+  Widget _sized(double width, Widget Function() build) =>
+      SizedBox(width: width, child: _bound(build));
+
+  /// 底部输入区：桌面显示键位提示，移动端显示触控键。
+  Widget _inputBar(KeyBindings bindings, {bool dense = false}) =>
+      isDesktopPlatform
+      ? GameKeyboardHint(
+          bindings: bindings,
+          showHold: _controller.rules.holdEnabled,
+        )
+      : _bound(() => TouchPad(controller: _controller, dense: dense));
+
+  /// 桌面与平板的宽屏版式：左右信息栏夹住棋盘，超宽窗口收敛到 1160 像素。
+  Widget _buildRails(
+    BlockPalette palette,
+    KeyBindings bindings,
+    Size size,
+  ) {
+    final rail = (size.width * 0.11).clamp(120.0, 176.0);
+    return Column(
+      children: [
+        Expanded(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1160),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    _sized(
+                      rail,
+                      () => GameLeftRail(
+                        controller: _controller,
+                        palette: palette,
+                        bindings: bindings,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(child: _buildBoard(palette)),
+                    const SizedBox(width: 16),
+                    _sized(
+                      rail - 8,
+                      () => GameRightRail(
+                        controller: _controller,
+                        palette: palette,
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-          const SizedBox(width: 16),
-          Expanded(child: _buildBoard(palette)),
-          const SizedBox(width: 16),
-          SizedBox(
-            width: 124,
-            child: _bound(
-              () => GameRightRail(controller: _controller, palette: palette),
-            ),
-          ),
-        ],
-      ),
+        ),
+        _inputBar(bindings),
+      ],
     );
   }
 
-  Widget _buildCompact(BlockPalette palette, KeyBindings bindings) {
+  /// 手机横屏版式：状态条压到 38 像素，左右两侧承担信息与操作，棋盘独占高度。
+  Widget _buildSidePads(BlockPalette palette, Size size) {
+    final rail = (size.width * 0.075).clamp(58.0, 76.0);
+    final pad = (size.width * 0.22).clamp(150.0, 220.0);
+    return Column(
+      children: [
+        _bound(
+          () => GameHudBar(
+            controller: _controller,
+            onBack: _exit,
+            onHelp: () => unawaited(_openHelp()),
+            onPause: _togglePause,
+          ),
+        ),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(8, 2, 8, 4),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _sized(
+                  rail,
+                  () => GameCompactRail(
+                    controller: _controller,
+                    palette: palette,
+                    width: rail,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(child: _buildBoard(palette)),
+                const SizedBox(width: 10),
+                SizedBox(
+                  width: pad,
+                  child: Center(
+                    child: _bound(
+                      () => TouchPad(
+                        controller: _controller,
+                        dense: true,
+                        columns: 2,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// 竖屏单列版式：数值在顶、棋盘中列、操作区贴底。
+  Widget _buildStack(
+    BlockPalette palette,
+    KeyBindings bindings,
+    Size size,
+  ) {
+    final short = size.height < 620;
+    final rail = size.width >= 600 ? 76.0 : (size.width < 360 ? 52.0 : 58.0);
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.fromLTRB(16, 2, 16, 8),
+          padding: EdgeInsets.fromLTRB(14, short ? 0 : 2, 14, short ? 4 : 8),
           child: _bound(() => GameHud(controller: _controller, compact: true)),
         ),
         Expanded(
@@ -409,26 +524,19 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
               children: [
                 Expanded(child: _buildBoard(palette)),
                 const SizedBox(width: 6),
-                SizedBox(
-                  width: 58,
-                  child: _bound(
-                    () => GameCompactRail(
-                      controller: _controller,
-                      palette: palette,
-                    ),
+                _sized(
+                  rail,
+                  () => GameCompactRail(
+                    controller: _controller,
+                    palette: palette,
+                    width: rail,
                   ),
                 ),
               ],
             ),
           ),
         ),
-        if (isDesktopPlatform)
-          GameKeyboardHint(
-            bindings: bindings,
-            showHold: _controller.rules.holdEnabled,
-          )
-        else
-          _bound(() => TouchPad(controller: _controller)),
+        _inputBar(bindings, dense: short),
       ],
     );
   }
