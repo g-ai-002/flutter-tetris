@@ -6,7 +6,7 @@ class AppConstants {
 
   static const String appName = '俄罗斯方块';
   static const String appEnglishName = 'TETRIS';
-  static const String version = '0.7.1';
+  static const String version = '0.7.2';
   static const String appDirName = 'FlutterTetris';
 
   static const String prefKeyDarkMode = 'dark_mode';
