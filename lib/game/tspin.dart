@@ -53,5 +53,5 @@ List<(int, int)> _cornersOf(ActivePiece piece) {
 bool _isBlocked(Board board, int x, int y) {
   if (x < 0 || x >= board.columns || y >= board.rows) return true;
   if (y < 0) return false;
-  return board.isFilled(x, y);
+  return board.at(x, y) != null;
 }

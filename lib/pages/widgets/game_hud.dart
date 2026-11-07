@@ -62,9 +62,14 @@ class GameHud extends StatelessWidget {
                 ],
               ),
             ),
-            _CompactStat(label: '行', value: '${controller.lines}'),
-            _CompactStat(label: '级', value: '${controller.level}'),
-            _CompactStat(label: _timeLabel, value: _timeValue, narrow: true),
+            _HudStat(compact: true, label: '行', value: '${controller.lines}'),
+            _HudStat(compact: true, label: '级', value: '${controller.level}'),
+            _HudStat(
+              compact: true,
+              label: _timeLabel,
+              value: _timeValue,
+              narrow: true,
+            ),
           ],
         ),
         if (controller.targetLines != null) ...[
@@ -109,10 +114,10 @@ class GameHud extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 14),
-        _WideStat(label: '消行', value: '${controller.lines}'),
-        _WideStat(label: '等级', value: '${controller.level}'),
-        _WideStat(label: _timeLabel, value: _timeValue),
-        _WideStat(label: '最高连击', value: '${controller.maxCombo}'),
+        _HudStat(label: '消行', value: '${controller.lines}'),
+        _HudStat(label: '等级', value: '${controller.level}'),
+        _HudStat(label: _timeLabel, value: _timeValue),
+        _HudStat(label: '最高连击', value: '${controller.maxCombo}'),
         if (controller.targetLines != null) ...[
           const SizedBox(height: 10),
           ClipRRect(
@@ -155,44 +160,37 @@ class GameHud extends StatelessWidget {
   }
 }
 
-class _CompactStat extends StatelessWidget {
-  const _CompactStat({
+class _HudStat extends StatelessWidget {
+  const _HudStat({
     required this.label,
     required this.value,
+    this.compact = false,
     this.narrow = false,
   });
 
   final String label;
   final String value;
+  final bool compact;
   final bool narrow;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Padding(
-      padding: const EdgeInsets.only(left: 14),
-      child: StatValue(
-        label: label,
-        value: value,
-        labelFirst: true,
-        alignment: CrossAxisAlignment.end,
-        valueStyle: Theme.of(context).textTheme.titleSmall
-            ?.copyWith(fontSize: narrow ? 12.5 : 14),
-      ),
-    );
-  }
-}
-
-class _WideStat extends StatelessWidget {
-  const _WideStat({required this.label, required this.value});
-
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: StatValue.inline(label: label, value: value),
+      padding: compact
+          ? const EdgeInsets.only(left: 14)
+          : const EdgeInsets.only(bottom: 8),
+      child: compact
+          ? StatValue(
+              label: label,
+              value: value,
+              labelFirst: true,
+              alignment: CrossAxisAlignment.end,
+              valueStyle: theme.textTheme.titleSmall?.copyWith(
+                fontSize: narrow ? 12.5 : 14,
+              ),
+            )
+          : StatValue.inline(label: label, value: value),
     );
   }
 }

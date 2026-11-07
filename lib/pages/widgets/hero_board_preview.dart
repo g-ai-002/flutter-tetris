@@ -86,7 +86,7 @@ class _HeroBoardPainter extends CustomPainter {
     for (var row = 0; row < _rows.length; row++) {
       final line = _rows[row];
       for (var col = 0; col < line.length; col++) {
-        final type = _typeFor(line[col]);
+        final type = tetrominoFromCode(line[col]);
         if (type == null) continue;
         final cellRect = Rect.fromLTWH(
           col * cell,
@@ -148,13 +148,6 @@ class _HeroBoardPainter extends CustomPainter {
     )..layout();
     painter.paint(canvas, Offset(-painter.width / 2, -painter.height / 2));
     canvas.restore();
-  }
-
-  TetrominoType? _typeFor(String code) {
-    for (final type in TetrominoType.values) {
-      if (type.code == code) return type;
-    }
-    return null;
   }
 
   @override

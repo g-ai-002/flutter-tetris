@@ -49,9 +49,8 @@ void main() {
         expect(board.at(block.x, block.y), TetrominoType.t);
       }
       expect(board.filledCount, 4);
-      expect(board.isEmpty, isFalse);
       board.reset();
-      expect(board.isEmpty, isTrue);
+      expect(board.filledCount, 0);
     });
 
     test('识别并删除满行，上方内容整体下移', () {
@@ -77,12 +76,11 @@ void main() {
       expect(board.stackHeight, 10);
     });
 
-    test('调试字符画只包含可视区域', () {
-      board.setCell(0, 20, TetrominoType.j);
-      final lines = board.debugString().split('\n');
-      expect(lines.length, 20);
-      expect(lines.last.startsWith('J'), isTrue);
-      expect(lines.first.length, 10);
+    test('隐藏行不参与可视区域的行数统计', () {
+      expect(board.rows - board.hiddenRows, 20);
+      board.setCell(0, 0, TetrominoType.j);
+      expect(board.at(0, 0), TetrominoType.j);
+      expect(board.stackHeight, board.rows);
     });
 
     test('载入关卡地形时贴底摆放并标记垃圾格', () {

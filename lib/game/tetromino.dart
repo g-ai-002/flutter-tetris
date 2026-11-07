@@ -24,6 +24,14 @@ class Block {
 /// 七种标准方块。
 enum TetrominoType { i, o, t, s, z, j, l }
 
+/// 按代号还原方块类型，未知代号返回 null。
+TetrominoType? tetrominoFromCode(String code) {
+  for (final type in TetrominoType.values) {
+    if (type.code == code) return type;
+  }
+  return null;
+}
+
 extension TetrominoTypeInfo on TetrominoType {
   /// 英文代号，用于预览与调试。
   String get code => switch (this) {

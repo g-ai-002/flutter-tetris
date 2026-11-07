@@ -189,7 +189,7 @@ void main() {
         containsAll([GameEvent.tetris, GameEvent.perfectClear]),
       );
       advance(controller, 300);
-      expect(controller.board.isEmpty, isTrue);
+      expect(controller.board.filledCount, 0);
     });
 
     test('每十行升级并发出升级事件', () {

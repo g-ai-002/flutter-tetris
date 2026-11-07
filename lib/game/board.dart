@@ -29,8 +29,6 @@ class Board {
     return _cells[y][x];
   }
 
-  bool isFilled(int x, int y) => at(x, y) != null;
-
   /// 该格是否为预设地形或上涌产生的垃圾块。
   bool isGarbage(int x, int y) {
     if (x < 0 || x >= columns || y < 0 || y >= rows) return false;
@@ -104,7 +102,7 @@ class Board {
         final code = cells[x];
         if (code == '.') continue;
         final garbage = code == '#';
-        final type = garbage ? TetrominoType.o : _typeFromCode(code);
+        final type = garbage ? TetrominoType.o : tetrominoFromCode(code);
         if (type == null) continue;
         _cells[y][x] = type;
         _garbage[y][x] = garbage;
@@ -137,13 +135,6 @@ class Board {
     return overflow;
   }
 
-  static TetrominoType? _typeFromCode(String code) {
-    for (final type in TetrominoType.values) {
-      if (type.code == code) return type;
-    }
-    return null;
-  }
-
   int get filledCount {
     var count = 0;
     for (final row in _cells) {
@@ -153,8 +144,6 @@ class Board {
     }
     return count;
   }
-
-  bool get isEmpty => filledCount == 0;
 
   /// 最高一堆方块距底部的行数，用于危险线提示。
   int get stackHeight {
@@ -180,18 +169,5 @@ class Board {
       (_) => List<TetrominoType?>.filled(columns, null),
     );
     _garbage = List.generate(rows, (_) => List<bool>.filled(columns, false));
-  }
-
-  /// 测试与调试用：把棋盘渲染成字符画，`.` 为空，字母为方块类型。
-  String debugString() {
-    final buffer = StringBuffer();
-    for (var y = hiddenRows; y < rows; y++) {
-      for (var x = 0; x < columns; x++) {
-        final type = _cells[y][x];
-        buffer.write(type?.code ?? '.');
-      }
-      if (y != rows - 1) buffer.writeln();
-    }
-    return buffer.toString();
   }
 }

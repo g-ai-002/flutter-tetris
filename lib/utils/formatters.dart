@@ -39,9 +39,6 @@ String formatPreciseDuration(int milliseconds) {
 }
 
 /// `HH:mm:ss.SSS`，日志行首时间戳。
-String formatLogTimestamp(DateTime time) =>
-    '${pad2(time.hour)}:${pad2(time.minute)}:${pad2(time.second)}.'
-    '${time.millisecond.toString().padLeft(3, '0')}';
-
 String formatLogLine(DateTime time, String level, String message) =>
-    '[${formatLogTimestamp(time)}][$level] $message';
+    '[${pad2(time.hour)}:${pad2(time.minute)}:${pad2(time.second)}.'
+    '${time.millisecond.toString().padLeft(3, '0')}][$level] $message';

@@ -244,40 +244,23 @@ class _ResultDialog extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    Expanded(
-                      child: StatValue(
-                        label: '消行',
-                        value: '${result.lines}',
-                        center: true,
-                        valueStyle: theme.textTheme.titleSmall,
+                    for (final (label, value) in [
+                      ('消行', '${result.lines}'),
+                      ('等级', '${result.level}'),
+                      (
+                        '用时',
+                        formatPreciseDuration(result.elapsed.inMilliseconds),
                       ),
-                    ),
-                    Expanded(
-                      child: StatValue(
-                        label: '等级',
-                        value: '${result.level}',
-                        center: true,
-                        valueStyle: theme.textTheme.titleSmall,
-                      ),
-                    ),
-                    Expanded(
-                      child: StatValue(
-                        label: '用时',
-                        value: formatPreciseDuration(
-                          result.elapsed.inMilliseconds,
+                      ('最高连击', '${result.maxCombo}'),
+                    ])
+                      Expanded(
+                        child: StatValue(
+                          label: label,
+                          value: value,
+                          center: true,
+                          valueStyle: theme.textTheme.titleSmall,
                         ),
-                        center: true,
-                        valueStyle: theme.textTheme.titleSmall,
                       ),
-                    ),
-                    Expanded(
-                      child: StatValue(
-                        label: '最高连击',
-                        value: '${result.maxCombo}',
-                        center: true,
-                        valueStyle: theme.textTheme.titleSmall,
-                      ),
-                    ),
                   ],
                 ),
               ),

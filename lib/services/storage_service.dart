@@ -222,30 +222,22 @@ class StorageService {
 
   /// 生涯计数与单局极值，所有玩法都会累计。
   Future<void> _addCareerTotals(SharedPreferences p, GameResult result) async {
-    await p.setInt(AppConstants.prefKeyGamesPlayed, gamesPlayed + 1);
-    await p.setInt(AppConstants.prefKeyTotalLines, totalLines + result.lines);
-    await p.setInt(AppConstants.prefKeyTotalScore, totalScore + result.score);
-    await p.setInt(
-      AppConstants.prefKeyTotalTetris,
-      totalTetris + result.tetrises,
-    );
-    await p.setInt(
-      AppConstants.prefKeyTotalTSpins,
-      totalTSpins + result.tSpins,
-    );
-    await p.setInt(
-      AppConstants.prefKeyTotalPerfectClears,
-      totalPerfectClears + result.perfectClears,
-    );
-    await p.setInt(
-      AppConstants.playsKey(result.mode.name),
-      plays(result.mode) + 1,
-    );
-    if (result.maxCombo > bestCombo) {
-      await p.setInt(AppConstants.prefKeyBestCombo, result.maxCombo);
-    }
-    if (result.score > bestScoreOverall) {
-      await p.setInt(AppConstants.prefKeyBestScoreOverall, result.score);
+    final totals = <String, int>{
+      AppConstants.prefKeyGamesPlayed: gamesPlayed + 1,
+      AppConstants.prefKeyTotalLines: totalLines + result.lines,
+      AppConstants.prefKeyTotalScore: totalScore + result.score,
+      AppConstants.prefKeyTotalTetris: totalTetris + result.tetrises,
+      AppConstants.prefKeyTotalTSpins: totalTSpins + result.tSpins,
+      AppConstants.prefKeyTotalPerfectClears:
+          totalPerfectClears + result.perfectClears,
+      AppConstants.playsKey(result.mode.name): plays(result.mode) + 1,
+      if (result.maxCombo > bestCombo)
+        AppConstants.prefKeyBestCombo: result.maxCombo,
+      if (result.score > bestScoreOverall)
+        AppConstants.prefKeyBestScoreOverall: result.score,
+    };
+    for (final entry in totals.entries) {
+      await p.setInt(entry.key, entry.value);
     }
   }
 
