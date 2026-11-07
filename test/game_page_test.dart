@@ -178,6 +178,31 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
   });
 
+  testWidgets('进入对局后无需点击即可用键盘操作', (tester) async {
+    tester.view.physicalSize = const Size(1280, 960);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      wrapPage(
+        child: const GamePage(mode: GameMode.endless),
+        storage: storage,
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final game = tester
+        .widget<GameWidget<TetrisGame>>(find.byType(GameWidget<TetrisGame>))
+        .game!;
+    final startX = game.controller.piece!.x;
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+    await tester.pump();
+    expect(game.controller.piece!.x, startX - 1);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
   testWidgets('对局页使用自定义键位', (tester) async {
     tester.view.physicalSize = const Size(1280, 960);
     tester.view.devicePixelRatio = 1.0;
