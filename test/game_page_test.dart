@@ -203,6 +203,38 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
   });
 
+  testWidgets('暂停弹窗期间暂停 Flame 引擎，继续后恢复', (tester) async {
+    tester.view.physicalSize = const Size(1280, 960);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      wrapPage(
+        child: const GamePage(mode: GameMode.endless),
+        storage: storage,
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final game = tester
+        .widget<GameWidget<TetrisGame>>(find.byType(GameWidget<TetrisGame>))
+        .game!;
+    expect(game.paused, isFalse);
+
+    await tester.tap(find.byIcon(Icons.pause_rounded));
+    await tester.pumpAndSettle();
+    expect(game.paused, isTrue);
+
+    await tester.tap(find.text('继续游戏'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400));
+    expect(game.paused, isFalse);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
   testWidgets('对局页使用自定义键位', (tester) async {
     tester.view.physicalSize = const Size(1280, 960);
     tester.view.devicePixelRatio = 1.0;

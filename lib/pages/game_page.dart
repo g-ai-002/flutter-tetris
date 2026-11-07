@@ -128,6 +128,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
         : daily != null
         ? storage.dailyRecord(daily.key).bestScore
         : storage.bestScore(result.mode);
+    _game.pauseEngine();
     await showGameResultDialog(
       context,
       result: result,
@@ -157,6 +158,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     _pauseDialogOpen = false;
     _controller.restart();
     LogService.info('重新开始: ${_controller.rules.title}');
+    _game.resumeEngine();
     _focusNode.requestFocus();
   }
 
@@ -167,6 +169,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
   Future<void> _openPause() async {
     if (!_controller.isPlaying || _pauseDialogOpen) return;
     _controller.pause();
+    _game.pauseEngine();
     _pauseDialogOpen = true;
     await showPauseDialog(
       context,
@@ -176,14 +179,21 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     );
     _pauseDialogOpen = false;
     if (mounted && _controller.isPaused) _controller.resume();
+    if (mounted) _game.resumeEngine();
     _focusNode.requestFocus();
   }
 
   Future<void> _openHelp() async {
     final wasPlaying = _controller.isPlaying;
-    if (wasPlaying) _controller.pause();
+    if (wasPlaying) {
+      _controller.pause();
+      _game.pauseEngine();
+    }
     await showHelpDialog(context);
-    if (mounted && wasPlaying && _controller.isPaused) _controller.resume();
+    if (mounted && wasPlaying && _controller.isPaused) {
+      _controller.resume();
+      _game.resumeEngine();
+    }
     _focusNode.requestFocus();
   }
 
