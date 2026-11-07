@@ -26,13 +26,13 @@
 
 ## 下载
 
-v0.6.1（最新发布）：[Gitea Release](http://192.168.31.120:3020/GTech/flutter-tetris/releases/tag/v0.6.1)
+v0.6.2（最新发布）：[Gitea Release](http://192.168.31.120:3020/GTech/flutter-tetris/releases/tag/v0.6.2)
 
 | 平台 | 产物 |
 | --- | --- |
-| Android (arm64) | `flutter-tetris-0.6.1-android-aarch64.apk` |
-| Windows (x64, Win10+) | `flutter-tetris-0.6.1-windows-x86_64.zip` |
-| Web | `flutter-tetris-0.6.1-web.zip`（解压后起静态服务器） |
+| Android (arm64) | `flutter-tetris-0.6.2-android-aarch64.apk` |
+| Windows (x64, Win10+) | `flutter-tetris-0.6.2-windows-x86_64.zip` |
+| Web | `flutter-tetris-0.6.2-web.zip`（解压后起静态服务器） |
 
 ## 开发
 
@@ -83,8 +83,8 @@ lib/
 
 | 版本 | 说明 |
 | --- | --- |
+| v0.6.2 | 修复桌面端键盘失效：棋盘内层焦点不再抢占并吞掉方向键与空格 |
 | v0.6.1 | 重构展示层与场地特效：统一数值组件、拆分纪录页与弹窗、预览队列收敛到七包 |
 | v0.6.0 | 新增二十枚生涯成就：四行、T-Spin、全消与连击累计，纪录页徽章墙与结算提示 |
 | v0.5.1 | 收敛输入连发与键位 / 手柄提示数据源，拆分首页组件，改键后提示条即时同步 |
 | v0.5.0 | 新增九项操作键位自定义与标准布局手柄支持，冲突自动交换、设置持久化 |
-| v0.4.1 | 收敛皮肤渐变与设置页组件，修复首页窄屏页脚溢出和缩略棋盘不跟随皮肤 |
