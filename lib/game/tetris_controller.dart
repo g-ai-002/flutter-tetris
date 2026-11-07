@@ -10,7 +10,6 @@ import 'garbage.dart';
 import 'level.dart';
 import 'match_rules.dart';
 import 'scoreboard.dart';
-import 'scoring.dart';
 import 'srs.dart';
 import 'tetromino.dart';
 import 'tspin.dart';
@@ -42,7 +41,7 @@ class TetrisController extends ChangeNotifier {
     DailyChallenge? daily,
     int? seed,
     bool autoTick = true,
-    Duration lockDelay = const Duration(milliseconds: 500),
+    Duration? lockDelay,
     Duration clearDelay = const Duration(milliseconds: 260),
     Duration tickInterval = const Duration(milliseconds: 16),
   }) : this._(
@@ -58,16 +57,20 @@ class TetrisController extends ChangeNotifier {
     required this.rules,
     required int? seed,
     required this.autoTick,
-    required this.lockDelay,
+    Duration? lockDelay,
     required this.clearDelay,
     required this.tickInterval,
-  }) : _seed = seed,
+  }) : lockDelay = lockDelay ?? rules.lockDelay,
+       _seed = seed,
        _bag = SevenBag(seed: seed),
        _garbage = GarbageSpawner(
          rule: rules.garbage,
          seed: (seed ?? 0) * 31 + 17,
        ),
-       _scoreBoard = ScoreBoard(startLevel: rules.startLevel),
+       _scoreBoard = ScoreBoard(
+         startLevel: rules.startLevel,
+         arcade: rules.isArcade,
+       ),
        board = Board() {
     _lastTick = DateTime.now();
   }
@@ -129,10 +132,11 @@ class TetrisController extends ChangeNotifier {
   GameStatus get status => _status;
   ActivePiece? get piece => _piece;
   TetrominoType? get holdType => _hold;
-  bool get canHold => _status == GameStatus.playing && !_holdUsed;
+  bool get canHold =>
+      rules.holdEnabled && _status == GameStatus.playing && !_holdUsed;
 
-  /// 接下来的五个方块，直接取自七包队列，不额外维护预览列表。
-  List<TetrominoType> get nextQueue => _bag.peek(5);
+  /// 接下来的方块：标准玩法五个，街机模式只有下一块。
+  List<TetrominoType> get nextQueue => _bag.peek(rules.previewCount);
 
   int get score => _scoreBoard.score;
   int get lines => _scoreBoard.lines;
@@ -290,9 +294,9 @@ class TetrisController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 暂存：一局中每次锁定前只能使用一次。
+  /// 暂存：一局中每次锁定前只能使用一次，街机模式不可用。
   void hold() {
-    if (!canControl || _holdUsed) return;
+    if (!canHold || !canControl) return;
     final current = _piece!;
     final previous = _hold;
     _hold = current.type;
@@ -356,7 +360,7 @@ class TetrisController extends ChangeNotifier {
     var current = activePiece;
 
     _gravityAccumulator += step;
-    final interval = gravityForLevel(level);
+    final interval = rules.gravityFor(level);
     while (_gravityAccumulator >= interval) {
       _gravityAccumulator -= interval;
       final moved = current.copyWith(y: current.y + 1);
@@ -457,14 +461,14 @@ class TetrisController extends ChangeNotifier {
     return true;
   }
 
-  /// 贴地时移动或旋转会重置锁定延迟，最多重置 15 次。
+  /// 贴地时移动或旋转会重置锁定延迟，最多重置 15 次；街机模式不重置。
   void _resetLockDelay() {
     _refreshGrounded();
     if (!_grounded) {
       _lockElapsed = Duration.zero;
       return;
     }
-    if (_lockResets >= maxLockResets) return;
+    if (!rules.lockResetEnabled || _lockResets >= maxLockResets) return;
     _lockResets++;
     _lockElapsed = Duration.zero;
   }

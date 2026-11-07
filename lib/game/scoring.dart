@@ -79,3 +79,48 @@ Duration gravityForLevel(int level) {
   final index = (level - 1).clamp(0, table.length - 1);
   return Duration(milliseconds: table[index]);
 }
+
+/// 街机模式的经典计分：单/双/三/四行为 40/100/300/1200，按等级放大。
+///
+/// 不计算 T-Spin、连击、连续奖励与全消，保持红白机原版手感。
+const List<int> kArcadeLineClearBase = [0, 40, 100, 300, 1200];
+
+/// 街机模式最高 19 级。
+const int kArcadeMaxLevel = 19;
+
+int arcadeClearScore({required int lines, required int level}) {
+  if (lines < 0 || lines > 4) return 0;
+  return kArcadeLineClearBase[lines] * level;
+}
+
+int arcadeLevelForLines(int lines, {int startLevel = 1}) {
+  final level = (startLevel < 1 ? 1 : startLevel) + lines ~/ 10;
+  return level > kArcadeMaxLevel ? kArcadeMaxLevel : level;
+}
+
+/// 红白机速度表：每级下落一行所需帧数（60 帧/秒），19 级最快 50ms。
+Duration arcadeGravityForLevel(int level) {
+  const frames = <int>[
+    48,
+    43,
+    38,
+    33,
+    28,
+    23,
+    18,
+    13,
+    8,
+    6,
+    5,
+    5,
+    5,
+    4,
+    4,
+    4,
+    3,
+    3,
+    3,
+  ];
+  final index = (level - 1).clamp(0, kArcadeMaxLevel - 1);
+  return Duration(milliseconds: (frames[index] * 1000 / 60).round());
+}

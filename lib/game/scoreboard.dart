@@ -22,9 +22,12 @@ class ClearOutcome {
 ///
 /// 只负责累计与结算，不感知场地和输入，方便单独验证计分规则。
 class ScoreBoard {
-  ScoreBoard({int startLevel = 1})
+  ScoreBoard({int startLevel = 1, this.arcade = false})
     : _startLevel = startLevel < 1 ? 1 : startLevel,
       _level = startLevel < 1 ? 1 : startLevel;
+
+  /// 街机模式使用经典计分与 19 级封顶，且不计 T-Spin / 连击。
+  final bool arcade;
 
   int _startLevel;
   int _score = 0;
@@ -70,40 +73,48 @@ class ScoreBoard {
   }) {
     final before = _score;
     if (rows == 0) {
-      if (tSpin) {
+      if (tSpin && !arcade) {
         _score += clearScore(lines: 0, level: _level, tSpin: true, mini: mini);
       }
       _combo = 0;
       return ClearOutcome(rows: 0, score: _score - before, levelUp: false);
     }
 
-    final difficult = tSpin || rows == 4;
-    _score += clearScore(
-      lines: rows,
-      level: _level,
-      tSpin: tSpin,
-      mini: mini,
-      backToBack: difficult && _backToBack,
-      perfectClear: perfectClear,
-      combo: _combo,
-    );
+    if (arcade) {
+      _score += arcadeClearScore(lines: rows, level: _level);
+    } else {
+      final difficult = tSpin || rows == 4;
+      _score += clearScore(
+        lines: rows,
+        level: _level,
+        tSpin: tSpin,
+        mini: mini,
+        backToBack: difficult && _backToBack,
+        perfectClear: perfectClear,
+        combo: _combo,
+      );
+      _backToBack = difficult;
+    }
     _combo++;
     if (_combo > _maxCombo) _maxCombo = _combo;
     _lines += rows;
     if (rows == 4) _tetrises++;
-    if (tSpin) _tSpins++;
+    if (tSpin && !arcade) _tSpins++;
     if (perfectClear) _perfectClears++;
-    final nextLevel = levelForLines(_lines, startLevel: _startLevel);
+    final nextLevel = _levelFor(_lines);
     final levelUp = nextLevel > _level;
     _level = nextLevel;
-    _backToBack = difficult;
     return ClearOutcome(rows: rows, score: _score - before, levelUp: levelUp);
   }
+
+  int _levelFor(int lines) => arcade
+      ? arcadeLevelForLines(lines, startLevel: _startLevel)
+      : levelForLines(lines, startLevel: _startLevel);
 
   /// 测试与调试用：直接设置已消行数并同步等级。
   void setLinesForTest(int lines) {
     _lines = lines;
-    _level = levelForLines(lines, startLevel: _startLevel);
+    _level = _levelFor(lines);
   }
 
   void reset({required int startLevel}) {

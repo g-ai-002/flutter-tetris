@@ -2,6 +2,7 @@ import 'daily_challenge.dart';
 import 'garbage.dart';
 import 'game_mode.dart';
 import 'level.dart';
+import 'scoring.dart';
 
 /// 一局对局的规则快照。
 ///
@@ -21,6 +22,20 @@ class MatchRules {
   bool get isLevel => level != null;
 
   bool get isDaily => daily != null;
+
+  /// 街机模式关闭暂存、幽灵与锁定重置，预览只保留下一块。
+  bool get isArcade => mode == GameMode.arcade;
+
+  bool get holdEnabled => !isArcade;
+
+  bool get ghostEnabled => !isArcade;
+
+  bool get lockResetEnabled => !isArcade;
+
+  int get previewCount => isArcade ? 1 : 5;
+
+  /// 街机模式贴地后短暂等待即锁定，不再逐次重置。
+  Duration get lockDelay => Duration(milliseconds: isArcade ? 120 : 500);
 
   int? get levelId => level?.id;
 
@@ -42,6 +57,10 @@ class MatchRules {
 
   /// 起始等级，关卡可以要求从更高等级开局。
   int get startLevel => level?.startLevel ?? 1;
+
+  /// 当前等级的下落间隔，街机模式走红白机帧表。
+  Duration gravityFor(int level) =>
+      isArcade ? arcadeGravityForLevel(level) : gravityForLevel(level);
 
   /// 关卡地形，其他模式为空。
   List<String> get terrain => level?.terrain ?? const [];

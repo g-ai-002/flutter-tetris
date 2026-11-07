@@ -1,11 +1,12 @@
-/// 五种玩法：经典无尽、40 行竞速、2 分钟计时、关卡挑战与每日挑战。
-enum GameMode { endless, sprint, ultra, level, daily }
+/// 六种玩法：经典无尽、40 行竞速、2 分钟计时、街机、关卡挑战与每日挑战。
+enum GameMode { endless, sprint, ultra, arcade, level, daily }
 
 extension GameModeInfo on GameMode {
   String get label => switch (this) {
     GameMode.endless => '经典模式',
     GameMode.sprint => '40 行竞速',
     GameMode.ultra => '2 分钟计时',
+    GameMode.arcade => '街机模式',
     GameMode.level => '关卡模式',
     GameMode.daily => '每日挑战',
   };
@@ -14,6 +15,7 @@ extension GameModeInfo on GameMode {
     GameMode.endless => '无尽堆叠，每 10 行提速',
     GameMode.sprint => '以最快速度消除 40 行',
     GameMode.ultra => '120 秒内尽可能多得分',
+    GameMode.arcade => '红白机规则：帧表重力与经典计分',
     GameMode.level => '逐关挑战预设地形与限时目标',
     GameMode.daily => '同一天同一副牌，刷出今日最高分',
   };
@@ -23,6 +25,7 @@ extension GameModeInfo on GameMode {
     GameMode.endless => null,
     GameMode.sprint => 40,
     GameMode.ultra => null,
+    GameMode.arcade => null,
     GameMode.level => null,
     GameMode.daily => null,
   };
@@ -32,6 +35,7 @@ extension GameModeInfo on GameMode {
     GameMode.endless => null,
     GameMode.sprint => null,
     GameMode.ultra => const Duration(seconds: 120),
+    GameMode.arcade => null,
     GameMode.level => null,
     GameMode.daily => const Duration(seconds: 120),
   };
