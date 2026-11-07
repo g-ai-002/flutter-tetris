@@ -12,7 +12,7 @@ import '../level_select_page.dart';
 import 'entry_tile.dart';
 import 'status_chip.dart';
 
-/// 首页玩法入口：三种经典玩法、每日挑战与关卡模式。
+/// 首页玩法入口：四种标准玩法、每日挑战与关卡模式。
 class HomeModeCards extends StatelessWidget {
   const HomeModeCards({
     super.key,
@@ -31,6 +31,7 @@ class HomeModeCards extends StatelessWidget {
       _modeCard(context: context, settings: settings, mode: GameMode.endless),
       _modeCard(context: context, settings: settings, mode: GameMode.sprint),
       _modeCard(context: context, settings: settings, mode: GameMode.ultra),
+      _modeCard(context: context, settings: settings, mode: GameMode.arcade),
     ];
     if (!wide) {
       return Column(
@@ -46,7 +47,8 @@ class HomeModeCards extends StatelessWidget {
         ],
       );
     }
-    final cardWidth = (contentWidth - 24) / 3;
+    final columns = contentWidth >= 760 ? 4 : 2;
+    final cardWidth = (contentWidth - 12 * (columns - 1)) / columns;
     return Column(
       children: [
         Wrap(
@@ -197,6 +199,7 @@ class _RecordLine extends StatelessWidget {
         break;
       case GameMode.endless:
       case GameMode.ultra:
+      case GameMode.arcade:
       case GameMode.level:
       case GameMode.daily:
         final best = settings.bestScore(mode);

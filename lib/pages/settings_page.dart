@@ -129,8 +129,9 @@ class SettingsPage extends StatelessWidget {
                   icon: Icons.sports_esports_outlined,
                   children: [
                     Text(
-                      '三种模式共享同一套规则：7 包随机器、SRS 旋转、'
-                      '幽灵落点与暂存。允许贴地旋转与踢墙，贴地后有 0.5 秒锁定延迟。',
+                      '经典、竞速、计时与每日挑战共享 Guideline 规则：7 包随机器、'
+                      'SRS 旋转、幽灵落点与暂存，贴地后有 0.5 秒锁定延迟。'
+                      '街机模式按红白机规则：帧表重力、经典计分，无暂存与幽灵。',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: colors.onSurfaceVariant,
                         height: 1.6,

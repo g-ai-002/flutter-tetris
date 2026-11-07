@@ -49,6 +49,34 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
   });
 
+  testWidgets('街机模式没有暂存区，只保留下一块预览', (tester) async {
+    tester.view.physicalSize = const Size(1280, 960);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      wrapPage(
+        child: const GamePage(mode: GameMode.arcade),
+        storage: storage,
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    final game = tester
+        .widget<GameWidget<TetrisGame>>(find.byType(GameWidget<TetrisGame>))
+        .game!;
+    expect(find.text('街机模式'), findsOneWidget);
+    expect(find.textContaining('街机计分'), findsOneWidget);
+    expect(find.text('HOLD 暂存'), findsNothing);
+    expect(game.controller.nextQueue, hasLength(1));
+    expect(game.controller.rules.holdEnabled, isFalse);
+    expect(tester.takeException(), isNull);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
   testWidgets('窄屏对局页展示手游操作区', (tester) async {
     tester.view.physicalSize = const Size(390, 844);
     tester.view.devicePixelRatio = 1.0;

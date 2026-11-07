@@ -21,6 +21,10 @@ ModeVisual modeVisualFor(GameMode mode, ColorScheme colors) => switch (mode) {
     accent: appJade,
   ),
   GameMode.ultra => const ModeVisual(icon: Icons.bolt_rounded, accent: appGold),
+  GameMode.arcade => const ModeVisual(
+    icon: Icons.videogame_asset_rounded,
+    accent: appJade,
+  ),
   GameMode.level => const ModeVisual(icon: Icons.flag_rounded, accent: appJade),
   GameMode.daily => ModeVisual(
     icon: Icons.today_rounded,

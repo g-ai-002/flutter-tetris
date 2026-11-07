@@ -22,13 +22,15 @@ void main() {
       'plays_sprint': 2,
       'best_score_ultra': 8900,
       'plays_ultra': 1,
+      'best_score_arcade': 5432,
+      'plays_arcade': 1,
       'daily_records': jsonEncode({
         todayKey: {'score': 4321, 'lines': 30, 'level': 4, 'plays': 2},
       }),
     });
   });
 
-  testWidgets('首页展示标题与三种模式', (tester) async {
+  testWidgets('首页展示标题与四种标准玩法', (tester) async {
     tester.view.physicalSize = const Size(1280, 900);
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
@@ -42,6 +44,7 @@ void main() {
     expect(find.text('经典模式'), findsOneWidget);
     expect(find.text('40 行竞速'), findsOneWidget);
     expect(find.text('2 分钟计时'), findsOneWidget);
+    expect(find.text('街机模式'), findsOneWidget);
     expect(find.text('关卡模式'), findsOneWidget);
     expect(find.text('每日挑战'), findsOneWidget);
     expect(find.textContaining('今日 4,321 分'), findsOneWidget);
@@ -49,6 +52,7 @@ void main() {
     expect(find.textContaining('最高 12,345 分'), findsOneWidget);
     expect(find.textContaining('最快 01:23.45'), findsOneWidget);
     expect(find.textContaining('最高 8,900 分'), findsOneWidget);
+    expect(find.textContaining('最高 5,432 分'), findsOneWidget);
     expect(find.textContaining('v${AppConstants.version}'), findsOneWidget);
   });
 

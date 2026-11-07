@@ -19,16 +19,18 @@ class TouchPad extends StatelessWidget {
         children: [
           Row(
             children: [
-              Expanded(
-                child: _PadButton(
-                  label: '暂存',
-                  icon: Icons.inventory_2_outlined,
-                  accent: colors.secondary,
-                  onPressed: controller.canHold ? controller.hold : null,
-                  height: 40,
+              if (controller.rules.holdEnabled) ...[
+                Expanded(
+                  child: _PadButton(
+                    label: '暂存',
+                    icon: Icons.inventory_2_outlined,
+                    accent: colors.secondary,
+                    onPressed: controller.canHold ? controller.hold : null,
+                    height: 40,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
+                const SizedBox(width: 8),
+              ],
               Expanded(
                 child: _PadButton(
                   label: '旋转',

@@ -25,17 +25,19 @@ class GameLeftRail extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        PieceSlot(
-          label: 'HOLD 暂存',
-          type: controller.holdType,
-          palette: palette,
-          size: 62,
-          onTap: controller.canHold ? controller.hold : null,
-          hint: controller.canHold
-              ? '${bindings.labelsFor(GameAction.hold).first} / 点击'
-              : null,
-        ),
-        const SizedBox(height: 18),
+        if (controller.rules.holdEnabled) ...[
+          PieceSlot(
+            label: 'HOLD 暂存',
+            type: controller.holdType,
+            palette: palette,
+            size: 62,
+            onTap: controller.canHold ? controller.hold : null,
+            hint: controller.canHold
+                ? '${bindings.labelsFor(GameAction.hold).first} / 点击'
+                : null,
+          ),
+          const SizedBox(height: 18),
+        ],
         Divider(color: Theme.of(context).colorScheme.outline),
         const SizedBox(height: 14),
         GameHud(controller: controller),
@@ -58,6 +60,7 @@ class GameRightRail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final next = controller.nextQueue;
+    final previews = controller.rules.previewCount;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -69,7 +72,7 @@ class GameRightRail extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        for (var i = 0; i < 5 && i < next.length; i++) ...[
+        for (var i = 0; i < previews && i < next.length; i++) ...[
           if (i > 0) const SizedBox(height: 7),
           PieceSlot(
             label: '',
@@ -120,6 +123,7 @@ class GameCompactRail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final next = controller.nextQueue;
+    final previews = controller.rules.previewCount.clamp(0, 3);
     return FittedBox(
       fit: BoxFit.scaleDown,
       alignment: Alignment.topCenter,
@@ -128,14 +132,16 @@ class GameCompactRail extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            PieceSlot(
-              label: 'HOLD',
-              type: controller.holdType,
-              palette: palette,
-              showLabel: false,
-              onTap: controller.canHold ? controller.hold : null,
-            ),
-            const SizedBox(height: 8),
+            if (controller.rules.holdEnabled) ...[
+              PieceSlot(
+                label: 'HOLD',
+                type: controller.holdType,
+                palette: palette,
+                showLabel: false,
+                onTap: controller.canHold ? controller.hold : null,
+              ),
+              const SizedBox(height: 8),
+            ],
             Text(
               'NEXT',
               style: TextStyle(
@@ -145,7 +151,7 @@ class GameCompactRail extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 4),
-            for (var i = 0; i < 3 && i < next.length; i++) ...[
+            for (var i = 0; i < previews && i < next.length; i++) ...[
               if (i > 0) const SizedBox(height: 5),
               PieceSlot(
                 label: '',
@@ -164,9 +170,16 @@ class GameCompactRail extends StatelessWidget {
 
 /// 桌面端的键盘提示条，按键取自当前键位配置。
 class GameKeyboardHint extends StatelessWidget {
-  const GameKeyboardHint({super.key, required this.bindings});
+  const GameKeyboardHint({
+    super.key,
+    required this.bindings,
+    this.showHold = true,
+  });
 
   final KeyBindings bindings;
+
+  /// 街机模式没有暂存，提示条随之隐藏该键。
+  final bool showHold;
 
   String _first(GameAction action) => bindings.labelsFor(action).first;
 
@@ -179,7 +192,7 @@ class GameKeyboardHint extends StatelessWidget {
     (GameAction.softDrop, _first(GameAction.softDrop), '软降'),
     (GameAction.hardDrop, _first(GameAction.hardDrop), '硬降'),
     (GameAction.rotateClockwise, _first(GameAction.rotateClockwise), '旋转'),
-    (GameAction.hold, _first(GameAction.hold), '暂存'),
+    if (showHold) (GameAction.hold, _first(GameAction.hold), '暂存'),
     (GameAction.pause, _first(GameAction.pause), '暂停'),
   ];
 

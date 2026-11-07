@@ -66,7 +66,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(storage.gamesPlayed, 0);
-    expect(find.text('还没有对局记录，去玩一局吧。'), findsNWidgets(3));
+    expect(find.text('还没有对局记录，去玩一局吧。'), findsNWidgets(4));
     expect(find.text('0'), findsWidgets);
   });
 
@@ -132,7 +132,7 @@ void main() {
       wrapPage(child: const RecordsPage(), storage: storage),
     );
 
-    expect(find.text('还没有对局记录，去玩一局吧。'), findsNWidgets(3));
+    expect(find.text('还没有对局记录，去玩一局吧。'), findsNWidgets(4));
     expect(find.byTooltip('清空纪录'), findsNothing);
   });
 }

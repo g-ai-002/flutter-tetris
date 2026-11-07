@@ -254,7 +254,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     final bindings = settings.keyBindings;
     _game.style = PlayfieldStyle(
       palette: palette,
-      showGhost: settings.showGhost,
+      showGhost: settings.showGhost && _controller.rules.ghostEnabled,
       showGrid: settings.showGrid,
     );
 
@@ -332,6 +332,8 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
         return '${_controller.lines} / 40 行 · 第 ${_controller.level} 级';
       case GameMode.ultra:
         return '剩余 ${formatDuration(_controller.remaining.inMilliseconds)}';
+      case GameMode.arcade:
+        return '第 ${_controller.level} 级 · 街机计分';
       case GameMode.level:
         final target = _controller.targetLines ?? 0;
         final garbage = _controller.garbageSecondsLeft;
@@ -357,6 +359,12 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     );
   }
 
+  /// 对局 HUD 与操作区随控制器每一帧刷新。
+  Widget _bound(Widget Function() builder) => AnimatedBuilder(
+    animation: _controller,
+    builder: (context, _) => builder(),
+  );
+
   Widget _buildWide(BlockPalette palette, KeyBindings bindings) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
@@ -365,9 +373,8 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
         children: [
           SizedBox(
             width: 132,
-            child: AnimatedBuilder(
-              animation: _controller,
-              builder: (context, _) => GameLeftRail(
+            child: _bound(
+              () => GameLeftRail(
                 controller: _controller,
                 palette: palette,
                 bindings: bindings,
@@ -379,10 +386,8 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
           const SizedBox(width: 16),
           SizedBox(
             width: 124,
-            child: AnimatedBuilder(
-              animation: _controller,
-              builder: (context, _) =>
-                  GameRightRail(controller: _controller, palette: palette),
+            child: _bound(
+              () => GameRightRail(controller: _controller, palette: palette),
             ),
           ),
         ],
@@ -395,11 +400,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 2, 16, 8),
-          child: AnimatedBuilder(
-            animation: _controller,
-            builder: (context, _) =>
-                GameHud(controller: _controller, compact: true),
-          ),
+          child: _bound(() => GameHud(controller: _controller, compact: true)),
         ),
         Expanded(
           child: Padding(
@@ -410,9 +411,8 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
                 const SizedBox(width: 6),
                 SizedBox(
                   width: 58,
-                  child: AnimatedBuilder(
-                    animation: _controller,
-                    builder: (context, _) => GameCompactRail(
+                  child: _bound(
+                    () => GameCompactRail(
                       controller: _controller,
                       palette: palette,
                     ),
@@ -423,12 +423,12 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
           ),
         ),
         if (isDesktopPlatform)
-          GameKeyboardHint(bindings: bindings)
+          GameKeyboardHint(
+            bindings: bindings,
+            showHold: _controller.rules.holdEnabled,
+          )
         else
-          AnimatedBuilder(
-            animation: _controller,
-            builder: (context, _) => TouchPad(controller: _controller),
-          ),
+          _bound(() => TouchPad(controller: _controller)),
       ],
     );
   }

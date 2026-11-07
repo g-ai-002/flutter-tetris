@@ -46,6 +46,7 @@ class RecordsPage extends StatelessWidget {
                   GameMode.endless,
                   GameMode.sprint,
                   GameMode.ultra,
+                  GameMode.arcade,
                 ]) ...[
                   ModeRecordCard(settings: settings, mode: mode),
                   const SizedBox(height: 12),
