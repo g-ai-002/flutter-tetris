@@ -16,7 +16,15 @@ class AppConstants {
   static const String prefKeyHaptics = 'haptics_enabled';
   static const String prefKeyShowGhost = 'show_ghost';
   static const String prefKeyShowGrid = 'show_grid';
+  static const String prefKeyLogicRate = 'logic_rate_hz';
   static const String prefKeyKeyBindings = 'key_bindings';
+
+  /// 逻辑更新速率选项，默认 60 Hz 兼顾性能与流畅度。
+  static const List<int> logicRates = [30, 60, 120];
+  static const int defaultLogicRate = 60;
+
+  static Duration logicInterval(int hz) =>
+      Duration(microseconds: 1000000 ~/ hz);
 
   static const String prefKeyGamesPlayed = 'games_played';
   static const String prefKeyTotalLines = 'total_lines';

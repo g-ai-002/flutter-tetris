@@ -1,9 +1,8 @@
 import 'board.dart';
 import 'tetromino.dart';
 
-/// SRS 踢墙位移表，y 轴向下（与标准表的 y 轴向上相反）。
-///
-/// 键为「起始旋转态 -> 目标旋转态」，列表第一项通常为 (0,0)。
+/// SRS 踢墙位移表，y 轴向下（与标准表相反）；键为「起始态 -> 目标态」，
+/// 列表第一项通常为 (0,0)。
 const Map<String, List<Block>> kJlstzKicks = {
   '01': [Block(0, 0), Block(-1, 0), Block(-1, -1), Block(0, 2), Block(-1, 2)],
   '10': [Block(0, 0), Block(1, 0), Block(1, 1), Block(0, -2), Block(1, -2)],
@@ -27,7 +26,6 @@ const Map<String, List<Block>> kIKicks = {
 };
 
 /// 返回旋转后的方块；被墙、地面或堆叠挡住时返回 null。
-///
 /// [direction] 为 1 顺时针、-1 逆时针，180 度旋转不参与踢墙。
 ActivePiece? tryRotate(Board board, ActivePiece piece, int direction) {
   if (direction != 1 && direction != -1) return null;

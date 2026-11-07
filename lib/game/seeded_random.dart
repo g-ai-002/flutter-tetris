@@ -1,7 +1,6 @@
 import 'dart:math';
 
 /// 跨平台一致的伪随机数：同一 seed 在 VM、Android 与 Web 上产出同一序列。
-///
 /// `dart:math` 的 [Random] 在不同编译目标下实现不同，每日挑战依赖固定序列，
 /// 因此这里用只含整数乘法与取模的 Lehmer 发生器自行实现。
 /// 中间结果不超过 2^47，在 Web 的 double 整数精度内也是精确的。

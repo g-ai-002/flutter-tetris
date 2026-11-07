@@ -19,7 +19,6 @@ class ClearOutcome {
 }
 
 /// 对局内的分数、等级、连击与落定统计。
-///
 /// 只负责累计与结算，不感知场地和输入，方便单独验证计分规则。
 class ScoreBoard {
   ScoreBoard({int startLevel = 1, this.arcade = false})
@@ -61,10 +60,8 @@ class ScoreBoard {
   /// 记录一次方块落定。
   void countPiece() => _pieces++;
 
-  /// 结算一次落定。
-  ///
-  /// [rows] 为消除行数；零消 T-Spin 保留分数但不增加连击，
-  /// 也不改变连续奖励状态。
+  /// 结算一次落定。[rows] 为消除行数；零消 T-Spin 保留分数
+  /// 但不增加连击，也不改变连续奖励状态。
   ClearOutcome registerClear({
     required int rows,
     required bool tSpin,

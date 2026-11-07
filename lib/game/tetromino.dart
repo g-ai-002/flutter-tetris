@@ -45,8 +45,7 @@ extension TetrominoTypeInfo on TetrominoType {
   };
 }
 
-/// 每种方块的四个旋转态，索引 0 为出生态，顺时针依次递增。
-///
+/// 每种方块的四个旋转态，索引 0 为出生态、顺时针递增；
 /// JLSTZ 使用 SRS 的 3x3 包围盒，I 使用 4x4 包围盒，O 不变。
 const Map<TetrominoType, List<List<Block>>> kTetrominoShapes = {
   TetrominoType.i: [

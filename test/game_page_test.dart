@@ -8,6 +8,7 @@ import 'package:flutter_tetris/game/garbage.dart';
 import 'package:flutter_tetris/game/level.dart';
 import 'package:flutter_tetris/input/key_bindings.dart';
 import 'package:flutter_tetris/pages/game_page.dart';
+import 'package:flutter_tetris/services/log_service.dart';
 import 'package:flutter_tetris/services/storage_service.dart';
 import 'package:flutter_tetris/theme/block_skin.dart';
 import 'package:flutter_tetris/utils/constants.dart';
@@ -45,6 +46,32 @@ void main() {
     expect(find.text('等级'), findsOneWidget);
     expect(find.byType(CustomPaint), findsWidgets);
     expect(tester.takeException(), isNull);
+
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('对局按偏好使用 120Hz 逻辑更新速率', (tester) async {
+    final custom = await prepareStorage({
+      AppConstants.prefKeyLogicRate: 120,
+    });
+    LogService.reset();
+    tester.view.physicalSize = const Size(1280, 960);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      wrapPage(
+        child: const GamePage(mode: GameMode.endless),
+        storage: custom,
+      ),
+    );
+    await tester.pump();
+
+    expect(
+      LogService.getRecentLogs().any((line) => line.contains('逻辑 120Hz')),
+      isTrue,
+    );
 
     await tester.pumpWidget(const SizedBox.shrink());
   });

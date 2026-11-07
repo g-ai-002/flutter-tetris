@@ -13,10 +13,8 @@ const List<int> kTSpinMiniBase = [100, 200];
 /// 全消奖励（1/2/3/4 行）。
 const List<int> kPerfectClearBonus = [0, 800, 1200, 1800, 2000];
 
-/// 计算一次落定带来的分数。
-///
-/// [combo] 为本次消行之前的连续消行次数，首消不加连击分，
-/// 第二次起按 `50 x 连击数 x 等级` 累加。
+/// 计算一次落定带来的分数。[combo] 为本次消行之前的连续消行次数，
+/// 首消不加连击分，第二次起按 `50 x 连击数 x 等级` 累加。
 int clearScore({
   required int lines,
   required int level,
@@ -49,7 +47,6 @@ int clearScore({
 }
 
 /// 等级：每消 10 行提升一级，最高 15 级，避免速度失控。
-///
 /// [startLevel] 用于关卡模式从更高的起始等级开始。
 int levelForLines(int lines, {int startLevel = 1}) {
   final base = startLevel < 1 ? 1 : startLevel;
@@ -81,7 +78,6 @@ Duration gravityForLevel(int level) {
 }
 
 /// 街机模式的经典计分：单/双/三/四行为 40/100/300/1200，按等级放大。
-///
 /// 不计算 T-Spin、连击、连续奖励与全消，保持红白机原版手感。
 const List<int> kArcadeLineClearBase = [0, 40, 100, 300, 1200];
 

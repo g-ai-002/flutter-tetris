@@ -26,9 +26,7 @@ void main() {
     );
 
     expect(find.text('外观与操作'), findsOneWidget);
-    expect(find.text('音效与反馈'), findsOneWidget);
-    expect(find.text('键位与手柄'), findsOneWidget);
-    expect(find.text('硬降 Y / RB / ↑'), findsOneWidget);
+    expect(find.text('逻辑更新速率'), findsOneWidget);
 
     expect(find.text('棋盘皮肤'), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('skin-celadon')));
@@ -47,6 +45,24 @@ void main() {
     await tester.tap(find.byKey(const ValueKey('switch-grid')));
     await tester.pump();
     expect(storage.showGrid, isFalse);
+
+    expect(
+      tester
+          .widget<ChoiceChip>(find.byKey(const ValueKey('logic-rate-60')))
+          .selected,
+      isTrue,
+    );
+    await tester.ensureVisible(find.byKey(const ValueKey('logic-rate-120')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('logic-rate-120')));
+    await tester.pump();
+    expect(storage.logicRate, 120);
+    expect(
+      tester
+          .widget<ChoiceChip>(find.byKey(const ValueKey('logic-rate-120')))
+          .selected,
+      isTrue,
+    );
 
     await tester.ensureVisible(find.byKey(const ValueKey('switch-sound')));
     await tester.pumpAndSettle();

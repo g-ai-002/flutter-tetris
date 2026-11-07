@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 /// 按住连续触发的统一调度：先立即触发一次，再按固定间隔重复。
-///
 /// 键盘与手柄的重复事件由平台负责，触控按钮与手柄长按则共用这里的节拍，
 /// 避免三处各写一套定时器导致起手延迟与频率不一致。
 class ActionRepeat {

@@ -6,11 +6,9 @@ import '../utils/formatters.dart';
 class DailyChallenge {
   const DailyChallenge({required this.date, required this.seed});
 
-  /// 本地日期（当天 00:00）。
   final DateTime date;
   final int seed;
 
-  /// 战报里带上的标签。
   static const String shareTag = '#俄罗斯方块每日挑战';
 
   /// 由任意时间点的本地日期构造当天挑战。
@@ -65,9 +63,7 @@ class DailyChallenge {
     ].join('\n');
   }
 
-  /// 日期与种子的混淆：让相邻日期的种子没有可见规律。
-  ///
-  /// 只用整数乘法与取模，中间值不超过 2^47，
+  /// 日期与种子的混淆：只用整数乘法与取模，中间值不超过 2^47，
   /// 保证 VM 与 Web 得到完全相同的种子。
   static int _mixSeed(int value) {
     const modulus = 2147483647;

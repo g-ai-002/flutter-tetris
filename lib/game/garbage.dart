@@ -12,10 +12,8 @@ class GarbageRule {
   final int rowsPerRise;
 }
 
-/// 按固定间隔产出垃圾行缺口，随机序列由种子决定，可复现。
-///
-/// 只负责计时与缺口生成，不直接操作场地；把规则从控制器里抽出来后，
-/// 上涌节奏可以独立测试。
+/// 按固定间隔产出垃圾行缺口，随机序列由种子决定；只负责计时与缺口生成，
+/// 不直接操作场地，因此上涌节奏可以独立测试。
 class GarbageSpawner {
   GarbageSpawner({this.rule, int seed = 0})
     : _seed = seed,

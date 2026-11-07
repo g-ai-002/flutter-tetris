@@ -7,9 +7,7 @@ import 'log_service.dart';
 import 'tone_synth.dart';
 
 /// 背景音乐：运行时合成五声音阶循环，与音效共用 SoLoud 音频引擎。
-///
-/// Web 端的自动播放限制会在用户首次点击页面后重试；应用进入后台时暂停，
-/// 回到前台继续，避免无谓的音频占用。
+/// Web 自动播放限制会在首次点击后重试；应用进入后台时暂停，回到前台继续。
 class MusicService {
   MusicService._();
 

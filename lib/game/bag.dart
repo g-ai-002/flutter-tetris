@@ -1,10 +1,7 @@
 import 'seeded_random.dart';
 import 'tetromino.dart';
 
-/// 七包随机：每七个方块为一轮，保证不会长时间不出某一种方块。
-///
-/// 使用 [SeededRandom] 而不是 `dart:math` 的随机数，保证每日挑战
-/// 在 Android / Windows / Web 上拿到完全相同的方块序列。
+/// 七包随机：每七个方块一轮；[SeededRandom] 保证每日挑战三端牌序一致。
 class SevenBag {
   SevenBag({int? seed}) : _random = SeededRandom(seed ?? _entropy());
 

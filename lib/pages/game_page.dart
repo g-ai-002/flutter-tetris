@@ -17,6 +17,7 @@ import '../services/log_service.dart';
 import '../services/sound_service.dart';
 import '../services/storage_service.dart';
 import '../theme/block_palette.dart';
+import '../utils/constants.dart';
 import '../utils/formatters.dart';
 import '../utils/game_display.dart';
 import '../utils/game_layout.dart';
@@ -56,12 +57,13 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    final settings = context.read<SettingsProvider>();
     _controller = TetrisController(
       mode: widget.mode,
       level: widget.level,
       daily: widget.daily,
+      tickInterval: AppConstants.logicInterval(settings.logicRate),
     );
-    final settings = context.read<SettingsProvider>();
     _game = TetrisGame(
       controller: _controller,
       style: PlayfieldStyle(
@@ -72,7 +74,9 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     _controller.start();
     _gamepad = GamepadService(onAction: _handleAction);
     unawaited(_gamepad.start());
-    LogService.info('开始对局: ${_controller.rules.title}');
+    LogService.info(
+      '开始对局: ${_controller.rules.title}, 逻辑 ${settings.logicRate}Hz',
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
         unawaited(enterGameDisplay(size: MediaQuery.sizeOf(context)));

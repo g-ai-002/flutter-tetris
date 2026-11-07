@@ -6,7 +6,6 @@ import 'block_skin.dart';
 export 'block_skin.dart';
 
 /// 方块配色：每套皮肤自带浅色 / 深色两副色板。
-///
 /// 方块颜色取自传统颜料名，棋盘底色与界面强调色跟随皮肤，
 /// 让首页、设置页与对局场地保持同一套观感。
 class BlockPalette {

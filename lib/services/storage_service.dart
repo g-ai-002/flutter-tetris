@@ -95,6 +95,16 @@ class StorageService {
   Future<void> setShowGrid(bool value) =>
       _write((p) => p.setBool(AppConstants.prefKeyShowGrid, value));
 
+  int get logicRate {
+    final hz = _p.getInt(AppConstants.prefKeyLogicRate);
+    return AppConstants.logicRates.contains(hz)
+        ? hz!
+        : AppConstants.defaultLogicRate;
+  }
+
+  Future<void> setLogicRate(int value) =>
+      _write((p) => p.setInt(AppConstants.prefKeyLogicRate, value));
+
   KeyBindings get keyBindings =>
       KeyBindings.decode(_p.getString(AppConstants.prefKeyKeyBindings));
   Future<void> setKeyBindings(KeyBindings value) => _write(

@@ -37,6 +37,10 @@ class SettingsProvider extends ChangeNotifier {
   Future<void> setShowGrid(bool value) =>
       _update(() => _storage.setShowGrid(value));
 
+  int get logicRate => _storage.logicRate;
+  Future<void> setLogicRate(int value) =>
+      _update(() => _storage.setLogicRate(value));
+
   KeyBindings get keyBindings => _storage.keyBindings;
   Future<void> bindKey(GameAction action, LogicalKeyboardKey key) =>
       _update(() => _storage.setKeyBindings(keyBindings.rebind(action, key)));

@@ -26,9 +26,7 @@ enum GameAction {
 }
 
 /// 键盘键位表：每个操作至少一个按键，同一按键只属于一个操作。
-///
-/// 默认保留多键并存（如顺时针同时支持 ↑ 与 X），重新绑定某操作后该操作
-/// 只保留新按键，被占用的按键会与对方交换，避免出现无法操作的动作。
+/// 默认保留多键并存，重新绑定后该操作只保留新按键，被占用的按键会与对方交换。
 class KeyBindings {
   KeyBindings(Map<GameAction, Set<LogicalKeyboardKey>> keys)
     : _keys = {

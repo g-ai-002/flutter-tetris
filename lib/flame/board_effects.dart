@@ -8,7 +8,6 @@ import '../game/tetromino.dart';
 import '../theme/block_palette.dart';
 
 /// 场地特效：消行碎屑、落定微尘与硬降拖影的生成、推进与绘制。
-///
 /// 只保存特效自身的状态，场地几何由调用方按帧传入，
 /// 便于在测试中独立驱动而不依赖 Flame 组件的尺寸。
 class BoardEffects {

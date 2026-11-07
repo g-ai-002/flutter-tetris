@@ -32,8 +32,7 @@ enum GameEvent {
 }
 
 /// 俄罗斯方块核心控制器：负责方块生成、移动、消行、计分与计时。
-///
-/// 默认自带 16ms 定时器驱动；单元测试可关闭自动计时，手动调用 [tick]。
+/// 默认自带 60Hz 定时器驱动；单元测试可关闭自动计时，手动调用 [tick]。
 class TetrisController extends ChangeNotifier {
   TetrisController({
     required GameMode mode,
@@ -43,7 +42,7 @@ class TetrisController extends ChangeNotifier {
     bool autoTick = true,
     Duration? lockDelay,
     Duration clearDelay = const Duration(milliseconds: 260),
-    Duration tickInterval = const Duration(milliseconds: 16),
+    Duration tickInterval = const Duration(microseconds: 16666),
   }) : this._(
          rules: MatchRules(mode: mode, level: level, daily: daily),
          seed: seed ?? daily?.seed ?? level?.seed,

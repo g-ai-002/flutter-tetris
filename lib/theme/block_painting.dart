@@ -14,7 +14,6 @@ void paintBoardBackground(Canvas canvas, Rect rect, BlockPalette palette) {
 }
 
 /// 绘制一块已落定的方块。
-///
 /// [rect] 为格子的完整区域，内部会留出缝隙并描边，
 /// 顶部提亮、底部压暗，模拟实体方块的立体感。
 void paintBlock(

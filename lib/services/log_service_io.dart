@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import '../utils/formatters.dart';
 
 /// 日志服务：内存环形缓冲 + 按天文件落盘。
-///
 /// 初始化前的日志先进入早期缓冲，初始化后补写；
 /// 用户目录不可用时降级为内存模式，不影响游戏。
 class LogService {

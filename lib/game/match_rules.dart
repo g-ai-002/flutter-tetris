@@ -4,10 +4,8 @@ import 'game_mode.dart';
 import 'level.dart';
 import 'scoring.dart';
 
-/// 一局对局的规则快照。
-///
-/// 玩法差异（目标行数、限时）与关卡差异（地形、起始等级、垃圾行）
-/// 都从这里读取，控制器不再散落 `levelDef?.x ?? mode.y` 的判断。
+/// 一局对局的规则快照：玩法差异（目标行数、限时）与关卡差异
+/// （地形、起始等级、垃圾行）都从这里读取，控制器不再散落 `levelDef?.x ?? mode.y` 的判断。
 class MatchRules {
   const MatchRules({required this.mode, this.level, this.daily});
 

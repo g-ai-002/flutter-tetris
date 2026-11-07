@@ -28,9 +28,8 @@ class SynthNote {
   final double noise;
 }
 
-/// 纯 Dart 音效合成：把若干乐音渲染成 16 位单声道 WAV 字节。
-///
-/// 音效全部在运行时生成，代码仓库与安装包都不携带音频文件。
+/// 纯 Dart 音效合成：把若干乐音渲染成 16 位单声道 WAV 字节，
+/// 全部在运行时生成，代码仓库与安装包都不携带音频文件。
 Uint8List synthesizeWav(
   List<SynthNote> notes, {
   int sampleRate = kSynthSampleRate,

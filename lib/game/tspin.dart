@@ -12,7 +12,6 @@ class TSpinInfo {
 }
 
 /// 三角判定：T 形方块最后一次动作是旋转，且中心格四角至少三处被占据。
-///
 /// 前两个角没有同时被占据时记为 T-Spin Mini。
 TSpinInfo detectTSpin({
   required Board board,

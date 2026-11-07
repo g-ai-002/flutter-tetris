@@ -16,6 +16,10 @@ import 'widgets/skin_option_card.dart';
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
+  TextStyle? _hint(ThemeData theme) => theme.textTheme.bodySmall?.copyWith(
+    color: theme.colorScheme.onSurfaceVariant,
+  );
+
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsProvider>();
@@ -38,9 +42,7 @@ class SettingsPage extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       '方块配色与界面强调色一同切换',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colors.onSurfaceVariant,
-                      ),
+                      style: _hint(theme),
                     ),
                     const SizedBox(height: 10),
                     Wrap(
@@ -88,6 +90,30 @@ class SettingsPage extends StatelessWidget {
                       value: settings.showGrid,
                       onChanged: settings.setShowGrid,
                       switchKey: const ValueKey('switch-grid'),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                SectionCard(
+                  title: '逻辑更新速率',
+                  icon: Icons.speed_rounded,
+                  children: [
+                    Text(
+                      '越高判定越细腻，也越耗电；默认 60 Hz，兼顾性能与流畅度',
+                      style: _hint(theme),
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8,
+                      children: [
+                        for (final hz in AppConstants.logicRates)
+                          ChoiceChip(
+                            key: ValueKey('logic-rate-$hz'),
+                            label: Text('$hz Hz'),
+                            selected: settings.logicRate == hz,
+                            onSelected: (_) => settings.setLogicRate(hz),
+                          ),
+                      ],
                     ),
                   ],
                 ),

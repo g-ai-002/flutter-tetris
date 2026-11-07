@@ -6,9 +6,8 @@ import '../services/log_service.dart';
 import 'action_repeat.dart';
 import 'key_bindings.dart';
 
-/// 标准布局手柄的固定按钮映射，摇杆与十字键的连发由 [GamepadService] 处理。
-///
-/// 界面上的手柄说明也从这张表派生，避免帮助弹窗、设置页与 README 各写一份。
+/// 标准布局手柄的固定按钮映射；摇杆与十字键的连发由 [GamepadService] 处理，
+/// 界面上的手柄说明也从这张表派生。
 const Map<GamepadButton, GameAction> gamepadButtonActions = {
   GamepadButton.a: GameAction.rotateClockwise,
   GamepadButton.b: GameAction.rotateCounterClockwise,
@@ -61,7 +60,6 @@ String formatGamepadButton(GamepadButton button) => switch (button) {
 };
 
 /// 手柄按键在界面上的说明；未映射的操作返回 null。
-///
 /// 移动与软降同时支持左摇杆，因此在这三项后面补上「左摇杆」。
 String? gamepadLabelsFor(GameAction action) {
   final buttons = gamepadButtonsFor(action);
@@ -76,9 +74,8 @@ String? gamepadLabelsFor(GameAction action) {
 }
 
 /// 把标准布局手柄的按钮与左摇杆转成与键盘一致的操作流。
-///
-/// 十字键与左摇杆支持长按连发；面板按钮只在按下时触发一次。
-/// 未连接手柄或平台不支持时静默降级，不影响键盘与触屏操作。
+/// 十字键与左摇杆支持长按连发；面板按钮只在按下时触发一次，
+/// 未连接手柄或平台不支持时静默降级。
 class GamepadService {
   GamepadService({
     required this.onAction,

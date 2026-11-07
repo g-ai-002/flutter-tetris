@@ -70,7 +70,6 @@ class LevelProgressMerge {
 }
 
 /// 关卡进度：通关状态、星级、最高分与最快用时。
-///
 /// 纯数据对象，负责序列化与合并规则，不依赖具体存储实现。
 class LevelProgress {
   const LevelProgress(this._records);

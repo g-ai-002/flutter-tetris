@@ -3,10 +3,8 @@ library;
 
 import 'garbage.dart';
 
-/// 单个关卡的完整规则。
-///
-/// [terrain] 从下往上贴底摆放，每行 10 个字符：`.` 为空，`#` 为垃圾块，
-/// `I O T S Z J L` 为对应颜色的方块。地形行数不超过可视高度。
+/// 单个关卡的完整规则。[terrain] 从下往上贴底摆放，每行 10 个字符：
+/// `.` 为空，`#` 为垃圾块，`I O T S Z J L` 为对应颜色的方块。
 class LevelDefinition {
   const LevelDefinition({
     required this.id,

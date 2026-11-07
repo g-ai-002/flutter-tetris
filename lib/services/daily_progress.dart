@@ -71,7 +71,6 @@ class DailyProgressMerge {
 }
 
 /// 每日挑战的本地进度：按天保存最高分、消行、等级与对局次数。
-///
 /// 纯数据对象，负责序列化、合并与连续打卡计算，不依赖具体存储实现。
 class DailyProgress {
   const DailyProgress(this._records);

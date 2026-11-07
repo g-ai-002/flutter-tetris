@@ -4,7 +4,6 @@ import '../../game/tetris_controller.dart';
 import '../../input/action_repeat.dart';
 
 /// 触屏操作区。
-///
 /// 竖屏默认三列两行；[columns] 为 2 时改为两列三行，供横屏侧栏使用。
 /// [dense] 收窄按键高度，把空间还给棋盘。
 class TouchPad extends StatelessWidget {

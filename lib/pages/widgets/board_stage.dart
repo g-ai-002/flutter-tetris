@@ -6,9 +6,8 @@ import 'package:flutter/material.dart';
 import '../../flame/tetris_game.dart';
 import '../../theme/block_palette.dart';
 
-/// 棋盘舞台：10:20 的场地按可用空间取最大尺寸，外加实体感边框与投影。
-///
-/// 宽度与高度任一方向受限都能完整显示，[maxCell] 只用来避免超宽屏上棋盘过大。
+/// 棋盘舞台：10:20 的场地按可用空间取最大尺寸，外加实体感边框与投影；
+/// 宽高任一方向受限都完整显示，[maxCell] 避免超宽屏上棋盘过大。
 class BoardStage extends StatelessWidget {
   const BoardStage({
     super.key,
