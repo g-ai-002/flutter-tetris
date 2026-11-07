@@ -4,6 +4,9 @@ import 'dart:typed_data';
 /// 音效采样率：落子与旋转这类短促提示音用 22.05 kHz 足够。
 const int kSynthSampleRate = 22050;
 
+/// 音效总增益：合成配方本身留有余量，统一放大到可听清的音量。
+const double kSfxMasterGain = 2.6;
+
 /// 单枚乐音：正弦基频叠加二、三次谐波，可混入少量噪声模拟木石撞击。
 class SynthNote {
   const SynthNote({
@@ -65,6 +68,9 @@ Uint8List synthesizeWav(
     }
   }
 
+  for (var i = 0; i < totalSamples; i++) {
+    mix[i] = (mix[i] * kSfxMasterGain).clamp(-1.0, 1.0);
+  }
   return _encodePcm(mix, sampleRate);
 }
 

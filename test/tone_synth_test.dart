@@ -44,6 +44,22 @@ void main() {
       }
     });
 
+    test('音效放大到可听清的音量且不超出满刻度', () {
+      SoundService.reset();
+      for (final sfx in Sfx.values) {
+        final bytes = SoundService.clipOf(sfx);
+        final data = ByteData.sublistView(bytes);
+        var peak = 0;
+        for (var i = 44; i + 1 < bytes.length; i += 2) {
+          final value = data.getInt16(i, Endian.little).abs();
+          if (value > peak) peak = value;
+        }
+        expect(peak, greaterThan(16000), reason: sfx.name);
+        expect(peak, lessThanOrEqualTo(32767), reason: sfx.name);
+      }
+      SoundService.reset();
+    });
+
     test('静音与震动开关只影响播放，不影响音效生成', () {
       SoundService.reset();
       final played = <Sfx>[];
