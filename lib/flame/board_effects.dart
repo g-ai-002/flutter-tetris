@@ -173,6 +173,7 @@ class BoardEffects {
   }
 
   void paintParticles(Canvas canvas) {
+    final paint = Paint();
     for (final particle in _particles) {
       final alpha = (particle.life / particle.maxLife).clamp(0.0, 1.0);
       canvas.save();
@@ -183,9 +184,10 @@ class BoardEffects {
         width: particle.size,
         height: particle.size,
       );
+      paint.color = particle.color.withValues(alpha: alpha);
       canvas.drawRRect(
         RRect.fromRectAndRadius(rect, Radius.circular(particle.size * 0.22)),
-        Paint()..color = particle.color.withValues(alpha: alpha),
+        paint,
       );
       canvas.restore();
     }

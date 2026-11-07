@@ -115,6 +115,7 @@ class TetrisController extends ChangeNotifier {
   bool _lastActionRotate = false;
   GameResult? _result;
 
+  int _boardRevision = 0;
   int _clearSequence = 0;
   int _lockSequence = 0;
   int _hardDropSequence = 0;
@@ -195,20 +196,19 @@ class TetrisController extends ChangeNotifier {
   }
 
   Duration? get garbageInterval => rules.garbage?.interval;
-  int get garbageRises => _garbage.rises;
 
   /// 距下一次垃圾行上涌还有多少秒，未启用时为 null。
   int? get garbageSecondsLeft => _garbage.secondsLeft;
 
-  Duration get gravity => gravityForLevel(level);
-
   int get stackHeight => board.stackHeight;
 
   // 渲染层用于触发特效的序号与快照。
+  /// 棋盘内容版本号，渲染层据此判断静态图层是否失效。
+  int get boardRevision => _boardRevision;
   int get clearSequence => _clearSequence;
   List<int> get lastClearRows => _clearingRows;
   int get lockSequence => _lockSequence;
-  List<Block> get lastLockedBlocks => List.unmodifiable(_lastLockedBlocks);
+  List<Block> get lastLockedBlocks => _lastLockedBlocks;
   TetrominoType? get lastLockedType => _lastLockedType;
   int get hardDropSequence => _hardDropSequence;
   int get hardDropColumn => _hardDropColumn;
@@ -230,22 +230,6 @@ class TetrisController extends ChangeNotifier {
   }
 
   void restart() => start();
-
-  void togglePause() {
-    if (_status == GameStatus.playing) {
-      _status = GameStatus.paused;
-      _timer?.cancel();
-      _timer = null;
-      notifyListeners();
-      return;
-    }
-    if (_status == GameStatus.paused) {
-      _status = GameStatus.playing;
-      _lastTick = DateTime.now();
-      _startTicker();
-      notifyListeners();
-    }
-  }
 
   void pause() {
     if (_status != GameStatus.playing) return;
@@ -409,6 +393,7 @@ class TetrisController extends ChangeNotifier {
   void _raiseGarbage(List<int> holes) {
     if (holes.isEmpty) return;
     final overflow = board.raiseGarbage(holes);
+    _boardRevision++;
     if (overflow) {
       _end(won: false, reason: '垃圾行顶到了顶部');
       return;
@@ -526,9 +511,10 @@ class TetrisController extends ChangeNotifier {
     final mini = spin.isMini;
     final blocks = current.blocks;
     board.lock(blocks, current.type);
+    _boardRevision++;
     _piece = null;
     _scoreBoard.countPiece();
-    _lastLockedBlocks = blocks;
+    _lastLockedBlocks = List.unmodifiable(blocks);
     _lastLockedType = current.type;
     _lockSequence++;
     _grounded = false;
@@ -575,6 +561,7 @@ class TetrisController extends ChangeNotifier {
 
   void _finishClear() {
     board.removeRows(_clearingRows);
+    _boardRevision++;
     _clearingRows = const [];
     _clearElapsed = Duration.zero;
 
@@ -637,6 +624,7 @@ class TetrisController extends ChangeNotifier {
     } else {
       board.loadTerrain(rules.terrain);
     }
+    _boardRevision++;
     _bag.reset(seed: _seed);
     _garbage.reset();
     _piece = null;

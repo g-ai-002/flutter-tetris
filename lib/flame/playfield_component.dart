@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
@@ -50,6 +51,12 @@ class PlayfieldComponent extends PositionComponent {
   int _seenLock;
   int _seenDrop;
   double _time = 0;
+
+  ui.Picture? _staticLayer;
+  (double, double, BlockSkin, bool, bool, int)? _staticKey;
+
+  @visibleForTesting
+  int debugStaticLayerBuilds = 0;
 
   @override
   void update(double dt) {
@@ -114,10 +121,8 @@ class PlayfieldComponent extends PositionComponent {
       );
     }
 
-    _paintBackground(canvas, boardRect, palette);
-    if (currentStyle.showGrid) _paintGrid(canvas, palette);
-    _paintDangerZone(canvas, palette);
-    _paintLocked(canvas, palette);
+    _ensureStaticLayer(currentStyle);
+    canvas.drawPicture(_staticLayer!);
     _paintGhostAndActive(canvas, palette, currentStyle);
     effects.paintTrails(
       canvas,
@@ -129,10 +134,35 @@ class PlayfieldComponent extends PositionComponent {
     canvas.restore();
   }
 
-  /// 供点击/拖拽换算列号。
-  int columnAt(double localX) {
-    if (_cellSize <= 0) return 0;
-    return (localX / _cellSize).floor().clamp(0, controller.board.columns - 1);
+  /// 背景、网格、危险区与落定方块只在棋盘或外观变化时重绘，
+  /// 其余帧复用同一张静态图层，避免每帧为两百格重建渐变。
+  void _ensureStaticLayer(PlayfieldStyle currentStyle) {
+    final palette = currentStyle.palette;
+    final key = (
+      size.x,
+      size.y,
+      palette.skin,
+      palette.dark,
+      currentStyle.showGrid,
+      controller.boardRevision,
+    );
+    if (key == _staticKey) return;
+    final recorder = ui.PictureRecorder();
+    final canvas = Canvas(recorder);
+    paintBoardBackground(canvas, Offset.zero & size.toSize(), palette);
+    if (currentStyle.showGrid) _paintGrid(canvas, palette);
+    _paintDangerZone(canvas, palette);
+    _paintLocked(canvas, palette);
+    _staticLayer?.dispose();
+    _staticLayer = recorder.endRecording();
+    _staticKey = key;
+    debugStaticLayerBuilds++;
+  }
+
+  @override
+  void onRemove() {
+    _staticLayer?.dispose();
+    super.onRemove();
   }
 
   double get _cellSize => size.x / controller.board.columns;
@@ -145,10 +175,6 @@ class PlayfieldComponent extends PositionComponent {
       cell - inset * 2,
       cell - inset * 2,
     );
-  }
-
-  void _paintBackground(Canvas canvas, Rect rect, BlockPalette palette) {
-    paintBoardBackground(canvas, rect, palette);
   }
 
   void _paintGrid(Canvas canvas, BlockPalette palette) {

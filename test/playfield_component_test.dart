@@ -54,4 +54,47 @@ void main() {
     component.render(Canvas(third));
     expect(third.endRecording(), isNotNull);
   });
+
+  test('静态图层复用，并在棋盘或样式变化时重建', () {
+    final controller = TetrisController(
+      mode: GameMode.endless,
+      seed: 7,
+      autoTick: false,
+    );
+    addTearDown(controller.dispose);
+    controller.start();
+    final style = ValueNotifier(
+      const PlayfieldStyle(palette: BlockPalette.light),
+    );
+    addTearDown(style.dispose);
+    final component = PlayfieldComponent(controller: controller, style: style)
+      ..size = Vector2(300, 600);
+
+    void render() {
+      final recorder = ui.PictureRecorder();
+      component.render(Canvas(recorder));
+      recorder.endRecording();
+    }
+
+    render();
+    expect(component.debugStaticLayerBuilds, 1);
+    render();
+    expect(component.debugStaticLayerBuilds, 1);
+
+    controller.hardDrop();
+    render();
+    expect(component.debugStaticLayerBuilds, 2);
+
+    style.value = const PlayfieldStyle(
+      palette: BlockPalette.darkPalette,
+      showGhost: false,
+    );
+    render();
+    expect(component.debugStaticLayerBuilds, 3);
+
+    component.size = Vector2(320, 640);
+    render();
+    expect(component.debugStaticLayerBuilds, 4);
+    component.onRemove();
+  });
 }

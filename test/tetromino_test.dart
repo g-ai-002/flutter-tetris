@@ -40,11 +40,8 @@ void main() {
       }
     });
 
-    test('方块中文名与代号完整', () {
+    test('方块代号完整', () {
       expect(TetrominoType.values.map((t) => t.code).join(), 'IOTSZJL');
-      for (final type in TetrominoType.values) {
-        expect(type.chineseName, isNotEmpty);
-      }
     });
   });
 }

@@ -87,10 +87,6 @@ class BlockPalette {
 
   Color get dangerTint => const Color(0xFFC2453D);
 
-  Color get ghostStroke => dark
-      ? Colors.white.withValues(alpha: 0.30)
-      : accent.withValues(alpha: 0.32);
-
   Color get onSurface => dark
       ? Color.lerp(const Color(0xFFEFE6D8), accent, 0.10)!
       : Color.lerp(const Color(0xFF2E2A24), accent, 0.10)!;

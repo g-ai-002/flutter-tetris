@@ -35,17 +35,6 @@ extension TetrominoTypeInfo on TetrominoType {
     TetrominoType.j => 'J',
     TetrominoType.l => 'L',
   };
-
-  /// 中文名称，展示在操作说明里。
-  String get chineseName => switch (this) {
-    TetrominoType.i => '长条',
-    TetrominoType.o => '方块',
-    TetrominoType.t => 'T 形',
-    TetrominoType.s => 'S 形',
-    TetrominoType.z => 'Z 形',
-    TetrominoType.j => 'J 形',
-    TetrominoType.l => 'L 形',
-  };
 }
 
 /// 每种方块的四个旋转态，索引 0 为出生态，顺时针依次递增。

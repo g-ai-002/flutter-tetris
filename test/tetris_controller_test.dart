@@ -152,6 +152,26 @@ void main() {
       expect(controller.combo, 2);
     });
 
+    test('棋盘版本号在落定、消行完成与重开时递增', () {
+      final start = controller.boardRevision;
+      controller.board.setCell(0, 18, TetrominoType.j);
+      for (var x = 4; x < 10; x++) {
+        controller.board.setCell(x, 20, TetrominoType.z);
+      }
+      controller.setPieceForTest(
+        const ActivePiece(type: TetrominoType.i, x: 0, y: 19),
+      );
+      controller.hardDrop();
+      expect(controller.boardRevision, start + 1);
+      expect(controller.isClearing, isTrue);
+
+      advance(controller, 300);
+      expect(controller.boardRevision, start + 2);
+
+      controller.restart();
+      expect(controller.boardRevision, start + 3);
+    });
+
     test('一次消四行并全消获得奖励', () {
       for (var y = 17; y < 21; y++) {
         for (var x = 1; x < 10; x++) {
@@ -387,9 +407,8 @@ void main() {
       controller.start();
       advance(controller, 1100);
 
-      expect(controller.garbageRises, 1);
-      expect(controller.board.filledCount, 9);
       expect(controller.garbageSecondsLeft, isNotNull);
+      expect(controller.board.filledCount, 9);
       expect(controller.status, GameStatus.playing);
     });
 
