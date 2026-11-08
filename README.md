@@ -29,13 +29,13 @@
 
 ## 下载
 
-v0.7.4（最新发布）：[Gitea Release](http://192.168.31.120:3020/GTech/flutter-tetris/releases/tag/v0.7.4)
+v0.7.5（最新发布）：[Gitea Release](http://192.168.31.120:3020/GTech/flutter-tetris/releases/tag/v0.7.5)
 
 | 平台 | 产物 |
 | --- | --- |
-| Android (arm64) | `flutter-tetris-0.7.4-android-aarch64.apk` |
-| Windows (x64, Win10+) | `flutter-tetris-0.7.4-windows-x86_64.zip` |
-| Web | `flutter-tetris-0.7.4-web.zip`（解压后起静态服务器） |
+| Android (arm64) | `flutter-tetris-0.7.5-android-aarch64.apk` |
+| Windows (x64, Win10+) | `flutter-tetris-0.7.5-windows-x86_64.zip` |
+| Web | `flutter-tetris-0.7.5-web.zip`（解压后起静态服务器） |
 
 ## 开发
 
