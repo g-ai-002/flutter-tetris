@@ -29,13 +29,13 @@
 
 ## 下载
 
-v0.7.2（最新发布）：[Gitea Release](http://192.168.31.120:3020/GTech/flutter-tetris/releases/tag/v0.7.2)
+v0.7.3（最新发布）：[Gitea Release](http://192.168.31.120:3020/GTech/flutter-tetris/releases/tag/v0.7.3)
 
 | 平台 | 产物 |
 | --- | --- |
-| Android (arm64) | `flutter-tetris-0.7.2-android-aarch64.apk` |
-| Windows (x64, Win10+) | `flutter-tetris-0.7.2-windows-x86_64.zip` |
-| Web | `flutter-tetris-0.7.2-web.zip`（解压后起静态服务器） |
+| Android (arm64) | `flutter-tetris-0.7.3-android-aarch64.apk` |
+| Windows (x64, Win10+) | `flutter-tetris-0.7.3-windows-x86_64.zip` |
+| Web | `flutter-tetris-0.7.3-web.zip`（解压后起静态服务器） |
 
 ## 开发
 
@@ -86,8 +86,8 @@ lib/
 
 | 版本 | 说明 |
 | --- | --- |
+| v0.7.3 | 重构对局展示层：对局页与版式分离，侧栏预览与关卡进度卡片统一复用 |
 | v0.7.2 | 新增 30 / 60 / 120Hz 逻辑更新速率三档选项，默认 60Hz 兼顾性能与流畅度 |
 | v0.7.1 | 界面显示优化：三档版式随设备切换、棋盘优先占满高度、窄屏自动横屏全屏，音效增益修复 |
 | v0.7.0 | 新增街机模式：红白机帧表重力与经典计分，19 级封顶，单块预览、无暂存与幽灵 |
 | v0.6.3 | 优化渲染性能：棋盘静态图层缓存、逐帧绘制分配收敛，弹窗期间暂停 Flame 引擎 |
-| v0.6.2 | 修复桌面端键盘失效：棋盘内层焦点不再抢占并吞掉方向键与空格 |
