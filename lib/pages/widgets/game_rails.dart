@@ -63,9 +63,14 @@ class GameRightRail extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _nextLabel(context),
-        const SizedBox(height: 8),
-        ..._previews(controller, palette, previews, 52, 44, 7),
+        NextQueue(
+          controller: controller,
+          palette: palette,
+          count: previews,
+          firstSize: 52,
+          restSize: 44,
+          gap: 7,
+        ),
         const Spacer(),
         if (controller.combo >= 2) ...[
           StatusChip(
@@ -124,59 +129,72 @@ class GameCompactRail extends StatelessWidget {
           ),
           const SizedBox(height: 8),
         ],
-        Text('NEXT', style: _miniLabel(context)),
-        const SizedBox(height: 4),
-        ..._previews(
-          controller,
-          palette,
-          previews,
-          slot * 0.92,
-          slot * 0.86,
-          5,
+        NextQueue(
+          controller: controller,
+          palette: palette,
+          count: previews,
+          firstSize: slot * 0.92,
+          restSize: slot * 0.86,
+          gap: 5,
+          compact: true,
         ),
       ],
     );
   }
 }
 
-Widget _nextLabel(BuildContext context) {
-  return Text(
-    'NEXT',
-    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-      color: Theme.of(context).colorScheme.onSurfaceVariant,
-      letterSpacing: 2,
-    ),
-  );
-}
-
-TextStyle? _miniLabel(BuildContext context) => TextStyle(
-  fontSize: 9,
-  letterSpacing: 1.2,
-  color: Theme.of(context).colorScheme.onSurfaceVariant,
-);
-
 /// 预览队列：第一块更大，其余同尺寸，超出栏高的部分自然裁掉。
-List<Widget> _previews(
-  TetrisController controller,
-  BlockPalette palette,
-  int count,
-  double first,
-  double rest,
-  double gap,
-) {
-  final next = controller.nextQueue;
-  return [
-    for (var i = 0; i < count && i < next.length; i++) ...[
-      if (i > 0) SizedBox(height: gap),
-      PieceSlot(
-        label: '',
-        type: next[i],
-        palette: palette,
-        size: i == 0 ? first : rest,
-        showLabel: false,
-      ),
-    ],
-  ];
+class NextQueue extends StatelessWidget {
+  const NextQueue({
+    super.key,
+    required this.controller,
+    required this.palette,
+    required this.count,
+    required this.firstSize,
+    required this.restSize,
+    required this.gap,
+    this.compact = false,
+  });
+
+  final TetrisController controller;
+  final BlockPalette palette;
+  final int count;
+  final double firstSize;
+  final double restSize;
+  final double gap;
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    final next = controller.nextQueue;
+    final colors = Theme.of(context).colorScheme;
+    final style = compact
+        ? TextStyle(
+            fontSize: 9,
+            letterSpacing: 1.2,
+            color: colors.onSurfaceVariant,
+          )
+        : Theme.of(context).textTheme.labelSmall
+              ?.copyWith(color: colors.onSurfaceVariant, letterSpacing: 2);
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('NEXT', style: style),
+        SizedBox(height: compact ? 4 : 8),
+        for (var i = 0; i < count && i < next.length; i++) ...[
+          if (i > 0) SizedBox(height: gap),
+          PieceSlot(
+            label: '',
+            type: next[i],
+            palette: palette,
+            size: i == 0 ? firstSize : restSize,
+            showLabel: false,
+          ),
+        ],
+      ],
+    );
+  }
 }
 
 /// 桌面端的键盘提示条，按键取自当前键位配置。

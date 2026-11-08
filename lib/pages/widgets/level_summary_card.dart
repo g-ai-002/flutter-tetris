@@ -7,9 +7,16 @@ import 'section_card.dart';
 
 /// 关卡模式的通关进度与累计星级。
 class LevelSummaryCard extends StatelessWidget {
-  const LevelSummaryCard({super.key, required this.settings});
+  const LevelSummaryCard({
+    super.key,
+    required this.settings,
+    this.title = '关卡模式',
+  });
 
   final SettingsProvider settings;
+
+  /// 关卡选择页复用此卡片并把标题改为「挑战进度」。
+  final String title;
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +24,7 @@ class LevelSummaryCard extends StatelessWidget {
     final colors = theme.colorScheme;
     final done = settings.completedLevels;
     return SectionCard(
-      title: '关卡模式',
+      title: title,
       icon: Icons.flag_outlined,
       trailing: Row(
         mainAxisSize: MainAxisSize.min,

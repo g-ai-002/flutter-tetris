@@ -21,7 +21,7 @@ void main() {
     );
 
     expect(find.text('挑战进度'), findsOneWidget);
-    expect(find.text('1 / 12'), findsOneWidget);
+    expect(find.text('已通关 1 / 12 关'), findsOneWidget);
     expect(find.text('初入长安'), findsOneWidget);
     expect(find.text('残垣'), findsOneWidget);
     expect(find.text('最佳 1,200 分'), findsOneWidget);

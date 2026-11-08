@@ -9,7 +9,7 @@ import '../providers/settings_provider.dart';
 import '../theme/app_theme.dart';
 import '../utils/formatters.dart';
 import 'game_page.dart';
-import 'widgets/section_card.dart';
+import 'widgets/level_summary_card.dart';
 import 'widgets/star_rating.dart';
 
 /// 关卡选择：展示通关进度、星级与每关目标。
@@ -68,7 +68,7 @@ class LevelSelectPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      _ProgressCard(settings: settings),
+                      LevelSummaryCard(settings: settings, title: '挑战进度'),
                       const SizedBox(height: 14),
                       Wrap(
                         spacing: gap,
@@ -101,61 +101,6 @@ class LevelSelectPage extends StatelessWidget {
           },
         ),
       ),
-    );
-  }
-}
-
-class _ProgressCard extends StatelessWidget {
-  const _ProgressCard({required this.settings});
-
-  final SettingsProvider settings;
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    final done = settings.completedLevels;
-    return SectionCard(
-      title: '挑战进度',
-      icon: Icons.flag_outlined,
-      trailing: Text(
-        '$done / ${kLevels.length}',
-        style: theme.textTheme.labelMedium?.copyWith(
-          color: colors.primary,
-          fontWeight: FontWeight.w700,
-          fontFeatures: const [FontFeature.tabularFigures()],
-        ),
-      ),
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(3),
-          child: LinearProgressIndicator(
-            value: kLevels.isEmpty ? 0 : done / kLevels.length,
-            minHeight: 6,
-            backgroundColor: colors.outline.withValues(alpha: 0.35),
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Text(
-              '已通关 $done 关',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colors.onSurfaceVariant,
-              ),
-            ),
-            const Spacer(),
-            const Icon(Icons.star_rounded, size: 15, color: appGold),
-            const SizedBox(width: 3),
-            Text(
-              '${settings.totalStars} 星',
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: colors.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-      ],
     );
   }
 }

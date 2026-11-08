@@ -60,8 +60,6 @@ class BlockPalette {
     for (final type in TetrominoType.values) (type, colorOf(type)),
   ];
 
-  Color get boardBackground => boardBottom;
-
   /// 首页等整屏背景的纵向渐变。
   LinearGradient get screenGradient => LinearGradient(
     begin: Alignment.topCenter,

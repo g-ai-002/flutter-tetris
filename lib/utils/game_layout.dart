@@ -34,8 +34,6 @@ class GameLayout {
 
   final GameLayoutKind kind;
 
-  bool get usesRails => kind == GameLayoutKind.rails;
-
   bool get usesSidePads => kind == GameLayoutKind.sidePads;
 
   /// 横屏与矮窗口收起顶部栏的第二行标题，避免挤压棋盘。

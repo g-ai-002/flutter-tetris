@@ -36,7 +36,7 @@ void main() {
       expect(lightColors.length, 7);
       expect(darkColors.length, 7);
       expect(light.legend.length, 7);
-      expect(light.boardBackground, isNot(dark.boardBackground));
+      expect(light.boardBottom, isNot(dark.boardBottom));
     });
 
     test('方块绘制与预览不抛异常', () {
