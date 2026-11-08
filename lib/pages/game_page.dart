@@ -71,9 +71,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
       '开始对局: ${_controller.rules.title}, 逻辑 ${settings.logicRate}Hz',
     );
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        unawaited(enterGameDisplay(size: MediaQuery.sizeOf(context)));
-      }
+      if (mounted) unawaited(enterGameDisplay());
     });
   }
 
@@ -84,7 +82,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
       if (_controller.isPlaying) _controller.pause();
     } else if (state == AppLifecycleState.resumed && mounted) {
       // 系统栏可能在后台被还原，回到前台重新进入沉浸模式。
-      unawaited(enterGameDisplay(size: MediaQuery.sizeOf(context)));
+      unawaited(enterGameDisplay());
     }
   }
 

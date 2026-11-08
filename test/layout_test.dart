@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_tetris/game/game_mode.dart';
 import 'package:flutter_tetris/pages/game_page.dart';
@@ -84,6 +85,33 @@ void main() {
     expect(board.height, greaterThan(844 * 0.62));
     expect(find.text('左移'), findsOneWidget);
     expect(find.text('旋转'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+    await dispose(tester);
+  });
+
+  testWidgets('手机竖屏进入对局不强制横屏', (tester) async {
+    final calls = <MethodCall>[];
+    final messenger =
+        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+    messenger.setMockMethodCallHandler(SystemChannels.platform, (call) async {
+      calls.add(call);
+      return null;
+    });
+    addTearDown(
+      () => messenger.setMockMethodCallHandler(SystemChannels.platform, null),
+    );
+
+    await pumpAt(
+      tester,
+      const Size(390, 844),
+      const GamePage(mode: GameMode.endless),
+    );
+
+    final methods = calls.map((call) => call.method);
+    expect(methods, contains('SystemChrome.setEnabledSystemUIMode'));
+    expect(methods, isNot(contains('SystemChrome.setPreferredOrientations')));
+    final board = tester.getSize(find.byKey(const ValueKey('tetris-board')));
+    expect(board.width / board.height, closeTo(0.5, 0.02));
     expect(tester.takeException(), isNull);
     await dispose(tester);
   });
