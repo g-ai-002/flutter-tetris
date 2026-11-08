@@ -55,36 +55,31 @@ void main() {
 
   group('版式判定', () {
     test('桌面宽窗三栏，窄窗单列，手机横屏双翼', () {
-      expect(
-        GameLayout.of(const Size(1280, 860)).kind,
-        GameLayoutKind.rails,
-      );
-      expect(
-        GameLayout.of(const Size(480, 640)).kind,
-        GameLayoutKind.stack,
-      );
+      expect(GameLayout.of(const Size(1280, 860)).kind, GameLayoutKind.rails);
+      expect(GameLayout.of(const Size(480, 640)).kind, GameLayoutKind.stack);
     });
 
     test('移动端横屏使用两侧操作区', () {
       debugDefaultTargetPlatformOverride = TargetPlatform.android;
-      expect(
-        GameLayout.of(const Size(844, 390)).kind,
-        GameLayoutKind.sidePads,
-      );
-      expect(
-        GameLayout.of(const Size(390, 844)).kind,
-        GameLayoutKind.stack,
-      );
+      expect(GameLayout.of(const Size(844, 390)).kind, GameLayoutKind.sidePads);
+      expect(GameLayout.of(const Size(390, 844)).kind, GameLayoutKind.stack);
     });
   });
 
   testWidgets('手机竖屏棋盘占满宽度且不被操作区挤扁', (tester) async {
-    await pumpAt(tester, const Size(390, 844), const GamePage(mode: GameMode.endless));
+    await pumpAt(
+      tester,
+      const Size(390, 844),
+      const GamePage(mode: GameMode.endless),
+    );
     final board = tester.getSize(find.byKey(const ValueKey('tetris-board')));
     expect(board.width / board.height, closeTo(0.5, 0.02));
     expect(board.height, greaterThan(844 * 0.62));
     expect(find.text('左移'), findsOneWidget);
-    expect(find.text('旋转'), findsOneWidget);
+    expect(find.text('硬降'), findsOneWidget);
+    expect(find.text('右移'), findsOneWidget);
+    expect(find.text('旋转'), findsNothing);
+    expect(find.text('软降'), findsNothing);
     expect(tester.takeException(), isNull);
     await dispose(tester);
   });
@@ -117,7 +112,11 @@ void main() {
   });
 
   testWidgets('手机横屏收起顶栏，棋盘获得接近全屏的高度', (tester) async {
-    await pumpAt(tester, const Size(844, 390), const GamePage(mode: GameMode.sprint));
+    await pumpAt(
+      tester,
+      const Size(844, 390),
+      const GamePage(mode: GameMode.sprint),
+    );
     final board = tester.getSize(find.byKey(const ValueKey('tetris-board')));
     expect(board.width / board.height, closeTo(0.5, 0.02));
     expect(board.height, greaterThan(390 * 0.75));
@@ -140,7 +139,11 @@ void main() {
   });
 
   testWidgets('平板竖屏棋盘随高度放大且不超过单格上限', (tester) async {
-    await pumpAt(tester, const Size(800, 1280), const GamePage(mode: GameMode.endless));
+    await pumpAt(
+      tester,
+      const Size(800, 1280),
+      const GamePage(mode: GameMode.endless),
+    );
     final board = tester.getSize(find.byKey(const ValueKey('tetris-board')));
     expect(board.width / board.height, closeTo(0.5, 0.02));
     expect(board.width, lessThanOrEqualTo(640));
@@ -156,7 +159,8 @@ void main() {
       const GamePage(mode: GameMode.endless),
       platform: TargetPlatform.windows,
     );
-    expect(find.text('HOLD 暂存'), findsOneWidget);
+    expect(find.text('暂存'), findsWidgets);
+    expect(find.text('下一个'), findsOneWidget);
     expect(find.textContaining('移动'), findsOneWidget);
     final board = tester.getSize(find.byKey(const ValueKey('tetris-board')));
     expect(board.height, greaterThan(700));
@@ -198,15 +202,23 @@ void main() {
   });
 
   testWidgets('平板横屏保留侧栏并补齐触控操作', (tester) async {
-    await pumpAt(tester, const Size(1024, 768), const GamePage(mode: GameMode.endless));
-    expect(find.text('HOLD 暂存'), findsOneWidget);
+    await pumpAt(
+      tester,
+      const Size(1024, 768),
+      const GamePage(mode: GameMode.endless),
+    );
+    expect(find.text('暂存'), findsWidgets);
     expect(find.text('左移'), findsOneWidget);
     expect(tester.takeException(), isNull);
     await dispose(tester);
   });
 
   testWidgets('折叠屏展开态竖屏按单列排布', (tester) async {
-    await pumpAt(tester, const Size(673, 841), const GamePage(mode: GameMode.endless));
+    await pumpAt(
+      tester,
+      const Size(673, 841),
+      const GamePage(mode: GameMode.endless),
+    );
     final board = tester.getSize(find.byKey(const ValueKey('tetris-board')));
     expect(board.width, greaterThan(280));
     expect(board.height, greaterThan(550));

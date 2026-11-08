@@ -62,8 +62,8 @@ Future<void> showHelpDialog(BuildContext context) {
                 Text('触屏与鼠标', style: theme.textTheme.titleSmall),
                 const SizedBox(height: 6),
                 Text(
-                  '点击棋盘旋转，左右拖动移动，向下拖动软降，'
-                  '向上滑动暂存；下方按钮可完成全部操作。',
+                  '点击棋盘旋转，左右拖动移动，向下拖动软降，向上滑动暂存；'
+                  '触屏设备底部只保留「左移 / 硬降 / 右移」三键。',
                   style: bodyStyle,
                 ),
                 const SizedBox(height: 14),

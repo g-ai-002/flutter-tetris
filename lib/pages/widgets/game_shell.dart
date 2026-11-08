@@ -237,7 +237,7 @@ class GameShell extends StatelessWidget {
                       () => TouchPad(
                         controller: controller,
                         dense: true,
-                        columns: 2,
+                        vertical: true,
                       ),
                     ),
                   ),
@@ -250,7 +250,7 @@ class GameShell extends StatelessWidget {
     );
   }
 
-  /// 竖屏单列版式：数值在顶、棋盘中列、操作区贴底。
+  /// 竖屏单列版式：数值在顶，信息栏贴左、棋盘中列，操作区贴底。
   Widget _buildStack(Size size) {
     final short = size.height < 620;
     final rail = size.width >= 600 ? 76.0 : (size.width < 360 ? 52.0 : 58.0);
@@ -265,8 +265,6 @@ class GameShell extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 10),
             child: Row(
               children: [
-                Expanded(child: _buildBoard()),
-                const SizedBox(width: 6),
                 _sized(
                   rail,
                   () => GameCompactRail(
@@ -275,6 +273,8 @@ class GameShell extends StatelessWidget {
                     width: rail,
                   ),
                 ),
+                const SizedBox(width: 6),
+                Expanded(child: _buildBoard()),
               ],
             ),
           ),

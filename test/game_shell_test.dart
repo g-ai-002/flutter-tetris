@@ -54,8 +54,8 @@ void main() {
     await tester.pump();
 
     expect(find.text('经典模式'), findsOneWidget);
-    expect(find.text('HOLD 暂存'), findsOneWidget);
-    expect(find.text('NEXT'), findsOneWidget);
+    expect(find.text('暂存'), findsOneWidget);
+    expect(find.text('下一个'), findsOneWidget);
     expect(find.text('分数'), findsOneWidget);
     expect(find.text('消行'), findsOneWidget);
     expect(find.text('等级'), findsOneWidget);
@@ -72,11 +72,32 @@ void main() {
     await tester.pump();
 
     expect(find.text('经典模式'), findsOneWidget);
-    expect(find.text('HOLD 暂存'), findsNothing);
     expect(find.text('暂存'), findsOneWidget);
+    expect(find.text('下一个'), findsOneWidget);
     expect(find.text('左移'), findsOneWidget);
+    expect(find.text('硬降'), findsOneWidget);
     expect(find.text('右移'), findsOneWidget);
+    expect(find.text('旋转'), findsNothing);
+    expect(find.text('软降'), findsNothing);
     expect(find.text('分数'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
+
+  testWidgets('窄屏信息栏贴在棋盘左侧', (tester) async {
+    tester.view.physicalSize = const Size(390, 844);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(shell());
+    await tester.pump();
+
+    final railRight = tester.getTopRight(find.text('下一个')).dx;
+    final boardLeft = tester
+        .getTopLeft(find.byKey(const ValueKey('tetris-board')))
+        .dx;
+    expect(railRight, lessThan(boardLeft));
+    expect(find.text('暂存'), findsOneWidget);
     await tester.pumpWidget(const SizedBox.shrink());
   });
 }

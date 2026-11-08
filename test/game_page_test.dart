@@ -39,8 +39,8 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.text('经典模式'), findsOneWidget);
-    expect(find.text('HOLD 暂存'), findsOneWidget);
-    expect(find.text('NEXT'), findsOneWidget);
+    expect(find.text('暂存'), findsOneWidget);
+    expect(find.text('下一个'), findsOneWidget);
     expect(find.text('分数'), findsOneWidget);
     expect(find.text('消行'), findsOneWidget);
     expect(find.text('等级'), findsOneWidget);
@@ -51,9 +51,7 @@ void main() {
   });
 
   testWidgets('对局按偏好使用 120Hz 逻辑更新速率', (tester) async {
-    final custom = await prepareStorage({
-      AppConstants.prefKeyLogicRate: 120,
-    });
+    final custom = await prepareStorage({AppConstants.prefKeyLogicRate: 120});
     LogService.reset();
     tester.view.physicalSize = const Size(1280, 960);
     tester.view.devicePixelRatio = 1.0;
@@ -96,7 +94,7 @@ void main() {
         .game!;
     expect(find.text('街机模式'), findsOneWidget);
     expect(find.textContaining('街机计分'), findsOneWidget);
-    expect(find.text('HOLD 暂存'), findsNothing);
+    expect(find.text('暂存'), findsNothing);
     expect(game.controller.nextQueue, hasLength(1));
     expect(game.controller.rules.holdEnabled, isFalse);
     expect(tester.takeException(), isNull);
@@ -121,11 +119,12 @@ void main() {
 
     expect(find.text('40 行竞速'), findsOneWidget);
     expect(find.text('暂存'), findsOneWidget);
-    expect(find.text('旋转'), findsOneWidget);
-    expect(find.text('硬降'), findsOneWidget);
+    expect(find.text('下一个'), findsOneWidget);
     expect(find.text('左移'), findsOneWidget);
-    expect(find.text('软降'), findsOneWidget);
+    expect(find.text('硬降'), findsOneWidget);
     expect(find.text('右移'), findsOneWidget);
+    expect(find.text('旋转'), findsNothing);
+    expect(find.text('软降'), findsNothing);
     expect(tester.takeException(), isNull);
 
     await tester.pumpWidget(const SizedBox.shrink());
@@ -169,7 +168,7 @@ void main() {
     expect(find.text('每日挑战 · 11 月 5 日'), findsOneWidget);
     expect(find.textContaining('固定牌序'), findsWidgets);
     expect(find.textContaining('剩余 02:00'), findsWidgets);
-    expect(find.text('HOLD 暂存'), findsOneWidget);
+    expect(find.text('暂存'), findsOneWidget);
     expect(tester.takeException(), isNull);
 
     await tester.pumpWidget(const SizedBox.shrink());

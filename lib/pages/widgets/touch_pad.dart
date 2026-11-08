@@ -3,79 +3,67 @@ import 'package:flutter/material.dart';
 import '../../game/tetris_controller.dart';
 import '../../input/action_repeat.dart';
 
-/// 触屏操作区。
-/// 竖屏默认三列两行；[columns] 为 2 时改为两列三行，供横屏侧栏使用。
+/// 触屏操作区：只保留左移、硬降与右移三键，旋转与软降交给棋盘手势。
+/// [vertical] 供横屏侧栏使用，三键纵向排布；默认横向一行贴底。
 /// [dense] 收窄按键高度，把空间还给棋盘。
 class TouchPad extends StatelessWidget {
   const TouchPad({
     super.key,
     required this.controller,
     this.dense = false,
-    this.columns = 3,
+    this.vertical = false,
   });
 
   final TetrisController controller;
   final bool dense;
-  final int columns;
-
-  List<_Spec> _specs(ColorScheme colors, bool enabled) {
-    final hold = controller.rules.holdEnabled;
-    if (columns == 2) {
-      return [
-        _Spec('左移', Icons.arrow_back_rounded, colors.onSurfaceVariant,
-            enabled ? controller.moveLeft : null, repeat: true),
-        _Spec('右移', Icons.arrow_forward_rounded, colors.onSurfaceVariant,
-            enabled ? controller.moveRight : null, repeat: true),
-        _Spec('软降', Icons.arrow_downward_rounded, colors.onSurfaceVariant,
-            enabled ? controller.softDrop : null, repeat: true),
-        _Spec('旋转', Icons.rotate_right_rounded, colors.primary,
-            enabled ? controller.rotateClockwise : null),
-        _Spec('硬降', Icons.vertical_align_bottom_rounded, colors.tertiary,
-            enabled ? controller.hardDrop : null),
-        if (hold)
-          _Spec('暂存', Icons.inventory_2_outlined, colors.secondary,
-              controller.canHold ? controller.hold : null),
-      ];
-    }
-    return [
-      if (hold)
-        _Spec('暂存', Icons.inventory_2_outlined, colors.secondary,
-            controller.canHold ? controller.hold : null),
-      _Spec('旋转', Icons.rotate_right_rounded, colors.primary,
-          enabled ? controller.rotateClockwise : null),
-      _Spec('硬降', Icons.vertical_align_bottom_rounded, colors.tertiary,
-          enabled ? controller.hardDrop : null),
-      _Spec('左移', Icons.arrow_back_rounded, colors.onSurfaceVariant,
-          enabled ? controller.moveLeft : null, repeat: true),
-      _Spec('软降', Icons.arrow_downward_rounded, colors.onSurfaceVariant,
-          enabled ? controller.softDrop : null, repeat: true),
-      _Spec('右移', Icons.arrow_forward_rounded, colors.onSurfaceVariant,
-          enabled ? controller.moveRight : null, repeat: true),
-    ];
-  }
+  final bool vertical;
 
   @override
   Widget build(BuildContext context) {
-    final specs = _specs(Theme.of(context).colorScheme, controller.canControl);
+    final colors = Theme.of(context).colorScheme;
+    final enabled = controller.canControl;
+    final specs = [
+      _Spec(
+        '左移',
+        Icons.arrow_back_rounded,
+        colors.onSurfaceVariant,
+        enabled ? controller.moveLeft : null,
+        repeat: true,
+      ),
+      _Spec(
+        '硬降',
+        Icons.vertical_align_bottom_rounded,
+        colors.tertiary,
+        enabled ? controller.hardDrop : null,
+      ),
+      _Spec(
+        '右移',
+        Icons.arrow_forward_rounded,
+        colors.onSurfaceVariant,
+        enabled ? controller.moveRight : null,
+        repeat: true,
+      ),
+    ];
     final height = dense ? 44.0 : 50.0;
-    return Padding(
-      padding: EdgeInsets.fromLTRB(10, 2, 10, dense ? 4 : 8),
-      child: Column(
+    if (vertical) {
+      return Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          for (var i = 0; i < specs.length; i += columns) ...[
-            if (i > 0) SizedBox(height: dense ? 5 : 8),
-            Row(
-              children: [
-                for (var j = 0; j < columns; j++) ...[
-                  if (j > 0) const SizedBox(width: 8),
-                  Expanded(
-                    child: i + j < specs.length
-                        ? _PadButton(spec: specs[i + j], height: height)
-                        : const SizedBox.shrink(),
-                  ),
-                ],
-              ],
+          for (var i = 0; i < specs.length; i++) ...[
+            if (i > 0) SizedBox(height: dense ? 6 : 8),
+            _PadButton(spec: specs[i], height: height),
+          ],
+        ],
+      );
+    }
+    return Padding(
+      padding: EdgeInsets.fromLTRB(10, 2, 10, dense ? 4 : 8),
+      child: Row(
+        children: [
+          for (var i = 0; i < specs.length; i++) ...[
+            if (i > 0) const SizedBox(width: 8),
+            Expanded(
+              child: _PadButton(spec: specs[i], height: height),
             ),
           ],
         ],
@@ -85,8 +73,13 @@ class TouchPad extends StatelessWidget {
 }
 
 class _Spec {
-  const _Spec(this.label, this.icon, this.accent, this.onPressed,
-      {this.repeat = false});
+  const _Spec(
+    this.label,
+    this.icon,
+    this.accent,
+    this.onPressed, {
+    this.repeat = false,
+  });
 
   final String label;
   final IconData icon;

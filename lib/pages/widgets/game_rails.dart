@@ -27,7 +27,7 @@ class GameLeftRail extends StatelessWidget {
       children: [
         if (controller.rules.holdEnabled) ...[
           PieceSlot(
-            label: 'HOLD 暂存',
+            label: '暂存',
             type: controller.holdType,
             palette: palette,
             size: 62,
@@ -98,7 +98,7 @@ class GameRightRail extends StatelessWidget {
   }
 }
 
-/// 窄屏右侧栏：紧凑的暂存与三个预览，尺寸跟随栏宽。
+/// 窄屏左侧栏：紧凑的暂存与三个预览，尺寸跟随栏宽。
 class GameCompactRail extends StatelessWidget {
   const GameCompactRail({
     super.key,
@@ -117,14 +117,14 @@ class GameCompactRail extends StatelessWidget {
     final slot = width * 0.66;
     return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (controller.rules.holdEnabled) ...[
           PieceSlot(
-            label: 'HOLD',
+            label: '暂存',
             type: controller.holdType,
             palette: palette,
             size: slot,
-            showLabel: false,
             onTap: controller.canHold ? controller.hold : null,
           ),
           const SizedBox(height: 8),
@@ -180,7 +180,7 @@ class NextQueue extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('NEXT', style: style),
+        Text('下一个', style: style),
         SizedBox(height: compact ? 4 : 8),
         for (var i = 0; i < count && i < next.length; i++) ...[
           if (i > 0) SizedBox(height: gap),

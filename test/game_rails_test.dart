@@ -36,7 +36,7 @@ void main() {
       ),
     );
     await tester.pump();
-    expect(find.text('NEXT'), findsOneWidget);
+    expect(find.text('下一个'), findsOneWidget);
     expect(find.byType(PieceSlot), findsNWidgets(5));
     await tester.pumpWidget(const SizedBox.shrink());
     standard.dispose();
@@ -55,7 +55,7 @@ void main() {
     arcade.dispose();
   });
 
-  testWidgets('紧凑侧栏最多展示三块预览', (tester) async {
+  testWidgets('紧凑侧栏最多展示三块预览并标注中文', (tester) async {
     final controller = TetrisController(mode: GameMode.endless, autoTick: false)
       ..start();
     await tester.pumpWidget(
@@ -65,7 +65,10 @@ void main() {
       ),
     );
     await tester.pump();
-    expect(find.text('NEXT'), findsOneWidget);
+    expect(find.text('下一个'), findsOneWidget);
+    expect(find.text('暂存'), findsOneWidget);
+    expect(find.text('NEXT'), findsNothing);
+    expect(find.text('HOLD'), findsNothing);
     expect(find.byType(PieceSlot), findsNWidgets(4));
     await tester.pumpWidget(const SizedBox.shrink());
     controller.dispose();
