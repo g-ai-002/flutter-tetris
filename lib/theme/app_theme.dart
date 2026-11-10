@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../utils/system_ui.dart';
 import 'block_palette.dart';
 
 export 'block_painting.dart';
@@ -83,6 +84,7 @@ ThemeData _buildBase({required BlockPalette palette, String? fontFamily}) {
       scrolledUnderElevation: 0,
       centerTitle: true,
       surfaceTintColor: Colors.transparent,
+      systemOverlayStyle: systemOverlayStyleFor(palette.backdrop),
       toolbarHeight: 52,
       titleTextStyle: TextStyle(
         fontSize: 17,
