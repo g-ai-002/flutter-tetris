@@ -41,12 +41,7 @@ TSpinInfo detectTSpin({
 List<(int, int)> _cornersOf(ActivePiece piece) {
   final cx = piece.x + 1;
   final cy = piece.y + 1;
-  return [
-    (cx - 1, cy - 1),
-    (cx + 1, cy - 1),
-    (cx - 1, cy + 1),
-    (cx + 1, cy + 1),
-  ];
+  return [(cx - 1, cy - 1), (cx + 1, cy - 1), (cx - 1, cy + 1), (cx + 1, cy + 1)];
 }
 
 bool _isBlocked(Board board, int x, int y) {

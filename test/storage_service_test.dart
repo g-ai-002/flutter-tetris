@@ -89,36 +89,18 @@ void main() {
     test('40 行竞速单独记录最快时间', () async {
       final storage = await prepareStorage();
       final first = await storage.recordResult(
-        result(
-          mode: GameMode.sprint,
-          score: 300,
-          lines: 40,
-          elapsedMs: 95000,
-          won: true,
-        ),
+        result(mode: GameMode.sprint, score: 300, lines: 40, elapsedMs: 95000, won: true),
       );
       expect(first.newBestTime, isTrue);
       expect(storage.bestSprintTimeMs, 95000);
 
       await storage.recordResult(
-        result(
-          mode: GameMode.sprint,
-          score: 400,
-          lines: 40,
-          elapsedMs: 120000,
-          won: true,
-        ),
+        result(mode: GameMode.sprint, score: 400, lines: 40, elapsedMs: 120000, won: true),
       );
       expect(storage.bestSprintTimeMs, 95000);
 
       final faster = await storage.recordResult(
-        result(
-          mode: GameMode.sprint,
-          score: 500,
-          lines: 40,
-          elapsedMs: 80000,
-          won: true,
-        ),
+        result(mode: GameMode.sprint, score: 500, lines: 40, elapsedMs: 80000, won: true),
       );
       expect(faster.newBestTime, isTrue);
       expect(storage.bestSprintTimeMs, 80000);
@@ -207,13 +189,7 @@ void main() {
     test('清空纪录同时删除关卡进度', () async {
       final storage = await prepareStorage();
       await storage.recordResult(
-        result(
-          mode: GameMode.level,
-          levelId: 1,
-          won: true,
-          stars: 3,
-          elapsedMs: 20000,
-        ),
+        result(mode: GameMode.level, levelId: 1, won: true, stars: 3, elapsedMs: 20000),
       );
       expect(storage.completedLevels, 1);
       await storage.clearRecords();
@@ -230,13 +206,7 @@ void main() {
       );
 
       final first = await storage.recordResult(
-        result(
-          mode: GameMode.daily,
-          score: 1500,
-          lines: 12,
-          level: 3,
-          challengeKey: today.key,
-        ),
+        result(mode: GameMode.daily, score: 1500, lines: 12, level: 3, challengeKey: today.key),
       );
       expect(first.newBestScore, isTrue);
       expect(storage.dailyRecord(today.key).bestScore, 1500);
@@ -246,24 +216,14 @@ void main() {
       expect(storage.dailyStreak(today.date), 1);
 
       final lower = await storage.recordResult(
-        result(
-          mode: GameMode.daily,
-          score: 900,
-          lines: 8,
-          challengeKey: today.key,
-        ),
+        result(mode: GameMode.daily, score: 900, lines: 8, challengeKey: today.key),
       );
       expect(lower.newBestScore, isFalse);
       expect(storage.dailyRecord(today.key).bestScore, 1500);
       expect(storage.dailyRecord(today.key).plays, 2);
 
       await storage.recordResult(
-        result(
-          mode: GameMode.daily,
-          score: 600,
-          lines: 5,
-          challengeKey: yesterday.key,
-        ),
+        result(mode: GameMode.daily, score: 600, lines: 5, challengeKey: yesterday.key),
       );
       expect(storage.dailyStreak(today.date), 2);
 
@@ -275,14 +235,7 @@ void main() {
     test('生涯统计累计四行、T-Spin、全消与最高连击', () async {
       final storage = await prepareStorage();
       await storage.recordResult(
-        result(
-          score: 8000,
-          lines: 20,
-          maxCombo: 9,
-          tetrises: 2,
-          tSpins: 1,
-          perfectClears: 1,
-        ),
+        result(score: 8000, lines: 20, maxCombo: 9, tetrises: 2, tSpins: 1, perfectClears: 1),
       );
       await storage.recordResult(
         result(score: 12000, lines: 4, maxCombo: 4, tetrises: 1, tSpins: 2),
@@ -354,9 +307,7 @@ void main() {
 
     test('清空纪录同时清空成就与生涯计数', () async {
       final storage = await prepareStorage();
-      await storage.recordResult(
-        result(tetrises: 2, tSpins: 1, perfectClears: 1, maxCombo: 6),
-      );
+      await storage.recordResult(result(tetrises: 2, tSpins: 1, perfectClears: 1, maxCombo: 6));
       expect(storage.unlockedAchievements, isNotEmpty);
 
       await storage.clearRecords();

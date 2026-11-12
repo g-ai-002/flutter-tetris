@@ -6,10 +6,7 @@ import 'tetromino.dart';
 class Board {
   Board({this.columns = 10, this.rows = 21, this.hiddenRows = 1})
     : assert(rows > hiddenRows && hiddenRows >= 0),
-      _cells = List.generate(
-        rows,
-        (_) => List<TetrominoType?>.filled(columns, null),
-      ),
+      _cells = List.generate(rows, (_) => List<TetrominoType?>.filled(columns, null)),
       _garbage = List.generate(rows, (_) => List<bool>.filled(columns, false));
 
   final int columns;
@@ -164,10 +161,7 @@ class Board {
   }
 
   void reset() {
-    _cells = List.generate(
-      rows,
-      (_) => List<TetrominoType?>.filled(columns, null),
-    );
+    _cells = List.generate(rows, (_) => List<TetrominoType?>.filled(columns, null));
     _garbage = List.generate(rows, (_) => List<bool>.filled(columns, false));
   }
 }

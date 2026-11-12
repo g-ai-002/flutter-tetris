@@ -12,22 +12,10 @@ class ModeVisual {
 }
 
 ModeVisual modeVisualFor(GameMode mode, ColorScheme colors) => switch (mode) {
-  GameMode.endless => ModeVisual(
-    icon: Icons.all_inclusive_rounded,
-    accent: colors.primary,
-  ),
-  GameMode.sprint => const ModeVisual(
-    icon: Icons.timer_outlined,
-    accent: appJade,
-  ),
+  GameMode.endless => ModeVisual(icon: Icons.all_inclusive_rounded, accent: colors.primary),
+  GameMode.sprint => const ModeVisual(icon: Icons.timer_outlined, accent: appJade),
   GameMode.ultra => const ModeVisual(icon: Icons.bolt_rounded, accent: appGold),
-  GameMode.arcade => const ModeVisual(
-    icon: Icons.videogame_asset_rounded,
-    accent: appJade,
-  ),
+  GameMode.arcade => const ModeVisual(icon: Icons.videogame_asset_rounded, accent: appJade),
   GameMode.level => const ModeVisual(icon: Icons.flag_rounded, accent: appJade),
-  GameMode.daily => ModeVisual(
-    icon: Icons.today_rounded,
-    accent: colors.primary,
-  ),
+  GameMode.daily => ModeVisual(icon: Icons.today_rounded, accent: colors.primary),
 };

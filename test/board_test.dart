@@ -17,29 +17,11 @@ void main() {
     test('越界与已占用格子不能放置', () {
       const i = ActivePiece(type: TetrominoType.i, x: 0, y: 0);
       expect(board.fits(i.blocks), isTrue);
-      expect(
-        board.fits(const ActivePiece(type: TetrominoType.i, x: 7, y: 0).blocks),
-        isFalse,
-      );
-      expect(
-        board.fits(
-          const ActivePiece(type: TetrominoType.i, x: -1, y: 0).blocks,
-        ),
-        isFalse,
-      );
-      expect(
-        board.fits(
-          const ActivePiece(type: TetrominoType.o, x: 3, y: 20).blocks,
-        ),
-        isFalse,
-      );
+      expect(board.fits(const ActivePiece(type: TetrominoType.i, x: 7, y: 0).blocks), isFalse);
+      expect(board.fits(const ActivePiece(type: TetrominoType.i, x: -1, y: 0).blocks), isFalse);
+      expect(board.fits(const ActivePiece(type: TetrominoType.o, x: 3, y: 20).blocks), isFalse);
       board.setCell(4, 20, TetrominoType.t);
-      expect(
-        board.fits(
-          const ActivePiece(type: TetrominoType.o, x: 3, y: 19).blocks,
-        ),
-        isFalse,
-      );
+      expect(board.fits(const ActivePiece(type: TetrominoType.o, x: 3, y: 19).blocks), isFalse);
     });
 
     test('落定后可读取格子类型', () {

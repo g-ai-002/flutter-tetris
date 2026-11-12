@@ -23,8 +23,7 @@ class AppConstants {
   static const List<int> logicRates = [30, 60, 120];
   static const int defaultLogicRate = 60;
 
-  static Duration logicInterval(int hz) =>
-      Duration(microseconds: 1000000 ~/ hz);
+  static Duration logicInterval(int hz) => Duration(microseconds: 1000000 ~/ hz);
 
   static const String prefKeyGamesPlayed = 'games_played';
   static const String prefKeyTotalLines = 'total_lines';

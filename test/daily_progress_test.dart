@@ -21,8 +21,7 @@ GameResult dailyResult({
     elapsed: Duration(milliseconds: elapsedMs),
     won: false,
     reason: '时间到',
-    challengeKey:
-        key ?? DailyChallenge.forDate(date ?? DateTime(2026, 11, 5)).key,
+    challengeKey: key ?? DailyChallenge.forDate(date ?? DateTime(2026, 11, 5)).key,
   );
 }
 
@@ -69,9 +68,7 @@ void main() {
     test('连续打卡跨天累计，遇缺口归零', () {
       var progress = DailyProgress.empty();
       for (final day in [5, 4, 3, 1]) {
-        progress = progress
-            .merge(dailyResult(date: DateTime(2026, 11, day)))
-            .progress;
+        progress = progress.merge(dailyResult(date: DateTime(2026, 11, day))).progress;
       }
       expect(progress.streak(DateTime(2026, 11, 5)), 3);
       expect(progress.streak(DateTime(2026, 11, 6)), 3);

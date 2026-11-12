@@ -15,12 +15,7 @@ void main() {
       }
       final info = detectTSpin(
         board: board,
-        piece: const ActivePiece(
-          type: TetrominoType.t,
-          x: 3,
-          y: 4,
-          rotation: 1,
-        ),
+        piece: const ActivePiece(type: TetrominoType.t, x: 3, y: 4, rotation: 1),
         lastActionRotate: true,
       );
       expect(info.isTSpin, isTrue);
@@ -33,12 +28,7 @@ void main() {
       }
       final info = detectTSpin(
         board: board,
-        piece: const ActivePiece(
-          type: TetrominoType.t,
-          x: 3,
-          y: 4,
-          rotation: 1,
-        ),
+        piece: const ActivePiece(type: TetrominoType.t, x: 3, y: 4, rotation: 1),
         lastActionRotate: true,
       );
       expect(info.isTSpin, isTrue);
@@ -53,12 +43,7 @@ void main() {
       }
       final info = detectTSpin(
         board: board,
-        piece: const ActivePiece(
-          type: TetrominoType.t,
-          x: 3,
-          y: 4,
-          rotation: 1,
-        ),
+        piece: const ActivePiece(type: TetrominoType.t, x: 3, y: 4, rotation: 1),
         lastActionRotate: false,
       );
       expect(info.isTSpin, isFalse);

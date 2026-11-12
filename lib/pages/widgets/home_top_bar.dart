@@ -47,17 +47,10 @@ class HomeTopBar extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              AppConstants.appName,
-              style: theme.textTheme.titleSmall?.copyWith(fontSize: 15),
-            ),
+            Text(AppConstants.appName, style: theme.textTheme.titleSmall?.copyWith(fontSize: 15)),
             Text(
               AppConstants.appEnglishName,
-              style: TextStyle(
-                fontSize: 8.5,
-                letterSpacing: 2.2,
-                color: colors.onSurfaceVariant,
-              ),
+              style: TextStyle(fontSize: 8.5, letterSpacing: 2.2, color: colors.onSurfaceVariant),
             ),
           ],
         ),
@@ -65,23 +58,20 @@ class HomeTopBar extends StatelessWidget {
         IconButton(
           tooltip: darkMode ? '切换浅色' : '切换深色',
           onPressed: () => settings.setDarkMode(!settings.darkMode),
-          icon: Icon(
-            darkMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-            size: 21,
-          ),
+          icon: Icon(darkMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined, size: 21),
         ),
         IconButton(
           tooltip: '本地纪录',
-          onPressed: () => Navigator.of(
-            context,
-          ).push(MaterialPageRoute<void>(builder: (_) => const RecordsPage())),
+          onPressed: () =>
+              Navigator.of(context)
+                  .push(MaterialPageRoute<void>(builder: (_) => const RecordsPage())),
           icon: const Icon(Icons.emoji_events_outlined, size: 21),
         ),
         IconButton(
           tooltip: '设置',
-          onPressed: () => Navigator.of(
-            context,
-          ).push(MaterialPageRoute<void>(builder: (_) => const SettingsPage())),
+          onPressed: () =>
+              Navigator.of(context)
+                  .push(MaterialPageRoute<void>(builder: (_) => const SettingsPage())),
           icon: const Icon(Icons.settings_outlined, size: 21),
         ),
       ],

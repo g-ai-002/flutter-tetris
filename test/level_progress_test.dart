@@ -42,9 +42,7 @@ void main() {
     });
 
     test('序列化与解析保持纪录字段', () {
-      final merged = LevelProgress.empty()
-          .merge(result(score: 1200, won: true, stars: 2))
-          .progress;
+      final merged = LevelProgress.empty().merge(result(score: 1200, won: true, stars: 2)).progress;
       final decoded = LevelProgress.decode(merged.encode());
       final record = decoded.record(1);
       expect(record.completed, isTrue);
@@ -83,9 +81,7 @@ void main() {
       final first = LevelProgress.empty()
           .merge(result(won: true, stars: 2, elapsedMs: 50000))
           .progress;
-      final second = first.merge(
-        result(score: 800, won: true, stars: 3, elapsedMs: 60000),
-      );
+      final second = first.merge(result(score: 800, won: true, stars: 3, elapsedMs: 60000));
       expect(second.newBestScore, isFalse);
       expect(second.newBestStars, isTrue);
       expect(second.newBestTime, isFalse);

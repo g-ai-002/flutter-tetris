@@ -34,9 +34,7 @@ class SkinOptionCard extends StatelessWidget {
           width: 152,
           padding: const EdgeInsets.fromLTRB(10, 9, 10, 9),
           decoration: BoxDecoration(
-            color: selected
-                ? palette.primaryContainer
-                : theme.colorScheme.surface,
+            color: selected ? palette.primaryContainer : theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(10),
             border: Border.all(
               color: selected ? palette.accent : theme.colorScheme.outline,
@@ -73,8 +71,7 @@ class SkinOptionCard extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  if (selected)
-                    Icon(Icons.check_rounded, size: 14, color: palette.accent),
+                  if (selected) Icon(Icons.check_rounded, size: 14, color: palette.accent),
                 ],
               ),
             ],

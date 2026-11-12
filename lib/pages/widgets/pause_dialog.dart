@@ -16,9 +16,7 @@ Future<void> showPauseDialog(
     barrierDismissible: false,
     builder: (dialogContext) {
       final level = controller.levelDef;
-      final label = level == null
-          ? controller.mode.label
-          : '第 ${level.id} 关 · ${level.name}';
+      final label = level == null ? controller.mode.label : '第 ${level.id} 关 · ${level.name}';
       return AlertDialog(
         title: const Text('已暂停'),
         content: Column(
@@ -29,9 +27,8 @@ Future<void> showPauseDialog(
             const SizedBox(height: 6),
             Text(
               '消行 ${controller.lines} · 等级 ${controller.level}',
-              style: Theme.of(dialogContext).textTheme.bodySmall?.copyWith(
-                color: Theme.of(dialogContext).colorScheme.onSurfaceVariant,
-              ),
+              style: Theme.of(dialogContext).textTheme.bodySmall
+                  ?.copyWith(color: Theme.of(dialogContext).colorScheme.onSurfaceVariant),
             ),
           ],
         ),

@@ -56,23 +56,7 @@ int levelForLines(int lines, {int startLevel = 1}) {
 
 /// 每级的下落间隔，数值取自 Guideline 速度表并做上限收敛。
 Duration gravityForLevel(int level) {
-  const table = <int>[
-    1000,
-    793,
-    618,
-    473,
-    355,
-    262,
-    190,
-    135,
-    94,
-    64,
-    43,
-    28,
-    18,
-    11,
-    7,
-  ];
+  const table = <int>[1000, 793, 618, 473, 355, 262, 190, 135, 94, 64, 43, 28, 18, 11, 7];
   final index = (level - 1).clamp(0, table.length - 1);
   return Duration(milliseconds: table[index]);
 }
@@ -96,27 +80,7 @@ int arcadeLevelForLines(int lines, {int startLevel = 1}) {
 
 /// 红白机速度表：每级下落一行所需帧数（60 帧/秒），19 级最快 50ms。
 Duration arcadeGravityForLevel(int level) {
-  const frames = <int>[
-    48,
-    43,
-    38,
-    33,
-    28,
-    23,
-    18,
-    13,
-    8,
-    6,
-    5,
-    5,
-    5,
-    4,
-    4,
-    4,
-    3,
-    3,
-    3,
-  ];
+  const frames = <int>[48, 43, 38, 33, 28, 23, 18, 13, 8, 6, 5, 5, 5, 4, 4, 4, 3, 3, 3];
   final index = (level - 1).clamp(0, kArcadeMaxLevel - 1);
   return Duration(milliseconds: (frames[index] * 1000 / 60).round());
 }

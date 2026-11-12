@@ -30,17 +30,14 @@ class AchievementsCard extends StatelessWidget {
       children: [
         Text(
           '对局表现会累计到生涯进度，解锁后永久保留。',
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: colors.onSurfaceVariant,
-          ),
+          style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
         ),
         const SizedBox(height: 10),
         LayoutBuilder(
           builder: (context, constraints) {
             final columns = constraints.maxWidth >= 520 ? 3 : 2;
             const spacing = 8.0;
-            final width =
-                (constraints.maxWidth - spacing * (columns - 1)) / columns;
+            final width = (constraints.maxWidth - spacing * (columns - 1)) / columns;
             return Wrap(
               spacing: spacing,
               runSpacing: spacing,
@@ -99,9 +96,7 @@ class _AchievementTile extends StatelessWidget {
             Icon(
               achievement.icon,
               size: 18,
-              color: unlocked
-                  ? appGold
-                  : colors.onSurfaceVariant.withValues(alpha: 0.55),
+              color: unlocked ? appGold : colors.onSurfaceVariant.withValues(alpha: 0.55),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -114,9 +109,7 @@ class _AchievementTile extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.w600,
-                      color: unlocked
-                          ? colors.onSurface
-                          : colors.onSurfaceVariant,
+                      color: unlocked ? colors.onSurface : colors.onSurfaceVariant,
                     ),
                   ),
                   const SizedBox(height: 2),

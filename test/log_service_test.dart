@@ -44,9 +44,7 @@ void main() {
     });
 
     test('日志目录不可用时降级为内存模式', () async {
-      await LogService.init(
-        logRoot: () async => throw const FileSystemException('denied'),
-      );
+      await LogService.init(logRoot: () async => throw const FileSystemException('denied'));
       LogService.info('仍然可用');
       expect(LogService.getRecentLogs().join(), contains('仍然可用'));
       expect(LogService.logFilePath, '');

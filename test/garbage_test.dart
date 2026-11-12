@@ -45,8 +45,7 @@ void main() {
       List<int> run() {
         final spawner = GarbageSpawner(rule: rule, seed: 99);
         return [
-          for (var i = 0; i < 3; i++)
-            ...spawner.advance(const Duration(seconds: 1), 10).single,
+          for (var i = 0; i < 3; i++) ...spawner.advance(const Duration(seconds: 1), 10).single,
         ];
       }
 
@@ -54,9 +53,7 @@ void main() {
       expect(run(), first);
 
       final spawner = GarbageSpawner(rule: rule, seed: 99);
-      final before = [
-        ...spawner.advance(const Duration(seconds: 1), 10).single,
-      ];
+      final before = [...spawner.advance(const Duration(seconds: 1), 10).single];
       spawner.reset();
       expect(spawner.rises, 0);
       expect(spawner.secondsLeft, 1);
@@ -65,10 +62,7 @@ void main() {
     });
 
     test('零间隔与非法列数不会产出缺口', () {
-      final spawner = GarbageSpawner(
-        rule: const GarbageRule(interval: Duration.zero),
-        seed: 1,
-      );
+      final spawner = GarbageSpawner(rule: const GarbageRule(interval: Duration.zero), seed: 1);
       expect(spawner.advance(const Duration(seconds: 1), 10), isEmpty);
 
       final valid = GarbageSpawner(

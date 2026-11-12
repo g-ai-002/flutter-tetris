@@ -21,12 +21,7 @@ void main() {
     test('抵住左墙时借踢墙完成旋转', () {
       // T 形竖立态，包围盒向左伸出一格，顺时针旋转需要左移后仍越界，
       // 标准踢墙表会把它推到右侧一格。
-      const piece = ActivePiece(
-        type: TetrominoType.t,
-        x: -1,
-        y: 5,
-        rotation: 1,
-      );
+      const piece = ActivePiece(type: TetrominoType.t, x: -1, y: 5, rotation: 1);
       expect(board.fits(piece.blocks), isTrue);
       final rotated = tryRotate(board, piece, 1);
       expect(rotated, isNotNull);

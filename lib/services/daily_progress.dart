@@ -23,12 +23,7 @@ class DailyRecord {
 
   bool get played => plays > 0;
 
-  DailyRecord copyWith({
-    int? bestScore,
-    int? bestLines,
-    int? bestLevel,
-    int? plays,
-  }) => DailyRecord(
+  DailyRecord copyWith({int? bestScore, int? bestLines, int? bestLevel, int? plays}) => DailyRecord(
     key: key,
     bestScore: bestScore ?? this.bestScore,
     bestLines: bestLines ?? this.bestLines,
@@ -88,10 +83,7 @@ class DailyProgress {
       if (decoded is! Map) return DailyProgress.empty();
       final records = <String, DailyRecord>{};
       for (final entry in decoded.entries) {
-        records['${entry.key}'] = DailyRecord.fromJson(
-          '${entry.key}',
-          entry.value,
-        );
+        records['${entry.key}'] = DailyRecord.fromJson('${entry.key}', entry.value);
       }
       return DailyProgress(records);
     } catch (_) {
@@ -99,9 +91,8 @@ class DailyProgress {
     }
   }
 
-  String encode() => jsonEncode({
-    for (final entry in _records.entries) entry.key: entry.value.toJson(),
-  });
+  String encode() =>
+      jsonEncode({for (final entry in _records.entries) entry.key: entry.value.toJson()});
 
   DailyRecord record(String key) => _records[key] ?? DailyRecord(key: key);
 
@@ -127,11 +118,7 @@ class DailyProgress {
   DailyProgressMerge merge(GameResult result) {
     final key = result.challengeKey;
     if (key == null) {
-      return DailyProgressMerge(
-        progress: this,
-        newBestScore: false,
-        newBestLines: false,
-      );
+      return DailyProgressMerge(progress: this, newBestScore: false, newBestLines: false);
     }
     final previous = record(key);
     final updated = previous.copyWith(

@@ -4,11 +4,7 @@ import '../../game/tetris_controller.dart';
 
 /// 棋盘上的手势操作：单击旋转、左右拖动移动、下滑软降、上滑暂存。
 class BoardGestureLayer extends StatefulWidget {
-  const BoardGestureLayer({
-    super.key,
-    required this.controller,
-    required this.child,
-  });
+  const BoardGestureLayer({super.key, required this.controller, required this.child});
 
   final TetrisController controller;
   final Widget child;

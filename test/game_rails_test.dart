@@ -27,13 +27,9 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    final standard = TetrisController(mode: GameMode.endless, autoTick: false)
-      ..start();
+    final standard = TetrisController(mode: GameMode.endless, autoTick: false)..start();
     await tester.pumpWidget(
-      rail(
-        standard,
-        GameRightRail(controller: standard, palette: BlockPalette.light),
-      ),
+      rail(standard, GameRightRail(controller: standard, palette: BlockPalette.light)),
     );
     await tester.pump();
     expect(find.text('下一个'), findsOneWidget);
@@ -41,13 +37,9 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     standard.dispose();
 
-    final arcade = TetrisController(mode: GameMode.arcade, autoTick: false)
-      ..start();
+    final arcade = TetrisController(mode: GameMode.arcade, autoTick: false)..start();
     await tester.pumpWidget(
-      rail(
-        arcade,
-        GameRightRail(controller: arcade, palette: BlockPalette.light),
-      ),
+      rail(arcade, GameRightRail(controller: arcade, palette: BlockPalette.light)),
     );
     await tester.pump();
     expect(find.byType(PieceSlot), findsOneWidget);
@@ -56,13 +48,9 @@ void main() {
   });
 
   testWidgets('紧凑侧栏最多展示三块预览并标注中文', (tester) async {
-    final controller = TetrisController(mode: GameMode.endless, autoTick: false)
-      ..start();
+    final controller = TetrisController(mode: GameMode.endless, autoTick: false)..start();
     await tester.pumpWidget(
-      rail(
-        controller,
-        GameCompactRail(controller: controller, palette: BlockPalette.light),
-      ),
+      rail(controller, GameCompactRail(controller: controller, palette: BlockPalette.light)),
     );
     await tester.pump();
     expect(find.text('下一个'), findsOneWidget);

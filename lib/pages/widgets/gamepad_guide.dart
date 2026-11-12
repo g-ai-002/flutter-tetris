@@ -24,9 +24,7 @@ class GamepadGuide extends StatelessWidget {
             ),
             child: Text(
               '${action.label} ${gamepadLabelsFor(action) ?? '—'}',
-              style: theme.textTheme.labelSmall?.copyWith(
-                color: colors.onSurfaceVariant,
-              ),
+              style: theme.textTheme.labelSmall?.copyWith(color: colors.onSurfaceVariant),
             ),
           ),
       ],

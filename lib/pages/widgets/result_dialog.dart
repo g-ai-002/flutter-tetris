@@ -91,11 +91,7 @@ class _ResultDialog extends StatelessWidget {
     if (challenge == null) return;
     await Clipboard.setData(
       ClipboardData(
-        text: challenge.shareText(
-          score: result.score,
-          lines: result.lines,
-          level: result.level,
-        ),
+        text: challenge.shareText(score: result.score, lines: result.lines, level: result.level),
       ),
     );
     if (!context.mounted) return;
@@ -128,9 +124,7 @@ class _ResultDialog extends StatelessWidget {
                 height: 54,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: (won ? appGold : colors.primary).withValues(
-                    alpha: 0.12,
-                  ),
+                  color: (won ? appGold : colors.primary).withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -148,9 +142,7 @@ class _ResultDialog extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 result.reason,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colors.onSurfaceVariant,
-                ),
+                style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
               ),
               const SizedBox(height: 18),
               Row(
@@ -169,9 +161,7 @@ class _ResultDialog extends StatelessWidget {
                     padding: const EdgeInsets.only(bottom: 5, left: 6),
                     child: Text(
                       '分',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colors.onSurfaceVariant,
-                      ),
+                      style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
                     ),
                   ),
                 ],
@@ -224,9 +214,7 @@ class _ResultDialog extends StatelessWidget {
                         accent: appGold,
                         child: Text(
                           '另有 $hiddenUnlocked 项',
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: appGold,
-                          ),
+                          style: theme.textTheme.labelSmall?.copyWith(color: appGold),
                         ),
                       ),
                   ],
@@ -234,10 +222,7 @@ class _ResultDialog extends StatelessWidget {
               ],
               const SizedBox(height: 16),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 12,
-                  horizontal: 8,
-                ),
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                 decoration: BoxDecoration(
                   color: colors.surfaceContainerHighest.withValues(alpha: 0.5),
                   borderRadius: BorderRadius.circular(12),
@@ -247,10 +232,7 @@ class _ResultDialog extends StatelessWidget {
                     for (final (label, value) in [
                       ('消行', '${result.lines}'),
                       ('等级', '${result.level}'),
-                      (
-                        '用时',
-                        formatPreciseDuration(result.elapsed.inMilliseconds),
-                      ),
+                      ('用时', formatPreciseDuration(result.elapsed.inMilliseconds)),
                       ('最高连击', '${result.maxCombo}'),
                     ])
                       Expanded(
@@ -267,9 +249,7 @@ class _ResultDialog extends StatelessWidget {
               const SizedBox(height: 10),
               Text(
                 '$_bestLabel最高 ${formatThousands(bestScore)} 分',
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: colors.onSurfaceVariant,
-                ),
+                style: theme.textTheme.labelSmall?.copyWith(color: colors.onSurfaceVariant),
               ),
               if (daily != null) ...[
                 const SizedBox(height: 6),

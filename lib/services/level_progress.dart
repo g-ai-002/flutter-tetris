@@ -20,18 +20,14 @@ class LevelRecord {
   final int bestScore;
   final int? bestTimeMs;
 
-  LevelRecord copyWith({
-    bool? completed,
-    int? stars,
-    int? bestScore,
-    int? bestTimeMs,
-  }) => LevelRecord(
-    id: id,
-    completed: completed ?? this.completed,
-    stars: stars ?? this.stars,
-    bestScore: bestScore ?? this.bestScore,
-    bestTimeMs: bestTimeMs ?? this.bestTimeMs,
-  );
+  LevelRecord copyWith({bool? completed, int? stars, int? bestScore, int? bestTimeMs}) =>
+      LevelRecord(
+        id: id,
+        completed: completed ?? this.completed,
+        stars: stars ?? this.stars,
+        bestScore: bestScore ?? this.bestScore,
+        bestTimeMs: bestTimeMs ?? this.bestTimeMs,
+      );
 
   Map<String, Object?> toJson() => {
     'completed': completed,
@@ -98,20 +94,17 @@ class LevelProgress {
     }
   }
 
-  String encode() => jsonEncode({
-    for (final entry in _records.entries) '${entry.key}': entry.value.toJson(),
-  });
+  String encode() =>
+      jsonEncode({for (final entry in _records.entries) '${entry.key}': entry.value.toJson()});
 
   LevelRecord record(int id) => _records[id] ?? LevelRecord(id: id);
 
   /// 第一关默认开放，其余关卡需通关上一关。
   bool isUnlocked(int id) => id <= 1 || record(id - 1).completed;
 
-  int get completedCount =>
-      kLevels.where((level) => record(level.id).completed).length;
+  int get completedCount => kLevels.where((level) => record(level.id).completed).length;
 
-  int get totalStars =>
-      kLevels.fold(0, (sum, level) => sum + record(level.id).stars);
+  int get totalStars => kLevels.fold(0, (sum, level) => sum + record(level.id).stars);
 
   /// 合并一局关卡结果；只升不降，未通关不会写入完成状态与星级。
   LevelProgressMerge merge(GameResult result) {
@@ -127,8 +120,7 @@ class LevelProgress {
     final previous = record(levelId);
     final faster =
         result.won &&
-        (previous.bestTimeMs == null ||
-            result.elapsed.inMilliseconds < previous.bestTimeMs!);
+        (previous.bestTimeMs == null || result.elapsed.inMilliseconds < previous.bestTimeMs!);
     final updated = LevelRecord(
       id: levelId,
       completed: previous.completed || result.won,

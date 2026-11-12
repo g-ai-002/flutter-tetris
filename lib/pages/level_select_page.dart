@@ -78,10 +78,7 @@ class LevelSelectPage extends StatelessWidget {
                             SizedBox(
                               width: tileWidth,
                               height: 170,
-                              child: _LevelTile(
-                                level: level,
-                                settings: settings,
-                              ),
+                              child: _LevelTile(level: level, settings: settings),
                             ),
                         ],
                       ),
@@ -89,9 +86,7 @@ class LevelSelectPage extends StatelessWidget {
                       Text(
                         '通关上一关即可解锁下一关；剩余时间越多，星级越高。',
                         textAlign: TextAlign.center,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: colors.onSurfaceVariant,
-                        ),
+                        style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
                       ),
                     ],
                   ),
@@ -157,8 +152,7 @@ class _LevelTile extends StatelessWidget {
                       height: 32,
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: (unlocked ? colors.primary : colors.outline)
-                            .withValues(alpha: 0.12),
+                        color: (unlocked ? colors.primary : colors.outline).withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(9),
                       ),
                       child: unlocked
@@ -184,9 +178,7 @@ class _LevelTile extends StatelessWidget {
                   level.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 3),
                 Text(

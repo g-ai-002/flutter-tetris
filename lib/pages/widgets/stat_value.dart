@@ -53,19 +53,12 @@ class StatValue extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final caption = theme.textTheme.labelSmall?.copyWith(
-      color: colors.onSurfaceVariant,
-    );
+    final caption = theme.textTheme.labelSmall?.copyWith(color: colors.onSurfaceVariant);
 
     if (inline) {
       return Row(
         children: [
-          Text(
-            label,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colors.onSurfaceVariant,
-            ),
-          ),
+          Text(label, style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant)),
           const Spacer(),
           Text(
             value,
@@ -81,9 +74,7 @@ class StatValue extends StatelessWidget {
     }
 
     final align = center ? TextAlign.center : TextAlign.start;
-    final cross =
-        alignment ??
-        (center ? CrossAxisAlignment.center : CrossAxisAlignment.start);
+    final cross = alignment ?? (center ? CrossAxisAlignment.center : CrossAxisAlignment.start);
     final numberStyle = (valueStyle ?? theme.textTheme.titleMedium)?.copyWith(
       fontWeight: FontWeight.w700,
       color: accent ?? colors.onSurface,
@@ -99,9 +90,7 @@ class StatValue extends StatelessWidget {
           )
         : Row(
             mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: center
-                ? MainAxisAlignment.center
-                : MainAxisAlignment.start,
+            mainAxisAlignment: center ? MainAxisAlignment.center : MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.baseline,
             textBaseline: TextBaseline.alphabetic,
             children: [

@@ -8,11 +8,7 @@ void main() {
     late TetrisController controller;
 
     setUp(() {
-      controller = TetrisController(
-        mode: GameMode.endless,
-        seed: 20261107,
-        autoTick: false,
-      );
+      controller = TetrisController(mode: GameMode.endless, seed: 20261107, autoTick: false);
       controller.start();
     });
 

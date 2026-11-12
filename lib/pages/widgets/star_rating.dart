@@ -4,12 +4,7 @@ import '../../theme/app_theme.dart';
 
 /// 三星评价，用于关卡选择与结算弹窗。
 class StarRating extends StatelessWidget {
-  const StarRating({
-    super.key,
-    required this.stars,
-    this.size = 16,
-    this.max = 3,
-  });
+  const StarRating({super.key, required this.stars, this.size = 16, this.max = 3});
 
   final int stars;
   final double size;

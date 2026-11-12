@@ -18,11 +18,7 @@ void main() {
 
   setUp(() async {
     storage = await prepareStorage();
-    controller = TetrisController(
-      mode: GameMode.endless,
-      autoTick: false,
-      seed: 7,
-    )..start();
+    controller = TetrisController(mode: GameMode.endless, autoTick: false, seed: 7)..start();
     game = TetrisGame(
       controller: controller,
       style: const PlayfieldStyle(palette: BlockPalette.light),
@@ -93,9 +89,7 @@ void main() {
     await tester.pump();
 
     final railRight = tester.getTopRight(find.text('下一个')).dx;
-    final boardLeft = tester
-        .getTopLeft(find.byKey(const ValueKey('tetris-board')))
-        .dx;
+    final boardLeft = tester.getTopLeft(find.byKey(const ValueKey('tetris-board'))).dx;
     expect(railRight, lessThan(boardLeft));
     expect(find.text('暂存'), findsOneWidget);
     await tester.pumpWidget(const SizedBox.shrink());

@@ -29,15 +29,11 @@ Future<void> showLogViewerDialog(BuildContext context) {
                   ],
                 ),
               ),
-              Divider(
-                color: theme.colorScheme.outline.withValues(alpha: 0.5),
-              ),
+              Divider(color: theme.colorScheme.outline.withValues(alpha: 0.5)),
               Expanded(
                 child: Container(
                   width: double.infinity,
-                  color: theme.colorScheme.surfaceContainerHighest.withValues(
-                    alpha: 0.5,
-                  ),
+                  color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(14),
                     child: SelectableText(

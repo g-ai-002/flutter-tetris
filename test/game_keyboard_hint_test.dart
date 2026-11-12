@@ -6,10 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   testWidgets('键盘提示条显示当前键位', (tester) async {
-    final bindings = KeyBindings.defaults().rebind(
-      GameAction.moveLeft,
-      LogicalKeyboardKey.keyA,
-    );
+    final bindings = KeyBindings.defaults().rebind(GameAction.moveLeft, LogicalKeyboardKey.keyA);
     await tester.pumpWidget(
       MaterialApp(
         home: Scaffold(body: GameKeyboardHint(bindings: bindings)),

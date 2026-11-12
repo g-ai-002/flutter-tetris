@@ -36,9 +36,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(
-      wrapPage(child: const HomePage(), storage: storage),
-    );
+    await tester.pumpWidget(wrapPage(child: const HomePage(), storage: storage));
 
     expect(find.text('俄罗斯方块'), findsWidgets);
     expect(find.text('经典模式'), findsOneWidget);
@@ -62,9 +60,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(
-      wrapPage(child: const HomePage(), storage: storage),
-    );
+    await tester.pumpWidget(wrapPage(child: const HomePage(), storage: storage));
 
     await tester.tap(find.text('关卡模式'));
     await tester.pumpAndSettle();
@@ -78,9 +74,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(
-      wrapPage(child: const HomePage(), storage: storage),
-    );
+    await tester.pumpWidget(wrapPage(child: const HomePage(), storage: storage));
     await tester.pump();
 
     expect(tester.takeException(), isNull);
@@ -95,9 +89,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(
-      wrapPage(child: const HomePage(), storage: storage),
-    );
+    await tester.pumpWidget(wrapPage(child: const HomePage(), storage: storage));
 
     await tester.tap(find.byTooltip('设置'));
     await tester.pumpAndSettle();

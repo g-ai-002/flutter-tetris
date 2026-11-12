@@ -7,12 +7,7 @@ void main() {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
-          body: StatValue(
-            label: '累计消行',
-            value: '1,280',
-            suffix: '行',
-            center: true,
-          ),
+          body: StatValue(label: '累计消行', value: '1,280', suffix: '行', center: true),
         ),
       ),
     );
@@ -22,10 +17,7 @@ void main() {
     expect(find.text('累计消行'), findsOneWidget);
 
     final value = tester.widget<Text>(find.text('1,280'));
-    expect(
-      value.style?.fontFeatures,
-      contains(const FontFeature.tabularFigures()),
-    );
+    expect(value.style?.fontFeatures, contains(const FontFeature.tabularFigures()));
   });
 
   testWidgets('labelFirst 把标签排在数值上方', (tester) async {
@@ -54,15 +46,9 @@ void main() {
       ),
     );
 
-    final row = find.descendant(
-      of: find.byType(StatValue),
-      matching: find.byType(Row),
-    );
+    final row = find.descendant(of: find.byType(StatValue), matching: find.byType(Row));
     expect(row, findsOneWidget);
-    expect(
-      tester.getCenter(find.text('最高连击')).dy,
-      tester.getCenter(find.text('12')).dy,
-    );
+    expect(tester.getCenter(find.text('最高连击')).dy, tester.getCenter(find.text('12')).dy);
   });
 
   testWidgets('强调色只作用于数值', (tester) async {

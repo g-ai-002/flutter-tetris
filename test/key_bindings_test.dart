@@ -16,15 +16,9 @@ void main() {
         expect(seen.add(key), isTrue, reason: '${action.label} 的按键重复');
       }
     }
-    expect(
-      bindings.actionFor(LogicalKeyboardKey.arrowLeft),
-      GameAction.moveLeft,
-    );
+    expect(bindings.actionFor(LogicalKeyboardKey.arrowLeft), GameAction.moveLeft);
     expect(bindings.actionFor(LogicalKeyboardKey.space), GameAction.hardDrop);
-    expect(
-      bindings.actionFor(LogicalKeyboardKey.keyX),
-      GameAction.rotateClockwise,
-    );
+    expect(bindings.actionFor(LogicalKeyboardKey.keyX), GameAction.rotateClockwise);
     expect(bindings.actionFor(LogicalKeyboardKey.keyQ), isNull);
   });
 
@@ -40,10 +34,7 @@ void main() {
   test('损坏或缺失的键位数据回退到默认值', () {
     for (final raw in [null, '', '{oops', '[]', '{"moveLeft":"x"}']) {
       final bindings = KeyBindings.decode(raw);
-      expect(
-        bindings.primaryKey(GameAction.moveLeft),
-        LogicalKeyboardKey.arrowLeft,
-      );
+      expect(bindings.primaryKey(GameAction.moveLeft), LogicalKeyboardKey.arrowLeft);
       for (final action in GameAction.values) {
         expect(bindings.keysFor(action), isNotEmpty);
       }
@@ -51,10 +42,7 @@ void main() {
   });
 
   test('重新绑定时与已占用按键交换，双方都可继续操作', () {
-    final bindings = KeyBindings.defaults().rebind(
-      GameAction.hold,
-      LogicalKeyboardKey.arrowLeft,
-    );
+    final bindings = KeyBindings.defaults().rebind(GameAction.hold, LogicalKeyboardKey.arrowLeft);
     expect(bindings.keysFor(GameAction.hold), {LogicalKeyboardKey.arrowLeft});
     expect(bindings.actionFor(LogicalKeyboardKey.arrowLeft), GameAction.hold);
     // 左移原本只有 ←，被占用后换到暂存的主键 C。
@@ -66,20 +54,11 @@ void main() {
     final storage = await prepareStorage();
     final settings = SettingsProvider(storage);
     await settings.bindKey(GameAction.hardDrop, LogicalKeyboardKey.enter);
-    expect(
-      settings.keyBindings.primaryKey(GameAction.hardDrop),
-      LogicalKeyboardKey.enter,
-    );
-    expect(
-      storage.keyBindings.actionFor(LogicalKeyboardKey.enter),
-      GameAction.hardDrop,
-    );
+    expect(settings.keyBindings.primaryKey(GameAction.hardDrop), LogicalKeyboardKey.enter);
+    expect(storage.keyBindings.actionFor(LogicalKeyboardKey.enter), GameAction.hardDrop);
 
     await settings.resetKeyBindings();
-    expect(
-      storage.keyBindings.primaryKey(GameAction.hardDrop),
-      LogicalKeyboardKey.space,
-    );
+    expect(storage.keyBindings.primaryKey(GameAction.hardDrop), LogicalKeyboardKey.space);
   });
 
   test('按键标签使用符号与常用键名', () {

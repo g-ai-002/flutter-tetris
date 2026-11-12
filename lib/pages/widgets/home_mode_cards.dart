@@ -14,11 +14,7 @@ import 'status_chip.dart';
 
 /// 首页玩法入口：四种标准玩法、每日挑战与关卡模式。
 class HomeModeCards extends StatelessWidget {
-  const HomeModeCards({
-    super.key,
-    required this.settings,
-    required this.contentWidth,
-  });
+  const HomeModeCards({super.key, required this.settings, required this.contentWidth});
 
   final SettingsProvider settings;
   final double contentWidth;
@@ -49,10 +45,7 @@ class HomeModeCards extends StatelessWidget {
           Wrap(
             spacing: gap,
             runSpacing: gap,
-            children: [
-              for (final card in cards)
-                SizedBox(width: cardWidth, child: card),
-            ],
+            children: [for (final card in cards) SizedBox(width: cardWidth, child: card)],
           ),
         const SizedBox(height: gap),
         _dailyCard(context),
@@ -76,8 +69,7 @@ class HomeModeCards extends StatelessWidget {
     return EntryTile(
       leading: EntryBadge(icon: Icons.today_rounded, accent: colors.primary),
       title: GameMode.daily.label,
-      subtitle:
-          '${challenge.label} ${challenge.weekdayLabel} · ${GameMode.daily.tagline}',
+      subtitle: '${challenge.label} ${challenge.weekdayLabel} · ${GameMode.daily.tagline}',
       trailing: StatusChip(
         accent: colors.primary,
         active: record.played,
@@ -103,11 +95,7 @@ class HomeModeCards extends StatelessWidget {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(
-                Icons.local_fire_department_outlined,
-                size: 14,
-                color: appGold,
-              ),
+              const Icon(Icons.local_fire_department_outlined, size: 14, color: appGold),
               const SizedBox(width: 4),
               Text('连续打卡 $streak 天', style: muted),
             ],
@@ -135,9 +123,9 @@ class HomeModeCards extends StatelessWidget {
           ),
         ),
       ),
-      onTap: () => Navigator.of(
-        context,
-      ).push(MaterialPageRoute<void>(builder: (_) => const LevelSelectPage())),
+      onTap: () =>
+          Navigator.of(context)
+              .push(MaterialPageRoute<void>(builder: (_) => const LevelSelectPage())),
       footer: Row(
         children: [
           const Icon(Icons.star_rounded, size: 14, color: appGold),
@@ -166,8 +154,8 @@ class HomeModeCards extends StatelessWidget {
       leading: EntryBadge(icon: visual.icon, accent: visual.accent),
       title: mode.label,
       subtitle: mode.tagline,
-      onTap: () => Navigator.of(context)
-          .push(MaterialPageRoute<void>(builder: (_) => GamePage(mode: mode))),
+      onTap: () =>
+          Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => GamePage(mode: mode))),
       footer: _RecordLine(settings: settings, mode: mode),
     );
   }

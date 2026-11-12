@@ -16,9 +16,8 @@ import 'widgets/skin_option_card.dart';
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
-  TextStyle? _hint(ThemeData theme) => theme.textTheme.bodySmall?.copyWith(
-    color: theme.colorScheme.onSurfaceVariant,
-  );
+  TextStyle? _hint(ThemeData theme) =>
+      theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant);
 
   @override
   Widget build(BuildContext context) {
@@ -40,10 +39,7 @@ class SettingsPage extends StatelessWidget {
                   children: [
                     Text('棋盘皮肤', style: theme.textTheme.bodyMedium),
                     const SizedBox(height: 2),
-                    Text(
-                      '方块配色与界面强调色一同切换',
-                      style: _hint(theme),
-                    ),
+                    Text('方块配色与界面强调色一同切换', style: _hint(theme)),
                     const SizedBox(height: 10),
                     Wrap(
                       spacing: 8,
@@ -61,9 +57,7 @@ class SettingsPage extends StatelessWidget {
                     const SizedBox(height: 8),
                     Text(
                       '${settings.blockSkin.label} · ${settings.blockSkin.description}',
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: colors.onSurfaceVariant,
-                      ),
+                      style: theme.textTheme.labelSmall?.copyWith(color: colors.onSurfaceVariant),
                     ),
                     const SizedBox(height: 14),
                     Divider(color: colors.outline.withValues(alpha: 0.6)),
@@ -98,10 +92,7 @@ class SettingsPage extends StatelessWidget {
                   title: '逻辑更新速率',
                   icon: Icons.speed_rounded,
                   children: [
-                    Text(
-                      '越高判定越细腻，也越耗电；默认 60 Hz，兼顾性能与流畅度',
-                      style: _hint(theme),
-                    ),
+                    Text('越高判定越细腻，也越耗电；默认 60 Hz，兼顾性能与流畅度', style: _hint(theme)),
                     const SizedBox(height: 10),
                     Wrap(
                       spacing: 8,
@@ -181,9 +172,7 @@ class SettingsPage extends StatelessWidget {
                       builder: (context, snapshot) {
                         final path = snapshot.data ?? '';
                         final text = path.isEmpty
-                            ? (isDesktopPlatform
-                                  ? '正在读取日志目录…'
-                                  : '当前平台日志仅保留在内存中')
+                            ? (isDesktopPlatform ? '正在读取日志目录…' : '当前平台日志仅保留在内存中')
                             : path;
                         return SelectableText(
                           text,
@@ -208,16 +197,12 @@ class SettingsPage extends StatelessWidget {
                         if (isDesktopPlatform)
                           OutlinedButton.icon(
                             onPressed: () async {
-                              final path = await FileSystemService.instance
-                                  .getLogRootPath();
-                              final ok = await FileSystemService.instance
-                                  .openDirectory(path);
+                              final path = await FileSystemService.instance.getLogRootPath();
+                              final ok = await FileSystemService.instance.openDirectory(path);
                               if (!context.mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(ok ? '已打开日志目录' : '无法打开日志目录'),
-                                ),
-                              );
+                              ScaffoldMessenger.of(
+                                context,
+                              ).showSnackBar(SnackBar(content: Text(ok ? '已打开日志目录' : '无法打开日志目录')));
                             },
                             icon: const Icon(Icons.folder_open, size: 17),
                             label: const Text('打开目录'),
@@ -231,20 +216,11 @@ class SettingsPage extends StatelessWidget {
                   title: '关于',
                   icon: Icons.info_outline,
                   children: [
-                    const SettingAboutRow(
-                      label: '版本',
-                      value: 'v${AppConstants.version}',
-                    ),
+                    const SettingAboutRow(label: '版本', value: 'v${AppConstants.version}'),
                     const SizedBox(height: 8),
-                    const SettingAboutRow(
-                      label: '引擎',
-                      value: 'Flutter + Flame',
-                    ),
+                    const SettingAboutRow(label: '引擎', value: 'Flutter + Flame'),
                     const SizedBox(height: 8),
-                    const SettingAboutRow(
-                      label: '平台',
-                      value: 'Android / Windows / Web',
-                    ),
+                    const SettingAboutRow(label: '平台', value: 'Android / Windows / Web'),
                     const SizedBox(height: 12),
                     Text(
                       '所有玩法均在本地运行，不需要联网；'

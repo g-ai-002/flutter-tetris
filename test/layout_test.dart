@@ -35,10 +35,7 @@ void main() {
     await tester.pumpWidget(
       wrapPage(
         child: MediaQuery(
-          data: MediaQueryData(
-            size: size,
-            textScaler: TextScaler.linear(textScale),
-          ),
+          data: MediaQueryData(size: size, textScaler: TextScaler.linear(textScale)),
           child: page,
         ),
         storage: storage,
@@ -67,11 +64,7 @@ void main() {
   });
 
   testWidgets('手机竖屏棋盘占满宽度且不被操作区挤扁', (tester) async {
-    await pumpAt(
-      tester,
-      const Size(390, 844),
-      const GamePage(mode: GameMode.endless),
-    );
+    await pumpAt(tester, const Size(390, 844), const GamePage(mode: GameMode.endless));
     final board = tester.getSize(find.byKey(const ValueKey('tetris-board')));
     expect(board.width / board.height, closeTo(0.5, 0.02));
     expect(board.height, greaterThan(844 * 0.62));
@@ -86,21 +79,14 @@ void main() {
 
   testWidgets('手机竖屏进入对局不强制横屏', (tester) async {
     final calls = <MethodCall>[];
-    final messenger =
-        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+    final messenger = TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
     messenger.setMockMethodCallHandler(SystemChannels.platform, (call) async {
       calls.add(call);
       return null;
     });
-    addTearDown(
-      () => messenger.setMockMethodCallHandler(SystemChannels.platform, null),
-    );
+    addTearDown(() => messenger.setMockMethodCallHandler(SystemChannels.platform, null));
 
-    await pumpAt(
-      tester,
-      const Size(390, 844),
-      const GamePage(mode: GameMode.endless),
-    );
+    await pumpAt(tester, const Size(390, 844), const GamePage(mode: GameMode.endless));
 
     final methods = calls.map((call) => call.method);
     expect(methods, contains('SystemChrome.setEnabledSystemUIMode'));
@@ -112,11 +98,7 @@ void main() {
   });
 
   testWidgets('手机横屏收起顶栏，棋盘获得接近全屏的高度', (tester) async {
-    await pumpAt(
-      tester,
-      const Size(844, 390),
-      const GamePage(mode: GameMode.sprint),
-    );
+    await pumpAt(tester, const Size(844, 390), const GamePage(mode: GameMode.sprint));
     final board = tester.getSize(find.byKey(const ValueKey('tetris-board')));
     expect(board.width / board.height, closeTo(0.5, 0.02));
     expect(board.height, greaterThan(390 * 0.75));
@@ -139,11 +121,7 @@ void main() {
   });
 
   testWidgets('平板竖屏棋盘随高度放大且不超过单格上限', (tester) async {
-    await pumpAt(
-      tester,
-      const Size(800, 1280),
-      const GamePage(mode: GameMode.endless),
-    );
+    await pumpAt(tester, const Size(800, 1280), const GamePage(mode: GameMode.endless));
     final board = tester.getSize(find.byKey(const ValueKey('tetris-board')));
     expect(board.width / board.height, closeTo(0.5, 0.02));
     expect(board.width, lessThanOrEqualTo(640));
@@ -202,11 +180,7 @@ void main() {
   });
 
   testWidgets('平板横屏保留侧栏并补齐触控操作', (tester) async {
-    await pumpAt(
-      tester,
-      const Size(1024, 768),
-      const GamePage(mode: GameMode.endless),
-    );
+    await pumpAt(tester, const Size(1024, 768), const GamePage(mode: GameMode.endless));
     expect(find.text('暂存'), findsWidgets);
     expect(find.text('左移'), findsOneWidget);
     expect(tester.takeException(), isNull);
@@ -214,11 +188,7 @@ void main() {
   });
 
   testWidgets('折叠屏展开态竖屏按单列排布', (tester) async {
-    await pumpAt(
-      tester,
-      const Size(673, 841),
-      const GamePage(mode: GameMode.endless),
-    );
+    await pumpAt(tester, const Size(673, 841), const GamePage(mode: GameMode.endless));
     final board = tester.getSize(find.byKey(const ValueKey('tetris-board')));
     expect(board.width, greaterThan(280));
     expect(board.height, greaterThan(550));

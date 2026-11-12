@@ -35,8 +35,7 @@ const List<GameAction> gamepadGuideOrder = [
 ];
 
 /// 手柄按钮 → 游戏操作，未映射的按钮返回 null。
-GameAction? gamepadActionForButton(GamepadButton button) =>
-    gamepadButtonActions[button];
+GameAction? gamepadActionForButton(GamepadButton button) => gamepadButtonActions[button];
 
 /// 映射到 [action] 的全部按钮，按 [gamepadButtonActions] 的声明顺序返回。
 List<GamepadButton> gamepadButtonsFor(GameAction action) => [

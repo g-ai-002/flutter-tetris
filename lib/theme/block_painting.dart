@@ -65,22 +65,13 @@ Paint _flatPaint(Color color, [double strokeWidth = 0]) {
 
 /// 绘制棋盘底色，场地与首页缩略棋盘共用同一套皮肤渐变。
 void paintBoardBackground(Canvas canvas, Rect rect, BlockPalette palette) {
-  canvas.drawRect(
-    rect,
-    Paint()..shader = palette.boardGradient.createShader(rect),
-  );
+  canvas.drawRect(rect, Paint()..shader = palette.boardGradient.createShader(rect));
 }
 
 /// 绘制一块已落定的方块。
 /// [rect] 为格子的完整区域，内部会留出缝隙并描边，
 /// 顶部提亮、底部压暗，模拟实体方块的立体感。
-void paintBlock(
-  Canvas canvas,
-  Rect rect,
-  Color color, {
-  double opacity = 1,
-  bool active = false,
-}) {
+void paintBlock(Canvas canvas, Rect rect, Color color, {double opacity = 1, bool active = false}) {
   if (rect.width <= 1 || rect.height <= 1) return;
   final size = Size(rect.width, rect.height);
   final gap = rect.width * 0.055;
@@ -104,14 +95,8 @@ void paintBlock(
     ..save()
     ..translate(rect.left, rect.top)
     ..drawRRect(shape, _fillPaint(color, size, opacity, active))
-    ..drawRRect(
-      highlight,
-      _flatPaint(Colors.white.withValues(alpha: 0.22 * opacity)),
-    )
-    ..drawRRect(
-      shape,
-      _flatPaint(Colors.black.withValues(alpha: 0.20 * opacity), 1),
-    )
+    ..drawRRect(highlight, _flatPaint(Colors.white.withValues(alpha: 0.22 * opacity)))
+    ..drawRRect(shape, _flatPaint(Colors.black.withValues(alpha: 0.20 * opacity), 1))
     ..restore();
 }
 
@@ -119,10 +104,7 @@ void paintBlock(
 void paintGhostBlock(Canvas canvas, Rect rect, Color color) {
   if (rect.width <= 1 || rect.height <= 1) return;
   final gap = rect.width * 0.055;
-  final shape = RRect.fromRectAndRadius(
-    rect.deflate(gap),
-    Radius.circular(rect.width * 0.18),
-  );
+  final shape = RRect.fromRectAndRadius(rect.deflate(gap), Radius.circular(rect.width * 0.18));
   canvas.drawRRect(shape, _flatPaint(color.withValues(alpha: 0.10)));
   canvas.drawRRect(shape, _flatPaint(color.withValues(alpha: 0.48), 1.6));
 }

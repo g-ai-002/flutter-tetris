@@ -12,13 +12,10 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
 
     final storage = await prepareStorage({
-      'level_records':
-          '{"1":{"completed":true,"stars":3,"score":1200,"time":50000}}',
+      'level_records': '{"1":{"completed":true,"stars":3,"score":1200,"time":50000}}',
     });
 
-    await tester.pumpWidget(
-      wrapPage(child: const LevelSelectPage(), storage: storage),
-    );
+    await tester.pumpWidget(wrapPage(child: const LevelSelectPage(), storage: storage));
 
     expect(find.text('挑战进度'), findsOneWidget);
     expect(find.text('已通关 1 / 12 关'), findsOneWidget);
@@ -37,9 +34,7 @@ void main() {
 
     final storage = await prepareStorage();
 
-    await tester.pumpWidget(
-      wrapPage(child: const LevelSelectPage(), storage: storage),
-    );
+    await tester.pumpWidget(wrapPage(child: const LevelSelectPage(), storage: storage));
     await tester.pump();
 
     expect(find.text('挑战进度'), findsOneWidget);
@@ -56,9 +51,7 @@ void main() {
 
     final storage = await prepareStorage();
 
-    await tester.pumpWidget(
-      wrapPage(child: const LevelSelectPage(), storage: storage),
-    );
+    await tester.pumpWidget(wrapPage(child: const LevelSelectPage(), storage: storage));
 
     await tester.tap(find.byKey(const ValueKey('level-tile-1')));
     await tester.pump();

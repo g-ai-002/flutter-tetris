@@ -8,18 +8,7 @@ import 'log_service.dart';
 import 'tone_synth.dart';
 
 /// 游戏内会发声的动作。
-enum Sfx {
-  move,
-  rotate,
-  hold,
-  lock,
-  lineClear,
-  tetris,
-  perfectClear,
-  levelUp,
-  gameOver,
-  win,
-}
+enum Sfx { move, rotate, hold, lock, lineClear, tetris, perfectClear, levelUp, gameOver, win }
 
 /// 音效与触感反馈：音频在运行时合成，三个平台共用同一套配方。
 class SoundService {
@@ -51,12 +40,8 @@ class SoundService {
       SynthNote(frequency: 392, start: 0.055, duration: 0.1, gain: 0.26),
     ],
     Sfx.lock: [
-      SynthNote(
-        frequency: 190, start: 0, duration: 0.075, gain: 0.62, noise: 0.38,
-      ),
-      SynthNote(
-        frequency: 120, start: 0.006, duration: 0.12, gain: 0.55, noise: 0.22,
-      ),
+      SynthNote(frequency: 190, start: 0, duration: 0.075, gain: 0.62, noise: 0.38),
+      SynthNote(frequency: 120, start: 0.006, duration: 0.12, gain: 0.55, noise: 0.22),
     ],
     Sfx.lineClear: [
       SynthNote(frequency: 523.25, start: 0, duration: 0.11, gain: 0.42),
@@ -113,10 +98,7 @@ class SoundService {
       final soloud = SoLoud.instance;
       if (!soloud.isInitialized) await soloud.init();
       for (final sfx in Sfx.values) {
-        _sources[sfx] = await soloud.loadMem(
-          'tetris-${sfx.name}.wav',
-          clipOf(sfx),
-        );
+        _sources[sfx] = await soloud.loadMem('tetris-${sfx.name}.wav', clipOf(sfx));
       }
     } catch (error) {
       _loadFailed = true;
@@ -128,8 +110,7 @@ class SoundService {
 
   /// 某个动作对应的合成音频，供测试校验音效配方。
   @visibleForTesting
-  static Uint8List clipOf(Sfx sfx) =>
-      _clips.putIfAbsent(sfx, () => synthesizeWav(_presets[sfx]!));
+  static Uint8List clipOf(Sfx sfx) => _clips.putIfAbsent(sfx, () => synthesizeWav(_presets[sfx]!));
 
   static void play(Sfx sfx) {
     if (soundEnabled) {

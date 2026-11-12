@@ -68,10 +68,7 @@ class EntryTile extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (trailing != null) ...[
-                          const SizedBox(width: 8),
-                          trailing!,
-                        ],
+                        if (trailing != null) ...[const SizedBox(width: 8), trailing!],
                       ],
                     ),
                     const SizedBox(height: 3),
@@ -79,9 +76,7 @@ class EntryTile extends StatelessWidget {
                       subtitle,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colors.onSurfaceVariant,
-                      ),
+                      style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
                     ),
                     if (footer != null) ...[const SizedBox(height: 8), footer!],
                   ],
@@ -102,13 +97,8 @@ class EntryTile extends StatelessWidget {
 
 /// 入口卡片的方形徽章：图标或文字，底色由强调色淡化得到。
 class EntryBadge extends StatelessWidget {
-  const EntryBadge({
-    super.key,
-    required this.accent,
-    this.icon,
-    this.label,
-    this.size = 46,
-  }) : assert(icon != null || label != null, '徽章需要图标或文字');
+  const EntryBadge({super.key, required this.accent, this.icon, this.label, this.size = 46})
+    : assert(icon != null || label != null, '徽章需要图标或文字');
 
   final Color accent;
   final IconData? icon;
@@ -130,8 +120,7 @@ class EntryBadge extends StatelessWidget {
           ? Icon(icon, color: accent, size: size * 0.52)
           : Text(
               label ?? '',
-              style: Theme.of(context).textTheme.titleSmall
-                  ?.copyWith(color: accent),
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(color: accent),
             ),
     );
   }

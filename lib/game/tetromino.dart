@@ -11,8 +11,7 @@ class Block {
   Block operator +(Block other) => Block(x + other.x, y + other.y);
 
   @override
-  bool operator ==(Object other) =>
-      other is Block && other.x == x && other.y == y;
+  bool operator ==(Object other) => other is Block && other.x == x && other.y == y;
 
   @override
   int get hashCode => Object.hash(x, y);
@@ -97,12 +96,7 @@ const int kSpawnColumn = 3;
 
 /// 正在下落的方块。
 class ActivePiece {
-  const ActivePiece({
-    required this.type,
-    required this.x,
-    required this.y,
-    this.rotation = 0,
-  });
+  const ActivePiece({required this.type, required this.x, required this.y, this.rotation = 0});
 
   final TetrominoType type;
   final int x;
@@ -113,16 +107,10 @@ class ActivePiece {
 
   List<Block> get localBlocks => kTetrominoShapes[type]![rotation];
 
-  List<Block> get blocks => [
-    for (final block in localBlocks) Block(x + block.x, y + block.y),
-  ];
+  List<Block> get blocks => [for (final block in localBlocks) Block(x + block.x, y + block.y)];
 
-  ActivePiece copyWith({int? x, int? y, int? rotation}) => ActivePiece(
-    type: type,
-    x: x ?? this.x,
-    y: y ?? this.y,
-    rotation: rotation ?? this.rotation,
-  );
+  ActivePiece copyWith({int? x, int? y, int? rotation}) =>
+      ActivePiece(type: type, x: x ?? this.x, y: y ?? this.y, rotation: rotation ?? this.rotation);
 
   /// 消行动画与音效按方块类型取色。
   @override

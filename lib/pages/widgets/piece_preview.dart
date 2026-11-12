@@ -30,9 +30,7 @@ class PiecePreview extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(size * 0.16),
                 color: colors.surfaceContainerHighest.withValues(alpha: 0.5),
-                border: Border.all(
-                  color: colors.outline.withValues(alpha: 0.7),
-                ),
+                border: Border.all(color: colors.outline.withValues(alpha: 0.7)),
               ),
             )
           : CustomPaint(
@@ -43,11 +41,7 @@ class PiecePreview extends StatelessWidget {
 }
 
 class _PiecePainter extends CustomPainter {
-  const _PiecePainter({
-    required this.type,
-    required this.color,
-    required this.faded,
-  });
+  const _PiecePainter({required this.type, required this.color, required this.faded});
 
   final TetrominoType type;
   final Color color;
@@ -56,17 +50,10 @@ class _PiecePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final blocks = kTetrominoShapes[type]![0];
-    paintMiniPiece(
-      canvas,
-      size,
-      blocks,
-      faded ? color.withValues(alpha: 0.35) : color,
-    );
+    paintMiniPiece(canvas, size, blocks, faded ? color.withValues(alpha: 0.35) : color);
   }
 
   @override
   bool shouldRepaint(covariant _PiecePainter oldDelegate) =>
-      oldDelegate.type != type ||
-      oldDelegate.color != color ||
-      oldDelegate.faded != faded;
+      oldDelegate.type != type || oldDelegate.color != color || oldDelegate.faded != faded;
 }

@@ -16,9 +16,7 @@ String _ascii(Uint8List bytes, int offset, int length) {
 void main() {
   group('程序化音频', () {
     test('合成结果是合法的 16 位单声道 WAV', () {
-      final bytes = synthesizeWav([
-        const SynthNote(frequency: 440, start: 0, duration: 0.1),
-      ]);
+      final bytes = synthesizeWav([const SynthNote(frequency: 440, start: 0, duration: 0.1)]);
       expect(_ascii(bytes, 0, 4), 'RIFF');
       expect(_ascii(bytes, 8, 4), 'WAVE');
       expect(_ascii(bytes, 36, 4), 'data');

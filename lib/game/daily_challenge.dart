@@ -18,17 +18,14 @@ class DailyChallenge {
     return DailyChallenge(date: day, seed: _mixSeed(key));
   }
 
-  static DailyChallenge today([DateTime? now]) =>
-      DailyChallenge.forDate(now ?? DateTime.now());
+  static DailyChallenge today([DateTime? now]) => DailyChallenge.forDate(now ?? DateTime.now());
 
   /// 最近 [count] 天，含今天，按日期从新到旧。
   static List<DailyChallenge> recent(int count, {DateTime? now}) {
     final today = DailyChallenge.today(now);
     return [
       for (var i = 0; i < count; i++)
-        DailyChallenge.forDate(
-          DateTime(today.date.year, today.date.month, today.date.day - i),
-        ),
+        DailyChallenge.forDate(DateTime(today.date.year, today.date.month, today.date.day - i)),
     ];
   }
 
@@ -39,8 +36,7 @@ class DailyChallenge {
   String get label => '${date.month} 月 ${date.day} 日';
 
   /// `周四`
-  String get weekdayLabel =>
-      const ['周一', '周二', '周三', '周四', '周五', '周六', '周日'][date.weekday - 1];
+  String get weekdayLabel => const ['周一', '周二', '周三', '周四', '周五', '周六', '周日'][date.weekday - 1];
 
   /// 距离下一次刷新（本地零点）还有多久。
   Duration refreshIn(DateTime now) {
@@ -50,11 +46,7 @@ class DailyChallenge {
   }
 
   /// 分享到聊天窗口的战报文本。
-  String shareText({
-    required int score,
-    required int lines,
-    required int level,
-  }) {
+  String shareText({required int score, required int lines, required int level}) {
     return [
       '俄罗斯方块 · 每日挑战 ${date.month} 月 ${date.day} 日',
       '得分 ${formatThousands(score)} · 消行 $lines · 等级 $level',

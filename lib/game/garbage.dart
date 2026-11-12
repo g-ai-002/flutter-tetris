@@ -2,8 +2,7 @@ import 'dart:math';
 
 /// 垃圾行上涌规则。
 class GarbageRule {
-  const GarbageRule({required this.interval, this.rowsPerRise = 1})
-    : assert(rowsPerRise > 0);
+  const GarbageRule({required this.interval, this.rowsPerRise = 1}) : assert(rowsPerRise > 0);
 
   /// 两次上涌之间的间隔。
   final Duration interval;
@@ -15,9 +14,7 @@ class GarbageRule {
 /// 按固定间隔产出垃圾行缺口，随机序列由种子决定；只负责计时与缺口生成，
 /// 不直接操作场地，因此上涌节奏可以独立测试。
 class GarbageSpawner {
-  GarbageSpawner({this.rule, int seed = 0})
-    : _seed = seed,
-      _random = Random(seed);
+  GarbageSpawner({this.rule, int seed = 0}) : _seed = seed, _random = Random(seed);
 
   final GarbageRule? rule;
   final int _seed;
@@ -50,9 +47,7 @@ class GarbageSpawner {
     while (_elapsed >= current.interval) {
       _elapsed -= current.interval;
       _rises++;
-      due.add([
-        for (var i = 0; i < current.rowsPerRise; i++) _random.nextInt(columns),
-      ]);
+      due.add([for (var i = 0; i < current.rowsPerRise; i++) _random.nextInt(columns)]);
     }
     return due;
   }

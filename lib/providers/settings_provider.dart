@@ -22,30 +22,24 @@ class SettingsProvider extends ChangeNotifier {
   final StorageService _storage;
 
   bool get darkMode => _storage.darkMode;
-  Future<void> setDarkMode(bool value) =>
-      _update(() => _storage.setDarkMode(value));
+  Future<void> setDarkMode(bool value) => _update(() => _storage.setDarkMode(value));
 
   BlockSkin get blockSkin => _storage.blockSkin;
-  Future<void> setBlockSkin(BlockSkin value) =>
-      _update(() => _storage.setBlockSkin(value));
+  Future<void> setBlockSkin(BlockSkin value) => _update(() => _storage.setBlockSkin(value));
 
   bool get showGhost => _storage.showGhost;
-  Future<void> setShowGhost(bool value) =>
-      _update(() => _storage.setShowGhost(value));
+  Future<void> setShowGhost(bool value) => _update(() => _storage.setShowGhost(value));
 
   bool get showGrid => _storage.showGrid;
-  Future<void> setShowGrid(bool value) =>
-      _update(() => _storage.setShowGrid(value));
+  Future<void> setShowGrid(bool value) => _update(() => _storage.setShowGrid(value));
 
   int get logicRate => _storage.logicRate;
-  Future<void> setLogicRate(int value) =>
-      _update(() => _storage.setLogicRate(value));
+  Future<void> setLogicRate(int value) => _update(() => _storage.setLogicRate(value));
 
   KeyBindings get keyBindings => _storage.keyBindings;
   Future<void> bindKey(GameAction action, LogicalKeyboardKey key) =>
       _update(() => _storage.setKeyBindings(keyBindings.rebind(action, key)));
-  Future<void> resetKeyBindings() =>
-      _update(() => _storage.setKeyBindings(KeyBindings.defaults()));
+  Future<void> resetKeyBindings() => _update(() => _storage.setKeyBindings(KeyBindings.defaults()));
 
   bool get soundEnabled => _storage.soundEnabled;
   Future<void> setSoundEnabled(bool value) => _update(() async {
@@ -83,16 +77,14 @@ class SettingsProvider extends ChangeNotifier {
   int get totalStars => _storage.totalStars;
 
   DailyRecord dailyRecord(String key) => _storage.dailyRecord(key);
-  int dailyStreak([DateTime? now]) =>
-      _storage.dailyStreak(now ?? DateTime.now());
+  int dailyStreak([DateTime? now]) => _storage.dailyStreak(now ?? DateTime.now());
 
   Future<void> clearRecords() => _update(_storage.clearRecords);
 
   /// 对局写入纪录后刷新依赖本地数据的界面。
   void refresh() => notifyListeners();
 
-  void _syncFeedback() =>
-      SoundService.configure(sound: soundEnabled, haptics: hapticsEnabled);
+  void _syncFeedback() => SoundService.configure(sound: soundEnabled, haptics: hapticsEnabled);
 
   /// 写入偏好后统一通知界面，避免每个 setter 重复一遍。
   Future<void> _update(Future<void> Function() write) async {

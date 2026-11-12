@@ -12,11 +12,7 @@ import 'board_effects.dart';
 
 /// 棋盘外观：调色板与网格/幽灵块开关，随主题变化实时更新。
 class PlayfieldStyle {
-  const PlayfieldStyle({
-    required this.palette,
-    this.showGhost = true,
-    this.showGrid = true,
-  });
+  const PlayfieldStyle({required this.palette, this.showGhost = true, this.showGrid = true});
 
   final BlockPalette palette;
   final bool showGhost;
@@ -31,8 +27,7 @@ class PlayfieldStyle {
       other.showGrid == showGrid;
 
   @override
-  int get hashCode =>
-      Object.hash(palette.dark, palette.skin, showGhost, showGrid);
+  int get hashCode => Object.hash(palette.dark, palette.skin, showGhost, showGrid);
 }
 
 /// Flame 渲染的游戏场地：网格、落定方块、幽灵块、消行动画与粒子特效。
@@ -115,20 +110,13 @@ class PlayfieldComponent extends PositionComponent {
     canvas.clipRRect(well);
     final shake = effects.shake;
     if (shake > 0.2) {
-      canvas.translate(
-        math.sin(_time * 70) * shake * 0.5,
-        math.cos(_time * 55) * shake * 0.25,
-      );
+      canvas.translate(math.sin(_time * 70) * shake * 0.5, math.cos(_time * 55) * shake * 0.25);
     }
 
     _ensureStaticLayer(currentStyle);
     canvas.drawPicture(_staticLayer!);
     _paintGhostAndActive(canvas, palette, currentStyle);
-    effects.paintTrails(
-      canvas,
-      hiddenRows: controller.board.hiddenRows,
-      cellSize: _cellSize,
-    );
+    effects.paintTrails(canvas, hiddenRows: controller.board.hiddenRows, cellSize: _cellSize);
     _paintClearFlash(canvas, palette);
     effects.paintParticles(canvas);
     canvas.restore();
@@ -214,19 +202,13 @@ class PlayfieldComponent extends PositionComponent {
       for (var x = 0; x < board.columns; x++) {
         final type = board.at(x, y);
         if (type == null) continue;
-        final color = board.isGarbage(x, y)
-            ? palette.garbageBlock
-            : palette.colorOf(type);
+        final color = board.isGarbage(x, y) ? palette.garbageBlock : palette.colorOf(type);
         paintBlock(canvas, _cellRect(x, y), color);
       }
     }
   }
 
-  void _paintGhostAndActive(
-    Canvas canvas,
-    BlockPalette palette,
-    PlayfieldStyle currentStyle,
-  ) {
+  void _paintGhostAndActive(Canvas canvas, BlockPalette palette, PlayfieldStyle currentStyle) {
     final piece = controller.piece;
     if (piece == null) return;
     final hidden = controller.board.hiddenRows;
@@ -258,18 +240,12 @@ class PlayfieldComponent extends PositionComponent {
     final cell = _cellSize;
     final lineHeight = math.max(1.2, cell * 0.06);
     final white = Paint()..color = Colors.white.withValues(alpha: 0.55 * flash);
-    final line = Paint()
-      ..color = palette
-          .colorOf(TetrominoType.o)
-          .withValues(alpha: 0.85 * flash);
+    final line = Paint()..color = palette.colorOf(TetrominoType.o).withValues(alpha: 0.85 * flash);
     for (final row in controller.clearingRows) {
       final rect = Rect.fromLTWH(0, (row - hidden) * cell, size.x, cell);
       canvas
         ..drawRect(rect, white)
-        ..drawRect(
-          Rect.fromLTWH(0, rect.center.dy - lineHeight / 2, size.x, lineHeight),
-          line,
-        );
+        ..drawRect(Rect.fromLTWH(0, rect.center.dy - lineHeight / 2, size.x, lineHeight), line);
     }
   }
 }

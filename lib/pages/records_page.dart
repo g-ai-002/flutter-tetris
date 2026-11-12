@@ -47,17 +47,12 @@ class RecordsPage extends StatelessWidget {
                   GameMode.sprint,
                   GameMode.ultra,
                   GameMode.arcade,
-                ]) ...[
-                  ModeRecordCard(settings: settings, mode: mode),
-                  const SizedBox(height: 12),
-                ],
+                ]) ...[ModeRecordCard(settings: settings, mode: mode), const SizedBox(height: 12)],
                 const SizedBox(height: 4),
                 Text(
                   '纪录保存在本机，不会上传到任何服务器。',
                   textAlign: TextAlign.center,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colors.onSurfaceVariant,
-                  ),
+                  style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
                 ),
               ],
             ),
@@ -67,10 +62,7 @@ class RecordsPage extends StatelessWidget {
     );
   }
 
-  Future<void> _confirmClear(
-    BuildContext context,
-    SettingsProvider settings,
-  ) async {
+  Future<void> _confirmClear(BuildContext context, SettingsProvider settings) async {
     final ok = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(

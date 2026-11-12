@@ -64,14 +64,8 @@ class _TetrisAppState extends State<TetrisApp> with WidgetsBindingObserver {
           return MaterialApp(
             title: AppConstants.appName,
             debugShowCheckedModeBanner: false,
-            theme: buildLightTheme(
-              fontFamily: fontFamily,
-              skin: settings.blockSkin,
-            ),
-            darkTheme: buildDarkTheme(
-              fontFamily: fontFamily,
-              skin: settings.blockSkin,
-            ),
+            theme: buildLightTheme(fontFamily: fontFamily, skin: settings.blockSkin),
+            darkTheme: buildDarkTheme(fontFamily: fontFamily, skin: settings.blockSkin),
             themeMode: settings.darkMode ? ThemeMode.dark : ThemeMode.light,
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
@@ -84,9 +78,7 @@ class _TetrisAppState extends State<TetrisApp> with WidgetsBindingObserver {
             builder: (context, child) => SystemUiOverlay(
               child: Listener(
                 behavior: HitTestBehavior.translucent,
-                onPointerDown: kIsWeb
-                    ? (_) => MusicService.retryOnInteraction()
-                    : null,
+                onPointerDown: kIsWeb ? (_) => MusicService.retryOnInteraction() : null,
                 child: MediaQuery.withClampedTextScaling(
                   minScaleFactor: 0.9,
                   maxScaleFactor: 1.3,

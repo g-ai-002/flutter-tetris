@@ -34,10 +34,7 @@ class HomePage extends StatelessWidget {
                   ? 28.0
                   : 16.0;
               const maxContent = 960.0;
-              final contentWidth = math.min(
-                width - horizontal * 2,
-                maxContent,
-              );
+              final contentWidth = math.min(width - horizontal * 2, maxContent);
               final tight = constraints.maxHeight < 680;
               return SingleChildScrollView(
                 padding: EdgeInsets.fromLTRB(
@@ -47,9 +44,7 @@ class HomePage extends StatelessWidget {
                   tight ? 18 : 24,
                 ),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: math.max(0, constraints.maxHeight - 38),
-                  ),
+                  constraints: BoxConstraints(minHeight: math.max(0, constraints.maxHeight - 38)),
                   child: Center(
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: maxContent),
@@ -60,10 +55,7 @@ class HomePage extends StatelessWidget {
                           SizedBox(height: tight ? 16 : 24),
                           const HomeHero(),
                           SizedBox(height: tight ? 20 : 30),
-                          HomeModeCards(
-                            settings: settings,
-                            contentWidth: contentWidth,
-                          ),
+                          HomeModeCards(settings: settings, contentWidth: contentWidth),
                           SizedBox(height: tight ? 16 : 24),
                           Text(
                             'v${AppConstants.version} · 本地离线 · Flutter + Flame',

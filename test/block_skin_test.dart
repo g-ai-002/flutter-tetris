@@ -24,14 +24,8 @@ void main() {
           expect(colors.length, TetrominoType.values.length);
           expect(palette.legend.length, TetrominoType.values.length);
           expect(palette.boardTop, isNot(palette.boardBottom));
-          expect(palette.screenGradient.colors, [
-            palette.screenTop,
-            palette.screenBottom,
-          ]);
-          expect(palette.boardGradient.colors, [
-            palette.boardTop,
-            palette.boardBottom,
-          ]);
+          expect(palette.screenGradient.colors, [palette.screenTop, palette.screenBottom]);
+          expect(palette.boardGradient.colors, [palette.boardTop, palette.boardBottom]);
         }
       }
     });
@@ -77,14 +71,9 @@ void main() {
 
     test('切换皮肤会触发场地样式更新', () {
       const paper = PlayfieldStyle(palette: BlockPalette.light);
-      final celadon = PlayfieldStyle(
-        palette: BlockSkin.celadon.palette(dark: false),
-      );
+      final celadon = PlayfieldStyle(palette: BlockSkin.celadon.palette(dark: false));
       expect(paper, isNot(celadon));
-      expect(
-        paper,
-        isNot(const PlayfieldStyle(palette: BlockPalette.darkPalette)),
-      );
+      expect(paper, isNot(const PlayfieldStyle(palette: BlockPalette.darkPalette)));
     });
   });
 
@@ -99,9 +88,7 @@ void main() {
     });
 
     test('设置 Provider 切换皮肤并通知界面', () async {
-      final storage = await prepareStorage({
-        'block_skin': BlockSkin.celadon.name,
-      });
+      final storage = await prepareStorage({'block_skin': BlockSkin.celadon.name});
       final provider = SettingsProvider(storage);
       var notified = 0;
       provider.addListener(() => notified++);

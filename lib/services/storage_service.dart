@@ -56,9 +56,7 @@ class StorageService {
     return prefs;
   }
 
-  Future<void> _write(
-    Future<bool> Function(SharedPreferences prefs) action,
-  ) async {
+  Future<void> _write(Future<bool> Function(SharedPreferences prefs) action) async {
     try {
       await action(_p);
     } catch (_) {
@@ -70,8 +68,7 @@ class StorageService {
   Future<void> setDarkMode(bool value) =>
       _write((p) => p.setBool(AppConstants.prefKeyDarkMode, value));
 
-  BlockSkin get blockSkin =>
-      BlockSkin.fromName(_p.getString(AppConstants.prefKeyBlockSkin));
+  BlockSkin get blockSkin => BlockSkin.fromName(_p.getString(AppConstants.prefKeyBlockSkin));
   Future<void> setBlockSkin(BlockSkin value) =>
       _write((p) => p.setString(AppConstants.prefKeyBlockSkin, value.name));
 
@@ -97,25 +94,19 @@ class StorageService {
 
   int get logicRate {
     final hz = _p.getInt(AppConstants.prefKeyLogicRate);
-    return AppConstants.logicRates.contains(hz)
-        ? hz!
-        : AppConstants.defaultLogicRate;
+    return AppConstants.logicRates.contains(hz) ? hz! : AppConstants.defaultLogicRate;
   }
 
   Future<void> setLogicRate(int value) =>
       _write((p) => p.setInt(AppConstants.prefKeyLogicRate, value));
 
-  KeyBindings get keyBindings =>
-      KeyBindings.decode(_p.getString(AppConstants.prefKeyKeyBindings));
-  Future<void> setKeyBindings(KeyBindings value) => _write(
-    (p) => p.setString(AppConstants.prefKeyKeyBindings, value.encode()),
-  );
+  KeyBindings get keyBindings => KeyBindings.decode(_p.getString(AppConstants.prefKeyKeyBindings));
+  Future<void> setKeyBindings(KeyBindings value) =>
+      _write((p) => p.setString(AppConstants.prefKeyKeyBindings, value.encode()));
 
-  int bestScore(GameMode mode) =>
-      _p.getInt(AppConstants.bestScoreKey(mode.name)) ?? 0;
+  int bestScore(GameMode mode) => _p.getInt(AppConstants.bestScoreKey(mode.name)) ?? 0;
 
-  int bestLines(GameMode mode) =>
-      _p.getInt(AppConstants.bestLinesKey(mode.name)) ?? 0;
+  int bestLines(GameMode mode) => _p.getInt(AppConstants.bestLinesKey(mode.name)) ?? 0;
 
   int plays(GameMode mode) => _p.getInt(AppConstants.playsKey(mode.name)) ?? 0;
 
@@ -127,16 +118,13 @@ class StorageService {
   int get totalScore => _p.getInt(AppConstants.prefKeyTotalScore) ?? 0;
   int get totalTetris => _p.getInt(AppConstants.prefKeyTotalTetris) ?? 0;
   int get totalTSpins => _p.getInt(AppConstants.prefKeyTotalTSpins) ?? 0;
-  int get totalPerfectClears =>
-      _p.getInt(AppConstants.prefKeyTotalPerfectClears) ?? 0;
+  int get totalPerfectClears => _p.getInt(AppConstants.prefKeyTotalPerfectClears) ?? 0;
   int get bestCombo => _p.getInt(AppConstants.prefKeyBestCombo) ?? 0;
-  int get bestScoreOverall =>
-      _p.getInt(AppConstants.prefKeyBestScoreOverall) ?? 0;
+  int get bestScoreOverall => _p.getInt(AppConstants.prefKeyBestScoreOverall) ?? 0;
 
   /// 已解锁的成就，未知名称直接忽略。
   Set<Achievement> get unlockedAchievements {
-    final names =
-        _p.getStringList(AppConstants.prefKeyAchievements) ?? const [];
+    final names = _p.getStringList(AppConstants.prefKeyAchievements) ?? const [];
     return {
       for (final achievement in Achievement.values)
         if (names.contains(achievement.name)) achievement,
@@ -184,26 +172,16 @@ class StorageService {
   Future<RecordOutcome> recordResult(GameResult result) async {
     final levelId = result.levelId;
     final levelMerge = levelId == null ? null : levelProgress.merge(result);
-    final dailyMerge = result.challengeKey == null
-        ? null
-        : dailyProgress.merge(result);
-    final oldLevel = levelId == null
-        ? const LevelRecord(id: 0)
-        : levelRecord(levelId);
-    final oldScore = levelId == null
-        ? bestScore(result.mode)
-        : oldLevel.bestScore;
+    final dailyMerge = result.challengeKey == null ? null : dailyProgress.merge(result);
+    final oldLevel = levelId == null ? const LevelRecord(id: 0) : levelRecord(levelId);
+    final oldScore = levelId == null ? bestScore(result.mode) : oldLevel.bestScore;
     final oldLines = bestLines(result.mode);
     final oldTime = levelId == null ? bestSprintTimeMs : oldLevel.bestTimeMs;
 
     final newModeBestScore = result.score > oldScore;
     final newBestScore = dailyMerge?.newBestScore ?? newModeBestScore;
-    final faster =
-        result.won &&
-        (oldTime == null || result.elapsed.inMilliseconds < oldTime);
-    final newBestTime = levelId == null
-        ? result.mode == GameMode.sprint && faster
-        : faster;
+    final faster = result.won && (oldTime == null || result.elapsed.inMilliseconds < oldTime);
+    final newBestTime = levelId == null ? result.mode == GameMode.sprint && faster : faster;
     final newBestStars = levelMerge?.newBestStars ?? false;
     final unlockedNow = <Achievement>[];
 
@@ -238,13 +216,10 @@ class StorageService {
       AppConstants.prefKeyTotalScore: totalScore + result.score,
       AppConstants.prefKeyTotalTetris: totalTetris + result.tetrises,
       AppConstants.prefKeyTotalTSpins: totalTSpins + result.tSpins,
-      AppConstants.prefKeyTotalPerfectClears:
-          totalPerfectClears + result.perfectClears,
+      AppConstants.prefKeyTotalPerfectClears: totalPerfectClears + result.perfectClears,
       AppConstants.playsKey(result.mode.name): plays(result.mode) + 1,
-      if (result.maxCombo > bestCombo)
-        AppConstants.prefKeyBestCombo: result.maxCombo,
-      if (result.score > bestScoreOverall)
-        AppConstants.prefKeyBestScoreOverall: result.score,
+      if (result.maxCombo > bestCombo) AppConstants.prefKeyBestCombo: result.maxCombo,
+      if (result.score > bestScoreOverall) AppConstants.prefKeyBestScoreOverall: result.score,
     };
     for (final entry in totals.entries) {
       await p.setInt(entry.key, entry.value);
@@ -262,16 +237,10 @@ class StorageService {
     required bool newBestTime,
   }) async {
     if (dailyMerge != null) {
-      await p.setString(
-        AppConstants.prefKeyDailyRecords,
-        dailyMerge.progress.encode(),
-      );
+      await p.setString(AppConstants.prefKeyDailyRecords, dailyMerge.progress.encode());
     }
     if (levelMerge != null) {
-      await p.setString(
-        AppConstants.prefKeyLevelRecords,
-        levelMerge.progress.encode(),
-      );
+      await p.setString(AppConstants.prefKeyLevelRecords, levelMerge.progress.encode());
       return;
     }
     if (newModeBestScore) {
@@ -281,22 +250,17 @@ class StorageService {
       await p.setInt(AppConstants.bestLinesKey(result.mode.name), result.lines);
     }
     if (newBestTime) {
-      await p.setInt(
-        AppConstants.prefKeyBestSprintTime,
-        result.elapsed.inMilliseconds,
-      );
+      await p.setInt(AppConstants.prefKeyBestSprintTime, result.elapsed.inMilliseconds);
     }
   }
 
   /// 依据最新生涯统计解锁成就，返回本局新增的徽章。
   Future<List<Achievement>> _unlockAchievements(SharedPreferences p) async {
     final unlocked = unlockedAchievements;
-    final newlyUnlocked = Achievement.unlockedIn(achievementStats)
-        .difference(unlocked);
+    final newlyUnlocked = Achievement.unlockedIn(achievementStats).difference(unlocked);
     if (newlyUnlocked.isEmpty) return const [];
     await p.setStringList(AppConstants.prefKeyAchievements, [
-      for (final achievement in {...unlocked, ...newlyUnlocked})
-        achievement.name,
+      for (final achievement in {...unlocked, ...newlyUnlocked}) achievement.name,
     ]);
     return newlyUnlocked.toList();
   }

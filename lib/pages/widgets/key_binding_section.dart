@@ -33,10 +33,7 @@ class KeyBindingSection extends StatelessWidget {
       children: [
         Text(
           '点击任一操作即可重新绑定按键，与已有按键冲突时会自动交换。',
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: colors.onSurfaceVariant,
-            height: 1.6,
-          ),
+          style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant, height: 1.6),
         ),
         const SizedBox(height: 6),
         for (final action in GameAction.values)
@@ -58,11 +55,7 @@ class KeyBindingSection extends StatelessWidget {
         const SizedBox(height: 8),
         Row(
           children: [
-            Icon(
-              Icons.videogame_asset_outlined,
-              size: 17,
-              color: colors.primary,
-            ),
+            Icon(Icons.videogame_asset_outlined, size: 17, color: colors.primary),
             const SizedBox(width: 8),
             Text('手柄 · 即插即用', style: theme.textTheme.bodyMedium),
           ],
@@ -73,10 +66,7 @@ class KeyBindingSection extends StatelessWidget {
         Text(
           '支持 Xbox、PlayStation 及标准布局的 USB / 蓝牙手柄；'
           'Android 需系统已识别手柄，Web 需浏览器支持 Gamepad API。',
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: colors.onSurfaceVariant,
-            height: 1.6,
-          ),
+          style: theme.textTheme.labelSmall?.copyWith(color: colors.onSurfaceVariant, height: 1.6),
         ),
       ],
     );
@@ -84,11 +74,7 @@ class KeyBindingSection extends StatelessWidget {
 }
 
 class _BindingRow extends StatelessWidget {
-  const _BindingRow({
-    required this.action,
-    required this.labels,
-    required this.onTap,
-  });
+  const _BindingRow({required this.action, required this.labels, required this.onTap});
 
   final GameAction action;
   final List<String> labels;
@@ -116,18 +102,11 @@ class _BindingRow extends StatelessWidget {
                 children: [
                   for (final label in labels)
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 3,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: colors.surfaceContainerHighest.withValues(
-                          alpha: 0.55,
-                        ),
+                        color: colors.surfaceContainerHighest.withValues(alpha: 0.55),
                         borderRadius: BorderRadius.circular(6),
-                        border: Border.all(
-                          color: colors.outline.withValues(alpha: 0.7),
-                        ),
+                        border: Border.all(color: colors.outline.withValues(alpha: 0.7)),
                       ),
                       child: Text(
                         label,
@@ -187,12 +166,7 @@ class KeyCaptureDialog extends StatelessWidget {
           ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('取消'),
-        ),
-      ],
+      actions: [TextButton(onPressed: () => Navigator.of(context).pop(), child: const Text('取消'))],
     );
   }
 }

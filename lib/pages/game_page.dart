@@ -59,17 +59,13 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     );
     _game = TetrisGame(
       controller: _controller,
-      style: PlayfieldStyle(
-        palette: settings.blockSkin.palette(dark: settings.darkMode),
-      ),
+      style: PlayfieldStyle(palette: settings.blockSkin.palette(dark: settings.darkMode)),
     );
     _controller.addListener(_onControllerChanged);
     _controller.start();
     _gamepad = GamepadService(onAction: _handleAction);
     unawaited(_gamepad.start());
-    LogService.info(
-      '开始对局: ${_controller.rules.title}, 逻辑 ${settings.logicRate}Hz',
-    );
+    LogService.info('开始对局: ${_controller.rules.title}, 逻辑 ${settings.logicRate}Hz');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) unawaited(enterGameDisplay());
     });
@@ -77,8 +73,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused ||
-        state == AppLifecycleState.hidden) {
+    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
       if (_controller.isPlaying) _controller.pause();
     } else if (state == AppLifecycleState.resumed && mounted) {
       // 系统栏可能在后台被还原，回到前台重新进入沉浸模式。
@@ -187,12 +182,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     _controller.pause();
     _game.pauseEngine();
     _pauseDialogOpen = true;
-    await showPauseDialog(
-      context,
-      controller: _controller,
-      onRestart: _restart,
-      onExit: _exit,
-    );
+    await showPauseDialog(context, controller: _controller, onRestart: _restart, onExit: _exit);
     _pauseDialogOpen = false;
     if (mounted && _controller.isPaused) _controller.resume();
     if (mounted) _game.resumeEngine();
@@ -217,9 +207,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
       return KeyEventResult.ignored;
     }
-    final action = context.read<SettingsProvider>().keyBindings.actionFor(
-      event.logicalKey,
-    );
+    final action = context.read<SettingsProvider>().keyBindings.actionFor(event.logicalKey);
     if (action == null) return KeyEventResult.ignored;
     if (!action.repeatable && event is! KeyDownEvent) {
       return KeyEventResult.ignored;

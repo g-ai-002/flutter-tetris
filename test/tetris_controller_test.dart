@@ -13,11 +13,7 @@ void main() {
     late TetrisController controller;
 
     setUp(() {
-      controller = TetrisController(
-        mode: GameMode.endless,
-        seed: 2026,
-        autoTick: false,
-      );
+      controller = TetrisController(mode: GameMode.endless, seed: 2026, autoTick: false);
       controller.start();
     });
 
@@ -35,19 +31,14 @@ void main() {
     });
 
     test('固定种子让方块序列在重开后复现', () {
-      List<TetrominoType> sequence() => [
-        controller.piece!.type,
-        ...controller.nextQueue.take(3),
-      ];
+      List<TetrominoType> sequence() => [controller.piece!.type, ...controller.nextQueue.take(3)];
       final first = sequence();
       controller.restart();
       expect(sequence(), first);
     });
 
     test('左右移动受墙限制', () {
-      controller.setPieceForTest(
-        const ActivePiece(type: TetrominoType.t, x: 0, y: 10),
-      );
+      controller.setPieceForTest(const ActivePiece(type: TetrominoType.t, x: 0, y: 10));
       expect(controller.moveLeft(), isFalse);
       expect(controller.piece!.x, 0);
       expect(controller.moveRight(), isTrue);
@@ -69,10 +60,7 @@ void main() {
       expect(ghost.type, controller.piece!.type);
       expect(ghost.y, greaterThan(controller.piece!.y));
       expect(controller.board.fits(ghost.blocks), isTrue);
-      expect(
-        controller.board.fits(ghost.copyWith(y: ghost.y + 1).blocks),
-        isFalse,
-      );
+      expect(controller.board.fits(ghost.copyWith(y: ghost.y + 1).blocks), isFalse);
     });
 
     test('幽灵方块在同一方块与棋盘版本内复用', () {
@@ -144,9 +132,7 @@ void main() {
     });
 
     test('贴地后锁定延迟到期才落定', () {
-      controller.setPieceForTest(
-        const ActivePiece(type: TetrominoType.o, x: 3, y: 19),
-      );
+      controller.setPieceForTest(const ActivePiece(type: TetrominoType.o, x: 3, y: 19));
       advance(controller, 400);
       expect(controller.pieces, 0);
       expect(controller.piece, isNotNull);
@@ -161,9 +147,7 @@ void main() {
       for (var x = 4; x < 10; x++) {
         controller.board.setCell(x, 20, TetrominoType.z);
       }
-      controller.setPieceForTest(
-        const ActivePiece(type: TetrominoType.i, x: 0, y: 19),
-      );
+      controller.setPieceForTest(const ActivePiece(type: TetrominoType.i, x: 0, y: 19));
       controller.hardDrop();
       expect(controller.lines, 1);
       expect(controller.clearingRows, [20]);
@@ -180,9 +164,7 @@ void main() {
       for (var x = 4; x < 10; x++) {
         controller.board.setCell(x, 20, TetrominoType.z);
       }
-      controller.setPieceForTest(
-        const ActivePiece(type: TetrominoType.i, x: 0, y: 19),
-      );
+      controller.setPieceForTest(const ActivePiece(type: TetrominoType.i, x: 0, y: 19));
       controller.hardDrop();
       expect(controller.score, 100 + 100 + 50);
       expect(controller.combo, 2);
@@ -194,9 +176,7 @@ void main() {
       for (var x = 4; x < 10; x++) {
         controller.board.setCell(x, 20, TetrominoType.z);
       }
-      controller.setPieceForTest(
-        const ActivePiece(type: TetrominoType.i, x: 0, y: 19),
-      );
+      controller.setPieceForTest(const ActivePiece(type: TetrominoType.i, x: 0, y: 19));
       controller.hardDrop();
       expect(controller.boardRevision, start + 1);
       expect(controller.isClearing, isTrue);
@@ -220,10 +200,7 @@ void main() {
       controller.hardDrop();
       expect(controller.lines, 4);
       expect(controller.score, 2800);
-      expect(
-        controller.drainEvents(),
-        containsAll([GameEvent.tetris, GameEvent.perfectClear]),
-      );
+      expect(controller.drainEvents(), containsAll([GameEvent.tetris, GameEvent.perfectClear]));
       advance(controller, 300);
       expect(controller.board.filledCount, 0);
     });
@@ -233,9 +210,7 @@ void main() {
       for (var x = 4; x < 10; x++) {
         controller.board.setCell(x, 20, TetrominoType.s);
       }
-      controller.setPieceForTest(
-        const ActivePiece(type: TetrominoType.i, x: 0, y: 19),
-      );
+      controller.setPieceForTest(const ActivePiece(type: TetrominoType.i, x: 0, y: 19));
       controller.hardDrop();
       expect(controller.lines, 10);
       expect(controller.level, 2);
@@ -246,9 +221,7 @@ void main() {
       for (final point in const [(3, 4), (5, 4), (3, 6), (5, 6)]) {
         controller.board.setCell(point.$1, point.$2, TetrominoType.z);
       }
-      controller.setPieceForTest(
-        const ActivePiece(type: TetrominoType.t, x: 3, y: 4),
-      );
+      controller.setPieceForTest(const ActivePiece(type: TetrominoType.t, x: 3, y: 4));
       expect(controller.rotateClockwise(), isTrue);
       expect(controller.piece!.rotation, 1);
       controller.lockNowForTest();
@@ -261,18 +234,14 @@ void main() {
       for (final point in const [(3, 4), (5, 4), (3, 6)]) {
         controller.board.setCell(point.$1, point.$2, TetrominoType.z);
       }
-      controller.setPieceForTest(
-        const ActivePiece(type: TetrominoType.t, x: 3, y: 4),
-      );
+      controller.setPieceForTest(const ActivePiece(type: TetrominoType.t, x: 3, y: 4));
       expect(controller.rotateClockwise(), isTrue);
       controller.lockNowForTest();
       expect(controller.score, 100);
     });
 
     test('方块完全锁在顶部时结束对局', () {
-      controller.setPieceForTest(
-        const ActivePiece(type: TetrominoType.o, x: 3, y: -2),
-      );
+      controller.setPieceForTest(const ActivePiece(type: TetrominoType.o, x: 3, y: -2));
       controller.lockNowForTest();
       expect(controller.status, GameStatus.over);
       expect(controller.result, isNotNull);
@@ -296,20 +265,14 @@ void main() {
 
   group('模式目标', () {
     test('40 行竞速完成目标即获胜并记录完成时间', () {
-      final controller = TetrisController(
-        mode: GameMode.sprint,
-        seed: 11,
-        autoTick: false,
-      );
+      final controller = TetrisController(mode: GameMode.sprint, seed: 11, autoTick: false);
       addTearDown(controller.dispose);
       controller.start();
       controller.debugSetStats(lines: 39);
       for (var x = 4; x < 10; x++) {
         controller.board.setCell(x, 20, TetrominoType.j);
       }
-      controller.setPieceForTest(
-        const ActivePiece(type: TetrominoType.i, x: 0, y: 19),
-      );
+      controller.setPieceForTest(const ActivePiece(type: TetrominoType.i, x: 0, y: 19));
       controller.hardDrop();
       advance(controller, 300);
       expect(controller.status, GameStatus.over);
@@ -319,11 +282,7 @@ void main() {
     });
 
     test('2 分钟计时到点结束', () {
-      final controller = TetrisController(
-        mode: GameMode.ultra,
-        seed: 12,
-        autoTick: false,
-      );
+      final controller = TetrisController(mode: GameMode.ultra, seed: 12, autoTick: false);
       addTearDown(controller.dispose);
       controller.start();
       controller.debugSetStats(elapsed: const Duration(milliseconds: 119900));
@@ -347,11 +306,7 @@ void main() {
         startLevel: 4,
         seed: 7,
       );
-      final controller = TetrisController(
-        mode: GameMode.level,
-        level: level,
-        autoTick: false,
-      );
+      final controller = TetrisController(mode: GameMode.level, level: level, autoTick: false);
       addTearDown(controller.dispose);
       controller.start();
 
@@ -374,19 +329,13 @@ void main() {
         terrain: [],
         seed: 8,
       );
-      final controller = TetrisController(
-        mode: GameMode.level,
-        level: level,
-        autoTick: false,
-      );
+      final controller = TetrisController(mode: GameMode.level, level: level, autoTick: false);
       addTearDown(controller.dispose);
       controller.start();
       for (var x = 4; x < 10; x++) {
         controller.board.setCell(x, 20, TetrominoType.z);
       }
-      controller.setPieceForTest(
-        const ActivePiece(type: TetrominoType.i, x: 0, y: 19),
-      );
+      controller.setPieceForTest(const ActivePiece(type: TetrominoType.i, x: 0, y: 19));
       controller.hardDrop();
       advance(controller, 300);
 
@@ -408,11 +357,7 @@ void main() {
         terrain: [],
         seed: 9,
       );
-      final controller = TetrisController(
-        mode: GameMode.level,
-        level: level,
-        autoTick: false,
-      );
+      final controller = TetrisController(mode: GameMode.level, level: level, autoTick: false);
       addTearDown(controller.dispose);
       controller.start();
       advance(controller, 2100);
@@ -434,11 +379,7 @@ void main() {
         garbage: GarbageRule(interval: Duration(seconds: 1)),
         seed: 10,
       );
-      final controller = TetrisController(
-        mode: GameMode.level,
-        level: level,
-        autoTick: false,
-      );
+      final controller = TetrisController(mode: GameMode.level, level: level, autoTick: false);
       addTearDown(controller.dispose);
       controller.start();
       advance(controller, 1100);
@@ -450,18 +391,11 @@ void main() {
 
     test('每日挑战使用当天种子，同一日期重开序列一致', () {
       final daily = DailyChallenge.forDate(DateTime(2026, 11, 5));
-      final controller = TetrisController(
-        mode: GameMode.daily,
-        daily: daily,
-        autoTick: false,
-      );
+      final controller = TetrisController(mode: GameMode.daily, daily: daily, autoTick: false);
       addTearDown(controller.dispose);
       controller.start();
 
-      List<TetrominoType> sequence() => [
-        controller.piece!.type,
-        ...controller.nextQueue.take(4),
-      ];
+      List<TetrominoType> sequence() => [controller.piece!.type, ...controller.nextQueue.take(4)];
       final first = sequence();
       expect(controller.limit, const Duration(seconds: 120));
       expect(controller.targetLines, isNull);
@@ -478,16 +412,8 @@ void main() {
     test('不同日期的每日挑战使用不同种子', () {
       final today = DailyChallenge.forDate(DateTime(2026, 11, 5));
       final tomorrow = DailyChallenge.forDate(DateTime(2026, 11, 6));
-      final first = TetrisController(
-        mode: GameMode.daily,
-        daily: today,
-        autoTick: false,
-      );
-      final second = TetrisController(
-        mode: GameMode.daily,
-        daily: tomorrow,
-        autoTick: false,
-      );
+      final first = TetrisController(mode: GameMode.daily, daily: today, autoTick: false);
+      final second = TetrisController(mode: GameMode.daily, daily: tomorrow, autoTick: false);
       addTearDown(first.dispose);
       addTearDown(second.dispose);
       first.start();

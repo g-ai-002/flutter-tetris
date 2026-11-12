@@ -13,26 +13,14 @@ const Color appInk = Color(0xFF2E2A24);
 const Color appJade = Color(0xFF3F6B5B);
 const Color appWood = Color(0xFF8B6239);
 
-ThemeData buildLightTheme({
-  String? fontFamily,
-  BlockSkin skin = BlockSkin.paper,
-}) => _buildBase(
-  palette: BlockPalette.of(skin, dark: false),
-  fontFamily: fontFamily,
-);
+ThemeData buildLightTheme({String? fontFamily, BlockSkin skin = BlockSkin.paper}) =>
+    _buildBase(palette: BlockPalette.of(skin, dark: false), fontFamily: fontFamily);
 
-ThemeData buildDarkTheme({
-  String? fontFamily,
-  BlockSkin skin = BlockSkin.paper,
-}) => _buildBase(
-  palette: BlockPalette.of(skin, dark: true),
-  fontFamily: fontFamily,
-);
+ThemeData buildDarkTheme({String? fontFamily, BlockSkin skin = BlockSkin.paper}) =>
+    _buildBase(palette: BlockPalette.of(skin, dark: true), fontFamily: fontFamily);
 
 ThemeData _buildBase({required BlockPalette palette, String? fontFamily}) {
-  final base = palette.dark
-      ? const ColorScheme.dark()
-      : const ColorScheme.light();
+  final base = palette.dark ? const ColorScheme.dark() : const ColorScheme.light();
   final colorScheme = base.copyWith(
     primary: palette.accent,
     onPrimary: palette.onAccent,
@@ -108,11 +96,7 @@ ThemeData _buildBase({required BlockPalette palette, String? fontFamily}) {
         elevation: 0,
         minimumSize: const Size(0, 46),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        textStyle: TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w600,
-          fontFamily: fontFamily,
-        ),
+        textStyle: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, fontFamily: fontFamily),
       ),
     ),
     outlinedButtonTheme: OutlinedButtonThemeData(
@@ -120,11 +104,7 @@ ThemeData _buildBase({required BlockPalette palette, String? fontFamily}) {
         minimumSize: const Size(0, 46),
         side: BorderSide(color: colorScheme.outline),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        textStyle: TextStyle(
-          fontSize: 15,
-          fontWeight: FontWeight.w600,
-          fontFamily: fontFamily,
-        ),
+        textStyle: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, fontFamily: fontFamily),
       ),
     ),
     chipTheme: ChipThemeData(
@@ -133,11 +113,7 @@ ThemeData _buildBase({required BlockPalette palette, String? fontFamily}) {
       shape: const StadiumBorder(),
       backgroundColor: colorScheme.surface,
       selectedColor: colorScheme.primaryContainer,
-      labelStyle: TextStyle(
-        fontSize: 13,
-        color: colorScheme.onSurface,
-        fontFamily: fontFamily,
-      ),
+      labelStyle: TextStyle(fontSize: 13, color: colorScheme.onSurface, fontFamily: fontFamily),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
     ),
     dividerTheme: DividerThemeData(

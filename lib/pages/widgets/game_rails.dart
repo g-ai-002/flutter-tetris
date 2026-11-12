@@ -32,9 +32,7 @@ class GameLeftRail extends StatelessWidget {
             palette: palette,
             size: 62,
             onTap: controller.canHold ? controller.hold : null,
-            hint: controller.canHold
-                ? '${bindings.labelsFor(GameAction.hold).first} / 点击'
-                : null,
+            hint: controller.canHold ? '${bindings.labelsFor(GameAction.hold).first} / 点击' : null,
           ),
           const SizedBox(height: 18),
         ],
@@ -48,11 +46,7 @@ class GameLeftRail extends StatelessWidget {
 
 /// 宽屏右侧栏：五个预览与连续奖励提示。
 class GameRightRail extends StatelessWidget {
-  const GameRightRail({
-    super.key,
-    required this.controller,
-    required this.palette,
-  });
+  const GameRightRail({super.key, required this.controller, required this.palette});
 
   final TetrisController controller;
   final BlockPalette palette;
@@ -169,11 +163,7 @@ class NextQueue extends StatelessWidget {
     final next = controller.nextQueue;
     final colors = Theme.of(context).colorScheme;
     final style = compact
-        ? TextStyle(
-            fontSize: 9,
-            letterSpacing: 1.2,
-            color: colors.onSurfaceVariant,
-          )
+        ? TextStyle(fontSize: 9, letterSpacing: 1.2, color: colors.onSurfaceVariant)
         : Theme.of(context).textTheme.labelSmall
               ?.copyWith(color: colors.onSurfaceVariant, letterSpacing: 2);
     return Column(
@@ -199,11 +189,7 @@ class NextQueue extends StatelessWidget {
 
 /// 桌面端的键盘提示条，按键取自当前键位配置。
 class GameKeyboardHint extends StatelessWidget {
-  const GameKeyboardHint({
-    super.key,
-    required this.bindings,
-    this.showHold = true,
-  });
+  const GameKeyboardHint({super.key, required this.bindings, this.showHold = true});
 
   final KeyBindings bindings;
 
@@ -213,11 +199,7 @@ class GameKeyboardHint extends StatelessWidget {
   String _first(GameAction action) => bindings.labelsFor(action).first;
 
   List<(GameAction, String, String)> get _items => [
-    (
-      GameAction.moveLeft,
-      '${_first(GameAction.moveLeft)}/${_first(GameAction.moveRight)}',
-      '移动',
-    ),
+    (GameAction.moveLeft, '${_first(GameAction.moveLeft)}/${_first(GameAction.moveRight)}', '移动'),
     (GameAction.softDrop, _first(GameAction.softDrop), '软降'),
     (GameAction.hardDrop, _first(GameAction.hardDrop), '硬降'),
     (GameAction.rotateClockwise, _first(GameAction.rotateClockwise), '旋转'),
@@ -242,23 +224,13 @@ class GameKeyboardHint extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 5,
-                    vertical: 2,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                   decoration: BoxDecoration(
-                    color: colors.surfaceContainerHighest.withValues(
-                      alpha: 0.7,
-                    ),
+                    color: colors.surfaceContainerHighest.withValues(alpha: 0.7),
                     borderRadius: BorderRadius.circular(5),
-                    border: Border.all(
-                      color: colors.outline.withValues(alpha: 0.7),
-                    ),
+                    border: Border.all(color: colors.outline.withValues(alpha: 0.7)),
                   ),
-                  child: Text(
-                    key,
-                    style: theme.textTheme.labelSmall?.copyWith(fontSize: 9.5),
-                  ),
+                  child: Text(key, style: theme.textTheme.labelSmall?.copyWith(fontSize: 9.5)),
                 ),
                 const SizedBox(width: 3),
                 Text(

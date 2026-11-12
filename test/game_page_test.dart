@@ -66,10 +66,7 @@ void main() {
     );
     await tester.pump();
 
-    expect(
-      LogService.getRecentLogs().any((line) => line.contains('逻辑 120Hz')),
-      isTrue,
-    );
+    expect(LogService.getRecentLogs().any((line) => line.contains('逻辑 120Hz')), isTrue);
 
     await tester.pumpWidget(const SizedBox.shrink());
   });
@@ -89,9 +86,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    final game = tester
-        .widget<GameWidget<TetrisGame>>(find.byType(GameWidget<TetrisGame>))
-        .game!;
+    final game = tester.widget<GameWidget<TetrisGame>>(find.byType(GameWidget<TetrisGame>)).game!;
     expect(find.text('街机模式'), findsOneWidget);
     expect(find.textContaining('街机计分'), findsOneWidget);
     expect(find.text('暂存'), findsNothing);
@@ -190,9 +185,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    final gameWidget = tester.widget<GameWidget<TetrisGame>>(
-      find.byType(GameWidget<TetrisGame>),
-    );
+    final gameWidget = tester.widget<GameWidget<TetrisGame>>(find.byType(GameWidget<TetrisGame>));
     expect(gameWidget.game!.style.palette.skin, BlockSkin.ink);
     await tester.pumpWidget(const SizedBox.shrink());
   });
@@ -247,9 +240,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    final game = tester
-        .widget<GameWidget<TetrisGame>>(find.byType(GameWidget<TetrisGame>))
-        .game!;
+    final game = tester.widget<GameWidget<TetrisGame>>(find.byType(GameWidget<TetrisGame>)).game!;
     final startX = game.controller.piece!.x;
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
     await tester.pump();
@@ -272,9 +263,7 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
-    final game = tester
-        .widget<GameWidget<TetrisGame>>(find.byType(GameWidget<TetrisGame>))
-        .game!;
+    final game = tester.widget<GameWidget<TetrisGame>>(find.byType(GameWidget<TetrisGame>)).game!;
     expect(game.paused, isFalse);
 
     await tester.tap(find.byIcon(Icons.pause_rounded));
@@ -294,13 +283,8 @@ void main() {
     tester.view.devicePixelRatio = 1.0;
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
-    final bindings = KeyBindings.defaults().rebind(
-      GameAction.moveLeft,
-      LogicalKeyboardKey.keyA,
-    );
-    storage = await prepareStorage({
-      AppConstants.prefKeyKeyBindings: bindings.encode(),
-    });
+    final bindings = KeyBindings.defaults().rebind(GameAction.moveLeft, LogicalKeyboardKey.keyA);
+    storage = await prepareStorage({AppConstants.prefKeyKeyBindings: bindings.encode()});
 
     await tester.pumpWidget(
       wrapPage(
@@ -310,13 +294,8 @@ void main() {
     );
     await tester.pump();
 
-    final game = tester
-        .widget<GameWidget<TetrisGame>>(find.byType(GameWidget<TetrisGame>))
-        .game!;
-    tester
-        .widget<Focus>(find.byKey(const ValueKey('game-focus')))
-        .focusNode!
-        .requestFocus();
+    final game = tester.widget<GameWidget<TetrisGame>>(find.byType(GameWidget<TetrisGame>)).game!;
+    tester.widget<Focus>(find.byKey(const ValueKey('game-focus'))).focusNode!.requestFocus();
     await tester.pump();
     final startX = game.controller.piece!.x;
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);

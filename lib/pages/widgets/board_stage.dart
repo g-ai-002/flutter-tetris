@@ -39,21 +39,13 @@ class BoardStage extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: palette.boardBorder, width: 1.2),
               boxShadow: [
-                BoxShadow(
-                  color: palette.wellShadow,
-                  blurRadius: 26,
-                  offset: const Offset(0, 12),
-                ),
+                BoxShadow(color: palette.wellShadow, blurRadius: 26, offset: const Offset(0, 12)),
               ],
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.circular(15),
               // 键盘焦点由对局页统一持有；Flame 默认 autofocus 会抢走焦点并拦截按键。
-              child: GameWidget<TetrisGame>(
-                key: gameKey,
-                game: game,
-                autofocus: false,
-              ),
+              child: GameWidget<TetrisGame>(key: gameKey, game: game, autofocus: false),
             ),
           ),
         );

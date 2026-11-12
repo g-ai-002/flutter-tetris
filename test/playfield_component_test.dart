@@ -13,16 +13,10 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   test('场地组件可以绘制方块、幽灵块与消行特效', () {
-    final controller = TetrisController(
-      mode: GameMode.endless,
-      seed: 21,
-      autoTick: false,
-    );
+    final controller = TetrisController(mode: GameMode.endless, seed: 21, autoTick: false);
     addTearDown(controller.dispose);
     controller.start();
-    final style = ValueNotifier(
-      const PlayfieldStyle(palette: BlockPalette.light),
-    );
+    final style = ValueNotifier(const PlayfieldStyle(palette: BlockPalette.light));
     addTearDown(style.dispose);
     final component = PlayfieldComponent(controller: controller, style: style)
       ..size = Vector2(300, 600);
@@ -34,9 +28,7 @@ void main() {
     for (var x = 4; x < 10; x++) {
       controller.board.setCell(x, 20, TetrominoType.t);
     }
-    controller.setPieceForTest(
-      const ActivePiece(type: TetrominoType.i, x: 0, y: 19),
-    );
+    controller.setPieceForTest(const ActivePiece(type: TetrominoType.i, x: 0, y: 19));
     controller.hardDrop();
     expect(controller.isClearing, isTrue);
     component.update(0.016);
@@ -56,16 +48,10 @@ void main() {
   });
 
   test('静态图层复用，并在棋盘或样式变化时重建', () {
-    final controller = TetrisController(
-      mode: GameMode.endless,
-      seed: 7,
-      autoTick: false,
-    );
+    final controller = TetrisController(mode: GameMode.endless, seed: 7, autoTick: false);
     addTearDown(controller.dispose);
     controller.start();
-    final style = ValueNotifier(
-      const PlayfieldStyle(palette: BlockPalette.light),
-    );
+    final style = ValueNotifier(const PlayfieldStyle(palette: BlockPalette.light));
     addTearDown(style.dispose);
     final component = PlayfieldComponent(controller: controller, style: style)
       ..size = Vector2(300, 600);
@@ -85,10 +71,7 @@ void main() {
     render();
     expect(component.debugStaticLayerBuilds, 2);
 
-    style.value = const PlayfieldStyle(
-      palette: BlockPalette.darkPalette,
-      showGhost: false,
-    );
+    style.value = const PlayfieldStyle(palette: BlockPalette.darkPalette, showGhost: false);
     render();
     expect(component.debugStaticLayerBuilds, 3);
 

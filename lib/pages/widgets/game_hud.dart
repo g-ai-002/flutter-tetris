@@ -54,15 +54,12 @@ class GameHud extends StatelessWidget {
           child: Text(
             formatThousands(controller.score),
             maxLines: 1,
-            style:
-                (compact
-                        ? theme.textTheme.headlineSmall
-                        : theme.textTheme.headlineMedium)
-                    ?.copyWith(
-                      fontWeight: FontWeight.w700,
-                      fontFeatures: const [FontFeature.tabularFigures()],
-                      height: 1.05,
-                    ),
+            style: (compact ? theme.textTheme.headlineSmall : theme.textTheme.headlineMedium)
+                ?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  fontFeatures: const [FontFeature.tabularFigures()],
+                  height: 1.05,
+                ),
           ),
         ),
       ],
@@ -125,12 +122,8 @@ class GameHud extends StatelessWidget {
           _note(context, '${controller.lines} / ${controller.targetLines} 行'),
         if (controller.garbageInterval != null)
           _note(context, '垃圾行 ${controller.garbageSecondsLeft} 秒后上涌'),
-        if (controller.mode == GameMode.ultra ||
-            controller.mode == GameMode.daily)
-          _note(
-            context,
-            controller.mode == GameMode.daily ? '每日挑战 · 限时 2 分钟' : '限时 2 分钟',
-          ),
+        if (controller.mode == GameMode.ultra || controller.mode == GameMode.daily)
+          _note(context, controller.mode == GameMode.daily ? '每日挑战 · 限时 2 分钟' : '限时 2 分钟'),
       ],
     );
   }
@@ -153,10 +146,7 @@ class GameHud extends StatelessWidget {
   Widget _note(BuildContext context, String text) {
     return Text(
       text,
-      style: TextStyle(
-        fontSize: 11,
-        color: Theme.of(context).colorScheme.onSurfaceVariant,
-      ),
+      style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurfaceVariant),
     );
   }
 }
@@ -189,18 +179,13 @@ class GameHudBar extends StatelessWidget {
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
-                child: SizedBox(
-                  width: 300,
-                  child: GameHud(controller: controller, compact: true),
-                ),
+                child: SizedBox(width: 300, child: GameHud(controller: controller, compact: true)),
               ),
             ),
           ),
           _BarButton(icon: Icons.help_outline, onPressed: onHelp, tip: '玩法与操作'),
           _BarButton(
-            icon: controller.isPaused
-                ? Icons.play_arrow_rounded
-                : Icons.pause_rounded,
+            icon: controller.isPaused ? Icons.play_arrow_rounded : Icons.pause_rounded,
             onPressed: onPause,
             tip: controller.isPaused ? '继续' : '暂停',
           ),
@@ -211,11 +196,7 @@ class GameHudBar extends StatelessWidget {
 }
 
 class _BarButton extends StatelessWidget {
-  const _BarButton({
-    required this.icon,
-    required this.onPressed,
-    required this.tip,
-  });
+  const _BarButton({required this.icon, required this.onPressed, required this.tip});
 
   final IconData icon;
   final VoidCallback onPressed;

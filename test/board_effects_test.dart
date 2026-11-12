@@ -93,13 +93,7 @@ void main() {
 
   test('没有拖影高度时不生成特效', () {
     final effects = BoardEffects(random: math.Random(4));
-    effects.spawnDropTrail(
-      board: Board(),
-      column: 0,
-      rows: 0,
-      blocks: const [],
-      cellSize: 30,
-    );
+    effects.spawnDropTrail(board: Board(), column: 0, rows: 0, blocks: const [], cellSize: 30);
     expect(effects.trailCount, 0);
   });
 }

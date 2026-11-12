@@ -11,8 +11,7 @@ import '../theme/block_palette.dart';
 /// 只保存特效自身的状态，场地几何由调用方按帧传入，
 /// 便于在测试中独立驱动而不依赖 Flame 组件的尺寸。
 class BoardEffects {
-  BoardEffects({math.Random? random})
-    : _random = random ?? math.Random(20261104);
+  BoardEffects({math.Random? random}) : _random = random ?? math.Random(20261104);
 
   static const int maxParticles = 260;
 
@@ -40,9 +39,7 @@ class BoardEffects {
         final type = board.at(x, row);
         if (type == null) continue;
         final center = _cellCenter(x, row, board.hiddenRows, cellSize);
-        final color = board.isGarbage(x, row)
-            ? palette.garbageBlock
-            : palette.colorOf(type);
+        final color = board.isGarbage(x, row) ? palette.garbageBlock : palette.colorOf(type);
         final count = rows.length >= 4 ? 2 : 1;
         for (var i = 0; i < count; i++) {
           _particles.add(
@@ -84,10 +81,7 @@ class BoardEffects {
       _particles.add(
         _Particle(
           position: Vector2(center.dx, center.dy + cellSize * 0.4),
-          velocity: Vector2(
-            (_random.nextDouble() - 0.5) * 70,
-            -25 - _random.nextDouble() * 45,
-          ),
+          velocity: Vector2((_random.nextDouble() - 0.5) * 70, -25 - _random.nextDouble() * 45),
           color: color,
           life: 0.2 + _random.nextDouble() * 0.15,
           maxLife: 0.35,
@@ -141,11 +135,7 @@ class BoardEffects {
     if (_shake > 0) _shake = math.max(0, _shake - dt * 26);
   }
 
-  void paintTrails(
-    Canvas canvas, {
-    required int hiddenRows,
-    required double cellSize,
-  }) {
+  void paintTrails(Canvas canvas, {required int hiddenRows, required double cellSize}) {
     if (_trails.isEmpty) return;
     final paint = Paint();
     for (final trail in _trails) {

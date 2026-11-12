@@ -18,18 +18,7 @@ import 'tspin.dart';
 enum GameStatus { ready, playing, paused, over }
 
 /// 需要界面反馈的动作，对应音效与震动。
-enum GameEvent {
-  move,
-  rotate,
-  hold,
-  lock,
-  lineClear,
-  tetris,
-  perfectClear,
-  levelUp,
-  gameOver,
-  win,
-}
+enum GameEvent { move, rotate, hold, lock, lineClear, tetris, perfectClear, levelUp, gameOver, win }
 
 /// 俄罗斯方块核心控制器：负责方块生成、移动、消行、计分与计时。
 /// 默认自带 60Hz 定时器驱动；单元测试可关闭自动计时，手动调用 [tick]。
@@ -62,14 +51,8 @@ class TetrisController extends ChangeNotifier {
   }) : lockDelay = lockDelay ?? rules.lockDelay,
        _seed = seed,
        _bag = SevenBag(seed: seed),
-       _garbage = GarbageSpawner(
-         rule: rules.garbage,
-         seed: (seed ?? 0) * 31 + 17,
-       ),
-       _scoreBoard = ScoreBoard(
-         startLevel: rules.startLevel,
-         arcade: rules.isArcade,
-       ),
+       _garbage = GarbageSpawner(rule: rules.garbage, seed: (seed ?? 0) * 31 + 17),
+       _scoreBoard = ScoreBoard(startLevel: rules.startLevel, arcade: rules.isArcade),
        board = Board() {
     _lastTick = DateTime.now();
   }
@@ -140,8 +123,7 @@ class TetrisController extends ChangeNotifier {
   GameStatus get status => _status;
   ActivePiece? get piece => _piece;
   TetrominoType? get holdType => _hold;
-  bool get canHold =>
-      rules.holdEnabled && _status == GameStatus.playing && !_holdUsed;
+  bool get canHold => rules.holdEnabled && _status == GameStatus.playing && !_holdUsed;
 
   /// 接下来的方块：标准玩法五个，街机模式只有下一块。
   List<TetrominoType> get nextQueue => _bag.peek(rules.previewCount);
@@ -171,8 +153,7 @@ class TetrisController extends ChangeNotifier {
     return ratio.clamp(0.0, 1.0);
   }
 
-  bool get canControl =>
-      _status == GameStatus.playing && _piece != null && !isClearing;
+  bool get canControl => _status == GameStatus.playing && _piece != null && !isClearing;
 
   /// 当前对局的目标行数：竞速为 40，关卡取自关卡定义。
   int? get targetLines => rules.targetLines;
@@ -194,8 +175,7 @@ class TetrisController extends ChangeNotifier {
   ActivePiece? get ghostPiece {
     final current = _piece;
     if (current == null) return null;
-    if (identical(current, _ghostSource) &&
-        _ghostSourceRevision == _boardRevision) {
+    if (identical(current, _ghostSource) && _ghostSourceRevision == _boardRevision) {
       return _ghost;
     }
     var ghost = current;
@@ -527,11 +507,7 @@ class TetrisController extends ChangeNotifier {
   void _lockPiece() {
     final current = _piece;
     if (current == null) return;
-    final spin = detectTSpin(
-      board: board,
-      piece: current,
-      lastActionRotate: _lastActionRotate,
-    );
+    final spin = detectTSpin(board: board, piece: current, lastActionRotate: _lastActionRotate);
     final tSpin = spin.isTSpin;
     final mini = spin.isMini;
     final blocks = current.blocks;
@@ -553,8 +529,7 @@ class TetrisController extends ChangeNotifier {
     }
 
     final rows = board.fullRows();
-    final perfect =
-        rows.isNotEmpty && board.filledCount == rows.length * board.columns;
+    final perfect = rows.isNotEmpty && board.filledCount == rows.length * board.columns;
     final clear = _scoreBoard.registerClear(
       rows: rows.length,
       tSpin: tSpin,
@@ -592,11 +567,7 @@ class TetrisController extends ChangeNotifier {
 
     final target = targetLines;
     if (target != null && lines >= target) {
-      _end(
-        won: true,
-        reason: '完成 $target 行',
-        elapsedOverride: _completedAt ?? _elapsed,
-      );
+      _end(won: true, reason: '完成 $target 行', elapsedOverride: _completedAt ?? _elapsed);
       return;
     }
     _completedAt = null;
@@ -604,11 +575,7 @@ class TetrisController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _end({
-    required bool won,
-    required String reason,
-    Duration? elapsedOverride,
-  }) {
+  void _end({required bool won, required String reason, Duration? elapsedOverride}) {
     if (_status == GameStatus.over) return;
     _status = GameStatus.over;
     _timer?.cancel();

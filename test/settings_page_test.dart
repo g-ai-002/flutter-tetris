@@ -21,9 +21,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(
-      wrapPage(child: const SettingsPage(), storage: storage),
-    );
+    await tester.pumpWidget(wrapPage(child: const SettingsPage(), storage: storage));
 
     expect(find.text('外观与操作'), findsOneWidget);
     expect(find.text('逻辑更新速率'), findsOneWidget);
@@ -46,21 +44,14 @@ void main() {
     await tester.pump();
     expect(storage.showGrid, isFalse);
 
-    expect(
-      tester
-          .widget<ChoiceChip>(find.byKey(const ValueKey('logic-rate-60')))
-          .selected,
-      isTrue,
-    );
+    expect(tester.widget<ChoiceChip>(find.byKey(const ValueKey('logic-rate-60'))).selected, isTrue);
     await tester.ensureVisible(find.byKey(const ValueKey('logic-rate-120')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const ValueKey('logic-rate-120')));
     await tester.pump();
     expect(storage.logicRate, 120);
     expect(
-      tester
-          .widget<ChoiceChip>(find.byKey(const ValueKey('logic-rate-120')))
-          .selected,
+      tester.widget<ChoiceChip>(find.byKey(const ValueKey('logic-rate-120'))).selected,
       isTrue,
     );
 
@@ -90,9 +81,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(
-      wrapPage(child: const SettingsPage(), storage: storage),
-    );
+    await tester.pumpWidget(wrapPage(child: const SettingsPage(), storage: storage));
 
     await tester.scrollUntilVisible(
       find.text('查看玩法与键位'),
@@ -114,9 +103,7 @@ void main() {
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
 
-    await tester.pumpWidget(
-      wrapPage(child: const SettingsPage(), storage: storage),
-    );
+    await tester.pumpWidget(wrapPage(child: const SettingsPage(), storage: storage));
 
     expect(find.text('键位与手柄'), findsOneWidget);
     await tester.tap(find.byKey(const ValueKey('bind-moveLeft')));
@@ -125,18 +112,12 @@ void main() {
 
     await tester.sendKeyEvent(LogicalKeyboardKey.keyA);
     await tester.pumpAndSettle();
-    expect(
-      storage.keyBindings.primaryKey(GameAction.moveLeft),
-      LogicalKeyboardKey.keyA,
-    );
+    expect(storage.keyBindings.primaryKey(GameAction.moveLeft), LogicalKeyboardKey.keyA);
 
     await tester.ensureVisible(find.byKey(const ValueKey('reset-keys')));
     await tester.tap(find.byKey(const ValueKey('reset-keys')));
     await tester.pump();
-    expect(
-      storage.keyBindings.primaryKey(GameAction.moveLeft),
-      LogicalKeyboardKey.arrowLeft,
-    );
+    expect(storage.keyBindings.primaryKey(GameAction.moveLeft), LogicalKeyboardKey.arrowLeft);
     expect(find.text('A'), findsNothing);
   });
 }

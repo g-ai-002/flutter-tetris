@@ -72,10 +72,6 @@ class PieceSlot extends StatelessWidget {
       ],
     );
     if (onTap == null) return content;
-    return InkWell(
-      borderRadius: BorderRadius.circular(10),
-      onTap: onTap,
-      child: content,
-    );
+    return InkWell(borderRadius: BorderRadius.circular(10), onTap: onTap, child: content);
   }
 }

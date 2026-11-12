@@ -63,11 +63,7 @@ class GameShell extends StatelessWidget {
         builder: (context, _) => Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              controller.rules.title,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
+            Text(controller.rules.title, maxLines: 1, overflow: TextOverflow.ellipsis),
             if (!short)
               Text(
                 _subtitle(),
@@ -92,9 +88,7 @@ class GameShell extends StatelessWidget {
             tooltip: controller.isPaused ? '继续' : '暂停',
             onPressed: controller.isOver ? null : onPause,
             icon: Icon(
-              controller.isPaused
-                  ? Icons.play_arrow_rounded
-                  : Icons.pause_rounded,
+              controller.isPaused ? Icons.play_arrow_rounded : Icons.pause_rounded,
               size: 23,
             ),
           ),
@@ -130,30 +124,21 @@ class GameShell extends StatelessWidget {
     return RepaintBoundary(
       child: BoardGestureLayer(
         controller: controller,
-        child: BoardStage(
-          game: game,
-          gameKey: const ValueKey('tetris-board'),
-          palette: palette,
-        ),
+        child: BoardStage(game: game, gameKey: const ValueKey('tetris-board'), palette: palette),
       ),
     );
   }
 
   /// 对局 HUD 与操作区随控制器每一帧刷新。
-  Widget _bound(Widget Function() builder) => AnimatedBuilder(
-    animation: controller,
-    builder: (context, _) => builder(),
-  );
+  Widget _bound(Widget Function() builder) =>
+      AnimatedBuilder(animation: controller, builder: (context, _) => builder());
 
   Widget _sized(double width, Widget Function() build) =>
       SizedBox(width: width, child: _bound(build));
 
   /// 底部输入区：桌面显示键位提示，移动端显示触控键。
   Widget _inputBar({bool dense = false}) => isDesktopPlatform
-      ? GameKeyboardHint(
-          bindings: bindings,
-          showHold: controller.rules.holdEnabled,
-        )
+      ? GameKeyboardHint(bindings: bindings, showHold: controller.rules.holdEnabled)
       : _bound(() => TouchPad(controller: controller, dense: dense));
 
   /// 桌面与平板的宽屏版式：左右信息栏夹住棋盘，超宽窗口收敛到 1160 像素。
@@ -181,13 +166,7 @@ class GameShell extends StatelessWidget {
                     const SizedBox(width: 16),
                     Expanded(child: _buildBoard()),
                     const SizedBox(width: 16),
-                    _sized(
-                      rail - 8,
-                      () => GameRightRail(
-                        controller: controller,
-                        palette: palette,
-                      ),
-                    ),
+                    _sized(rail - 8, () => GameRightRail(controller: controller, palette: palette)),
                   ],
                 ),
               ),
@@ -206,12 +185,8 @@ class GameShell extends StatelessWidget {
     return Column(
       children: [
         _bound(
-          () => GameHudBar(
-            controller: controller,
-            onBack: onExit,
-            onHelp: onHelp,
-            onPause: onPause,
-          ),
+          () =>
+              GameHudBar(controller: controller, onBack: onExit, onHelp: onHelp, onPause: onPause),
         ),
         Expanded(
           child: Padding(
@@ -221,11 +196,7 @@ class GameShell extends StatelessWidget {
               children: [
                 _sized(
                   rail,
-                  () => GameCompactRail(
-                    controller: controller,
-                    palette: palette,
-                    width: rail,
-                  ),
+                  () => GameCompactRail(controller: controller, palette: palette, width: rail),
                 ),
                 const SizedBox(width: 10),
                 Expanded(child: _buildBoard()),
@@ -234,11 +205,7 @@ class GameShell extends StatelessWidget {
                   width: pad,
                   child: Center(
                     child: _bound(
-                      () => TouchPad(
-                        controller: controller,
-                        dense: true,
-                        vertical: true,
-                      ),
+                      () => TouchPad(controller: controller, dense: true, vertical: true),
                     ),
                   ),
                 ),
@@ -267,11 +234,7 @@ class GameShell extends StatelessWidget {
               children: [
                 _sized(
                   rail,
-                  () => GameCompactRail(
-                    controller: controller,
-                    palette: palette,
-                    width: rail,
-                  ),
+                  () => GameCompactRail(controller: controller, palette: palette, width: rail),
                 ),
                 const SizedBox(width: 6),
                 Expanded(child: _buildBoard()),

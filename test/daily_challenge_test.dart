@@ -28,10 +28,7 @@ void main() {
 
     test('刷新倒计时指向次日零点', () {
       final challenge = DailyChallenge.forDate(DateTime(2026, 11, 5));
-      expect(
-        challenge.refreshIn(DateTime(2026, 11, 5, 23)),
-        const Duration(hours: 1),
-      );
+      expect(challenge.refreshIn(DateTime(2026, 11, 5, 23)), const Duration(hours: 1));
       expect(challenge.refreshIn(DateTime(2026, 11, 6, 1)), Duration.zero);
     });
 

@@ -31,9 +31,7 @@ class SettingSwitchRow extends StatelessWidget {
               const SizedBox(height: 2),
               Text(
                 subtitle,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colors.onSurfaceVariant,
-                ),
+                style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
               ),
             ],
           ),
@@ -63,9 +61,7 @@ class SettingAboutRow extends StatelessWidget {
       children: [
         Text(
           label,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
+          style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
         ),
         const Spacer(),
         Text(value, style: theme.textTheme.bodySmall),

@@ -10,11 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   TetrisController build({int seed = 5}) {
-    final controller = TetrisController(
-      mode: GameMode.endless,
-      seed: seed,
-      autoTick: false,
-    );
+    final controller = TetrisController(mode: GameMode.endless, seed: seed, autoTick: false);
     addTearDown(controller.dispose);
     controller.start();
     return controller;

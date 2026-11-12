@@ -49,11 +49,7 @@ void main() {
 
   group('街机对局', () {
     test('只给一块预览且暂存无效', () {
-      final controller = TetrisController(
-        mode: GameMode.arcade,
-        seed: 7,
-        autoTick: false,
-      );
+      final controller = TetrisController(mode: GameMode.arcade, seed: 7, autoTick: false);
       addTearDown(controller.dispose);
       controller.start();
 
@@ -67,12 +63,8 @@ void main() {
 
     test('街机计分不含连击、T-Spin 与全消奖励', () {
       final board = ScoreBoard(arcade: true);
-      ClearOutcome clear(int rows) => board.registerClear(
-        rows: rows,
-        tSpin: true,
-        mini: false,
-        perfectClear: true,
-      );
+      ClearOutcome clear(int rows) =>
+          board.registerClear(rows: rows, tSpin: true, mini: false, perfectClear: true);
 
       expect(clear(1).score, 40);
       expect(clear(1).score, 40);
@@ -82,12 +74,8 @@ void main() {
 
     test('四行 1200 分，每 10 行升级且封顶 19 级', () {
       final board = ScoreBoard(arcade: true);
-      ClearOutcome clear(int rows) => board.registerClear(
-        rows: rows,
-        tSpin: false,
-        mini: false,
-        perfectClear: false,
-      );
+      ClearOutcome clear(int rows) =>
+          board.registerClear(rows: rows, tSpin: false, mini: false, perfectClear: false);
 
       expect(clear(4).score, 1200);
       expect(clear(4).score, 1200);
@@ -100,16 +88,10 @@ void main() {
     });
 
     test('贴地后不再重置锁定计时，120ms 内落定', () {
-      final controller = TetrisController(
-        mode: GameMode.arcade,
-        seed: 3,
-        autoTick: false,
-      );
+      final controller = TetrisController(mode: GameMode.arcade, seed: 3, autoTick: false);
       addTearDown(controller.dispose);
       controller.start();
-      controller.setPieceForTest(
-        const ActivePiece(type: TetrominoType.o, x: 4, y: 19),
-      );
+      controller.setPieceForTest(const ActivePiece(type: TetrominoType.o, x: 4, y: 19));
 
       controller.tick(const Duration(milliseconds: 100));
       expect(controller.moveLeft(), isTrue);
@@ -119,16 +101,10 @@ void main() {
     });
 
     test('标准模式贴地移动仍会重置锁定计时', () {
-      final controller = TetrisController(
-        mode: GameMode.endless,
-        seed: 3,
-        autoTick: false,
-      );
+      final controller = TetrisController(mode: GameMode.endless, seed: 3, autoTick: false);
       addTearDown(controller.dispose);
       controller.start();
-      controller.setPieceForTest(
-        const ActivePiece(type: TetrominoType.o, x: 4, y: 19),
-      );
+      controller.setPieceForTest(const ActivePiece(type: TetrominoType.o, x: 4, y: 19));
 
       controller.tick(const Duration(milliseconds: 400));
       expect(controller.moveLeft(), isTrue);

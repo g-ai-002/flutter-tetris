@@ -55,19 +55,13 @@ void main() {
 
   test('标准手柄按钮映射到对应操作', () {
     expect(gamepadActionForButton(GamepadButton.a), GameAction.rotateClockwise);
-    expect(
-      gamepadActionForButton(GamepadButton.b),
-      GameAction.rotateCounterClockwise,
-    );
+    expect(gamepadActionForButton(GamepadButton.b), GameAction.rotateCounterClockwise);
     expect(gamepadActionForButton(GamepadButton.x), GameAction.hold);
     expect(gamepadActionForButton(GamepadButton.leftBumper), GameAction.hold);
     expect(gamepadActionForButton(GamepadButton.y), GameAction.hardDrop);
     expect(gamepadActionForButton(GamepadButton.dpadUp), GameAction.hardDrop);
     expect(gamepadActionForButton(GamepadButton.dpadLeft), GameAction.moveLeft);
-    expect(
-      gamepadActionForButton(GamepadButton.dpadRight),
-      GameAction.moveRight,
-    );
+    expect(gamepadActionForButton(GamepadButton.dpadRight), GameAction.moveRight);
     expect(gamepadActionForButton(GamepadButton.dpadDown), GameAction.softDrop);
     expect(gamepadActionForButton(GamepadButton.start), GameAction.pause);
     expect(gamepadActionForButton(GamepadButton.back), isNull);

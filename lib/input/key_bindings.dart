@@ -20,9 +20,7 @@ enum GameAction {
 
   /// 长按可持续触发的操作，只有这些操作响应键盘与手柄的重复事件。
   bool get repeatable =>
-      this == GameAction.moveLeft ||
-      this == GameAction.moveRight ||
-      this == GameAction.softDrop;
+      this == GameAction.moveLeft || this == GameAction.moveRight || this == GameAction.softDrop;
 }
 
 /// 键盘键位表：每个操作至少一个按键，同一按键只属于一个操作。
@@ -32,9 +30,7 @@ class KeyBindings {
     : _keys = {
         for (final action in GameAction.values)
           action: Set.unmodifiable(
-            keys[action] == null || keys[action]!.isEmpty
-                ? defaultKeysFor(action)
-                : keys[action]!,
+            keys[action] == null || keys[action]!.isEmpty ? defaultKeysFor(action) : keys[action]!,
           ),
       };
 
@@ -45,10 +41,7 @@ class KeyBindings {
     GameAction.moveRight: {LogicalKeyboardKey.arrowRight},
     GameAction.softDrop: {LogicalKeyboardKey.arrowDown},
     GameAction.hardDrop: {LogicalKeyboardKey.space},
-    GameAction.rotateClockwise: {
-      LogicalKeyboardKey.arrowUp,
-      LogicalKeyboardKey.keyX,
-    },
+    GameAction.rotateClockwise: {LogicalKeyboardKey.arrowUp, LogicalKeyboardKey.keyX},
     GameAction.rotateCounterClockwise: {LogicalKeyboardKey.keyZ},
     GameAction.hold: {
       LogicalKeyboardKey.keyC,
@@ -76,9 +69,7 @@ class KeyBindings {
         if (stored is List) {
           for (final value in stored) {
             final id = value is int ? value : int.tryParse('$value');
-            final key = id == null
-                ? null
-                : LogicalKeyboardKey.findKeyByKeyId(id);
+            final key = id == null ? null : LogicalKeyboardKey.findKeyByKeyId(id);
             if (key != null && used.add(key)) keys.add(key);
           }
         }
@@ -112,8 +103,7 @@ class KeyBindings {
   /// 设置页展示用主键：多键并存时取默认顺序中的第一个。
   LogicalKeyboardKey primaryKey(GameAction action) => _keys[action]!.first;
 
-  List<String> labelsFor(GameAction action) =>
-      _keys[action]!.map(formatKeyLabel).toList();
+  List<String> labelsFor(GameAction action) => _keys[action]!.map(formatKeyLabel).toList();
 
   /// 返回按键对应的操作，未绑定时为 null。
   GameAction? actionFor(LogicalKeyboardKey key) {
@@ -148,16 +138,13 @@ String formatKeyLabel(LogicalKeyboardKey key) {
   if (key == LogicalKeyboardKey.arrowDown) return '↓';
   if (key == LogicalKeyboardKey.space) return '空格';
   if (key == LogicalKeyboardKey.escape) return 'Esc';
-  if (key == LogicalKeyboardKey.enter ||
-      key == LogicalKeyboardKey.numpadEnter) {
+  if (key == LogicalKeyboardKey.enter || key == LogicalKeyboardKey.numpadEnter) {
     return 'Enter';
   }
-  if (key == LogicalKeyboardKey.shiftLeft ||
-      key == LogicalKeyboardKey.shiftRight) {
+  if (key == LogicalKeyboardKey.shiftLeft || key == LogicalKeyboardKey.shiftRight) {
     return 'Shift';
   }
-  if (key == LogicalKeyboardKey.controlLeft ||
-      key == LogicalKeyboardKey.controlRight) {
+  if (key == LogicalKeyboardKey.controlLeft || key == LogicalKeyboardKey.controlRight) {
     return 'Ctrl';
   }
   if (key == LogicalKeyboardKey.altLeft || key == LogicalKeyboardKey.altRight) {

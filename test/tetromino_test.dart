@@ -18,10 +18,7 @@ void main() {
       for (final type in TetrominoType.values) {
         final states = kTetrominoShapes[type]!;
         final signatures = states
-            .map(
-              (state) => (state.map((b) => '${b.x},${b.y}').toList()..sort())
-                  .join('|'),
-            )
+            .map((state) => (state.map((b) => '${b.x},${b.y}').toList()..sort()).join('|'))
             .toSet();
         if (type == TetrominoType.o) {
           expect(signatures.length, 1);

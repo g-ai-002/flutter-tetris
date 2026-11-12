@@ -24,10 +24,8 @@ class TetrisGame extends FlameGame with KeyboardEvents {
   /// 按键统一交给对局页处理。返回 ignored 让事件继续冒泡，
   /// 否则 Flame 的焦点节点会吞掉方向键与空格。
   @override
-  KeyEventResult onKeyEvent(
-    KeyEvent event,
-    Set<LogicalKeyboardKey> keysPressed,
-  ) => KeyEventResult.ignored;
+  KeyEventResult onKeyEvent(KeyEvent event, Set<LogicalKeyboardKey> keysPressed) =>
+      KeyEventResult.ignored;
 
   @override
   Future<void> onLoad() async {

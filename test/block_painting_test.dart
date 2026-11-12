@@ -24,12 +24,7 @@ void main() {
     paintBlock(canvas, const Rect.fromLTWH(0, 0, 40, 40), color);
     expect(debugBlockPaintBuilds, builds + 1, reason: '尺寸变化只需重建渐变');
 
-    paintBlock(
-      canvas,
-      const Rect.fromLTWH(0, 0, 30, 30),
-      color,
-      opacity: 0.5,
-    );
+    paintBlock(canvas, const Rect.fromLTWH(0, 0, 30, 30), color, opacity: 0.5);
     expect(debugBlockPaintBuilds, builds + 4, reason: '半透明另算一套画笔');
   });
 

@@ -11,8 +11,6 @@ enum BlockSkin {
   final String description;
 
   /// 读取历史偏好，未知或缺失时回到默认的宣纸皮肤。
-  static BlockSkin fromName(String? name) => values.firstWhere(
-    (skin) => skin.name == name,
-    orElse: () => BlockSkin.paper,
-  );
+  static BlockSkin fromName(String? name) =>
+      values.firstWhere((skin) => skin.name == name, orElse: () => BlockSkin.paper);
 }

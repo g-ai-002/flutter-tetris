@@ -72,10 +72,7 @@ Future<void> showHelpDialog(BuildContext context) {
                 for (final mode in GameMode.values)
                   Padding(
                     padding: const EdgeInsets.only(bottom: 4),
-                    child: Text(
-                      '· ${mode.label}：${mode.tagline}',
-                      style: bodyStyle,
-                    ),
+                    child: Text('· ${mode.label}：${mode.tagline}', style: bodyStyle),
                   ),
               ],
             ),

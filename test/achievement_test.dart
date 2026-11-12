@@ -19,21 +19,11 @@ void main() {
       expect(Achievement.hundredGames.unlockedBy(stats), isFalse);
       expect(Achievement.lines100.unlockedBy(stats), isTrue);
       expect(Achievement.lines1000.progress(stats), 800);
-      expect(
-        Achievement.hundredGames.progressLabel(
-          const AchievementStats(games: 12),
-        ),
-        '12/100',
-      );
+      expect(Achievement.hundredGames.progressLabel(const AchievementStats(games: 12)), '12/100');
     });
 
     test('技巧类成就读取四行、T-Spin 与全消次数', () {
-      const stats = AchievementStats(
-        tetrises: 10,
-        tSpins: 4,
-        perfectClears: 1,
-        bestCombo: 6,
-      );
+      const stats = AchievementStats(tetrises: 10, tSpins: 4, perfectClears: 1, bestCombo: 6);
       expect(Achievement.tetris1.unlockedBy(stats), isTrue);
       expect(Achievement.tetris10.unlockedBy(stats), isTrue);
       expect(Achievement.tspin1.unlockedBy(stats), isTrue);
@@ -60,11 +50,7 @@ void main() {
     });
 
     test('关卡、星级与每日连续打卡参与判定', () {
-      const stats = AchievementStats(
-        completedLevels: 6,
-        totalStars: 24,
-        dailyStreak: 7,
-      );
+      const stats = AchievementStats(completedLevels: 6, totalStars: 24, dailyStreak: 7);
       expect(Achievement.levels6.unlockedBy(stats), isTrue);
       expect(Achievement.stars24.unlockedBy(stats), isTrue);
       expect(Achievement.daily7.unlockedBy(stats), isTrue);
@@ -78,17 +64,12 @@ void main() {
         hasLength(Achievement.values.length),
       );
       expect(
-        Achievement.values
-            .map((achievement) => achievement.target)
-            .every((target) => target > 0),
+        Achievement.values.map((achievement) => achievement.target).every((target) => target > 0),
         isTrue,
       );
       const stats = AchievementStats(games: 100);
       expect(Achievement.hundredGames.progressLabel(stats), '已达成');
-      expect(
-        Achievement.firstGame.progressLabel(const AchievementStats()),
-        '未达成',
-      );
+      expect(Achievement.firstGame.progressLabel(const AchievementStats()), '未达成');
     });
   });
 }

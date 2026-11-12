@@ -29,9 +29,7 @@ void main() {
       'plays_ultra': 1,
     });
 
-    await tester.pumpWidget(
-      wrapPage(child: const RecordsPage(), storage: storage),
-    );
+    await tester.pumpWidget(wrapPage(child: const RecordsPage(), storage: storage));
 
     expect(find.text('4'), findsOneWidget);
     expect(find.text('128'), findsOneWidget);
@@ -55,9 +53,7 @@ void main() {
       'plays_endless': 3,
     });
 
-    await tester.pumpWidget(
-      wrapPage(child: const RecordsPage(), storage: storage),
-    );
+    await tester.pumpWidget(wrapPage(child: const RecordsPage(), storage: storage));
 
     expect(find.text('1,200'), findsOneWidget);
     await tester.tap(find.byTooltip('清空纪录'));
@@ -86,9 +82,7 @@ void main() {
       }),
     });
 
-    await tester.pumpWidget(
-      wrapPage(child: const RecordsPage(), storage: storage),
-    );
+    await tester.pumpWidget(wrapPage(child: const RecordsPage(), storage: storage));
 
     expect(find.text('每日挑战'), findsOneWidget);
     expect(find.textContaining('今日最高 5,432 分'), findsOneWidget);
@@ -108,9 +102,7 @@ void main() {
       'achievements': ['firstGame'],
     });
 
-    await tester.pumpWidget(
-      wrapPage(child: const RecordsPage(), storage: storage),
-    );
+    await tester.pumpWidget(wrapPage(child: const RecordsPage(), storage: storage));
 
     expect(find.text('成就'), findsOneWidget);
     expect(find.text('1/20'), findsOneWidget);
@@ -128,9 +120,7 @@ void main() {
     addTearDown(tester.view.resetDevicePixelRatio);
     final storage = await prepareStorage();
 
-    await tester.pumpWidget(
-      wrapPage(child: const RecordsPage(), storage: storage),
-    );
+    await tester.pumpWidget(wrapPage(child: const RecordsPage(), storage: storage));
 
     expect(find.text('还没有对局记录，去玩一局吧。'), findsNWidgets(4));
     expect(find.byTooltip('清空纪录'), findsNothing);

@@ -30,9 +30,7 @@ class ModeRecordCard extends StatelessWidget {
         if (plays == 0)
           Text(
             '还没有对局记录，去玩一局吧。',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colors.onSurfaceVariant,
-            ),
+            style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
           )
         else ...[
           Row(
@@ -66,9 +64,7 @@ class ModeRecordCard extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             mode.tagline,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: colors.onSurfaceVariant,
-            ),
+            style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
           ),
         ],
       ],

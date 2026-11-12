@@ -27,16 +27,7 @@ void main() {
     test('连击与全消奖励累加', () {
       expect(clearScore(lines: 1, level: 1, combo: 2), 200);
       expect(clearScore(lines: 4, level: 1, perfectClear: true), 2800);
-      expect(
-        clearScore(
-          lines: 4,
-          level: 2,
-          backToBack: true,
-          perfectClear: true,
-          combo: 1,
-        ),
-        6500,
-      );
+      expect(clearScore(lines: 4, level: 2, backToBack: true, perfectClear: true, combo: 1), 6500);
     });
   });
 

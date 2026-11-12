@@ -2,11 +2,7 @@ import 'scoring.dart';
 
 /// 一次落定后的计分结果。
 class ClearOutcome {
-  const ClearOutcome({
-    required this.rows,
-    required this.score,
-    required this.levelUp,
-  });
+  const ClearOutcome({required this.rows, required this.score, required this.levelUp});
 
   /// 本次消除的行数，0 表示没有消行。
   final int rows;

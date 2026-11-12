@@ -30,11 +30,7 @@ class DailyRecordsCard extends StatelessWidget {
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(
-            Icons.local_fire_department_outlined,
-            size: 15,
-            color: appGold,
-          ),
+          const Icon(Icons.local_fire_department_outlined, size: 15, color: appGold),
           const SizedBox(width: 3),
           Text(
             '连续 $streak 天',
@@ -51,9 +47,7 @@ class DailyRecordsCard extends StatelessWidget {
               ? '今日最高 ${formatThousands(todayRecord.bestScore)} 分'
                     ' · 已挑战 ${todayRecord.plays} 次'
               : '今天还没有挑战，同一副牌每天都在等你。',
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: colors.onSurfaceVariant,
-          ),
+          style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
         ),
         const SizedBox(height: 6),
         for (final day in days)
@@ -65,9 +59,7 @@ class DailyRecordsCard extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           '点击任一天可用当时的种子重玩，成绩仍记在该天。',
-          style: theme.textTheme.labelSmall?.copyWith(
-            color: colors.onSurfaceVariant,
-          ),
+          style: theme.textTheme.labelSmall?.copyWith(color: colors.onSurfaceVariant),
         ),
       ],
     );
@@ -75,11 +67,7 @@ class DailyRecordsCard extends StatelessWidget {
 }
 
 class _DailyRow extends StatelessWidget {
-  const _DailyRow({
-    required this.challenge,
-    required this.played,
-    required this.isToday,
-  });
+  const _DailyRow({required this.challenge, required this.played, required this.isToday});
 
   final DailyChallenge challenge;
   final DailyRecord played;

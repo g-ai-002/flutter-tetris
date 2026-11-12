@@ -8,20 +8,14 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// 初始化一份使用 mock 偏好的存储服务。
-Future<StorageService> prepareStorage([
-  Map<String, Object> values = const {},
-]) async {
+Future<StorageService> prepareStorage([Map<String, Object> values = const {}]) async {
   SharedPreferences.setMockInitialValues(values);
   StorageService.resetForTests();
   return StorageService.instance;
 }
 
 /// 用设置 Provider 与中文主题包裹被测页面。
-Widget wrapPage({
-  required Widget child,
-  required StorageService storage,
-  ThemeData? theme,
-}) {
+Widget wrapPage({required Widget child, required StorageService storage, ThemeData? theme}) {
   return ChangeNotifierProvider(
     create: (_) => SettingsProvider(storage),
     child: MaterialApp(theme: theme ?? buildLightTheme(), home: child),

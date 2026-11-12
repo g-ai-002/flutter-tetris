@@ -7,12 +7,7 @@ import '../../input/action_repeat.dart';
 /// [vertical] 供横屏侧栏使用，三键纵向排布；默认横向一行贴底。
 /// [dense] 收窄按键高度，把空间还给棋盘。
 class TouchPad extends StatelessWidget {
-  const TouchPad({
-    super.key,
-    required this.controller,
-    this.dense = false,
-    this.vertical = false,
-  });
+  const TouchPad({super.key, required this.controller, this.dense = false, this.vertical = false});
 
   final TetrisController controller;
   final bool dense;
@@ -73,13 +68,7 @@ class TouchPad extends StatelessWidget {
 }
 
 class _Spec {
-  const _Spec(
-    this.label,
-    this.icon,
-    this.accent,
-    this.onPressed, {
-    this.repeat = false,
-  });
+  const _Spec(this.label, this.icon, this.accent, this.onPressed, {this.repeat = false});
 
   final String label;
   final IconData icon;
@@ -117,9 +106,7 @@ class _PadButtonState extends State<_PadButton> {
     if (widget.spec.onPressed == null) return;
     setState(() => _pressed = true);
     _repeat.start(
-      interval: widget.spec.repeat
-          ? const Duration(milliseconds: 70)
-          : Duration.zero,
+      interval: widget.spec.repeat ? const Duration(milliseconds: 70) : Duration.zero,
       initialDelay: const Duration(milliseconds: 220),
     );
   }
@@ -157,9 +144,7 @@ class _PadButtonState extends State<_PadButton> {
                   : 0.08,
             ),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: accent.withValues(alpha: enabled ? 0.45 : 0.25),
-            ),
+            border: Border.all(color: accent.withValues(alpha: enabled ? 0.45 : 0.25)),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
