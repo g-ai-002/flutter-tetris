@@ -59,7 +59,7 @@ class GameShell extends StatelessWidget {
     return AppBar(
       toolbarHeight: short ? 46 : 58,
       title: AnimatedBuilder(
-        animation: controller,
+        animation: Listenable.merge([controller, controller.clock]),
         builder: (context, _) => Column(
           mainAxisSize: MainAxisSize.min,
           children: [

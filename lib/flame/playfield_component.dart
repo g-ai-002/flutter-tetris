@@ -229,19 +229,23 @@ class PlayfieldComponent extends PositionComponent {
   ) {
     final piece = controller.piece;
     if (piece == null) return;
+    final hidden = controller.board.hiddenRows;
     final color = palette.colorOf(piece.type);
     if (currentStyle.showGhost) {
       final ghost = controller.ghostPiece;
       if (ghost != null && ghost.y > piece.y) {
-        for (final block in ghost.blocks) {
-          if (block.y < controller.board.hiddenRows) continue;
-          paintGhostBlock(canvas, _cellRect(block.x, block.y), color);
+        // 直接按包围盒偏移取格，逐帧不再生成坐标列表。
+        for (final block in ghost.localBlocks) {
+          final y = ghost.y + block.y;
+          if (y < hidden) continue;
+          paintGhostBlock(canvas, _cellRect(ghost.x + block.x, y), color);
         }
       }
     }
-    for (final block in piece.blocks) {
-      if (block.y < controller.board.hiddenRows) continue;
-      paintBlock(canvas, _cellRect(block.x, block.y), color, active: true);
+    for (final block in piece.localBlocks) {
+      final y = piece.y + block.y;
+      if (y < hidden) continue;
+      paintBlock(canvas, _cellRect(piece.x + block.x, y), color, active: true);
     }
   }
 
@@ -250,25 +254,22 @@ class PlayfieldComponent extends PositionComponent {
     final progress = controller.clearProgress;
     final flash = math.sin(progress * math.pi);
     if (flash <= 0) return;
+    final hidden = controller.board.hiddenRows;
+    final cell = _cellSize;
+    final lineHeight = math.max(1.2, cell * 0.06);
+    final white = Paint()..color = Colors.white.withValues(alpha: 0.55 * flash);
+    final line = Paint()
+      ..color = palette
+          .colorOf(TetrominoType.o)
+          .withValues(alpha: 0.85 * flash);
     for (final row in controller.clearingRows) {
-      final rect = Rect.fromLTWH(
-        0,
-        (row - controller.board.hiddenRows) * _cellSize,
-        size.x,
-        _cellSize,
-      );
-      canvas.drawRect(
-        rect,
-        Paint()..color = Colors.white.withValues(alpha: 0.55 * flash),
-      );
-      final lineHeight = math.max(1.2, _cellSize * 0.06);
-      canvas.drawRect(
-        Rect.fromLTWH(0, rect.center.dy - lineHeight / 2, size.x, lineHeight),
-        Paint()
-          ..color = palette
-              .colorOf(TetrominoType.o)
-              .withValues(alpha: 0.85 * flash),
-      );
+      final rect = Rect.fromLTWH(0, (row - hidden) * cell, size.x, cell);
+      canvas
+        ..drawRect(rect, white)
+        ..drawRect(
+          Rect.fromLTWH(0, rect.center.dy - lineHeight / 2, size.x, lineHeight),
+          line,
+        );
     }
   }
 }

@@ -96,32 +96,16 @@ class _PluckNote {
 /// 宫商角徵羽的循环旋律，低音铺底营造安静的专注感。
 const List<_PluckNote> _musicNotes = [
   _PluckNote(
-    start: 0,
-    frequency: 130.81,
-    duration: 7.4,
-    gain: 0.30,
-    damp: 0.55,
+    start: 0, frequency: 130.81, duration: 7.4, gain: 0.30, damp: 0.55,
   ),
   _PluckNote(
-    start: 4,
-    frequency: 196.00,
-    duration: 3.4,
-    gain: 0.22,
-    damp: 0.75,
+    start: 4, frequency: 196.00, duration: 3.4, gain: 0.22, damp: 0.75,
   ),
   _PluckNote(
-    start: 8,
-    frequency: 146.83,
-    duration: 7.4,
-    gain: 0.28,
-    damp: 0.55,
+    start: 8, frequency: 146.83, duration: 7.4, gain: 0.28, damp: 0.55,
   ),
   _PluckNote(
-    start: 12,
-    frequency: 196.00,
-    duration: 3.4,
-    gain: 0.22,
-    damp: 0.75,
+    start: 12, frequency: 196.00, duration: 3.4, gain: 0.22, damp: 0.75,
   ),
   _PluckNote(start: 0.0, frequency: 523.25, duration: 1.0),
   _PluckNote(start: 0.5, frequency: 587.33, duration: 1.0, gain: 0.42),

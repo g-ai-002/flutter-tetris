@@ -126,6 +126,15 @@ class TetrisController extends ChangeNotifier {
   List<Block> _lastLockedBlocks = const [];
   TetrominoType? _lastLockedType;
 
+  /// 计时专用通知：只在时间读数变化时触发。
+  /// 界面上的数值组件单独监听它，避免侧栏与操作区跟着按帧重建。
+  final ValueNotifier<Duration> clock = ValueNotifier(Duration.zero);
+
+  ActivePiece? _ghost;
+  ActivePiece? _ghostSource;
+  int _ghostSourceRevision = -1;
+  int _ghostComputations = 0;
+
   int _lastNotifiedMillis = -1;
 
   GameStatus get status => _status;
@@ -181,15 +190,28 @@ class TetrisController extends ChangeNotifier {
   }
 
   /// 幽灵方块：当前方块直落到底的位置。
+  /// 方块不可变、移动即换实例，棋盘变化由版本号表示，两者不变时直接复用。
   ActivePiece? get ghostPiece {
     final current = _piece;
     if (current == null) return null;
+    if (identical(current, _ghostSource) &&
+        _ghostSourceRevision == _boardRevision) {
+      return _ghost;
+    }
     var ghost = current;
     while (board.fits(ghost.copyWith(y: ghost.y + 1).blocks)) {
       ghost = ghost.copyWith(y: ghost.y + 1);
     }
+    _ghostComputations++;
+    _ghostSource = current;
+    _ghostSourceRevision = _boardRevision;
+    _ghost = ghost;
     return ghost;
   }
+
+  /// 幽灵落点实际计算次数，用于校验缓存命中。
+  @visibleForTesting
+  int get debugGhostComputations => _ghostComputations;
 
   /// 已完成的进度（0~1），用于目标行数进度条。
   double get progress {
@@ -350,7 +372,7 @@ class TetrisController extends ChangeNotifier {
     if (isClearing) {
       _clearElapsed += step;
       if (_clearElapsed >= clearDelay) _finishClear();
-      _notifyIfTimeChanged();
+      _publishClock();
       return;
     }
 
@@ -382,7 +404,7 @@ class TetrisController extends ChangeNotifier {
       }
     }
     _updateGarbage(step);
-    _notifyIfTimeChanged();
+    _publishClock();
   }
 
   /// 按关卡设定定期把整行垃圾从底部顶上，并把当前方块一并抬起。
@@ -614,11 +636,11 @@ class TetrisController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _notifyIfTimeChanged() {
+  void _publishClock() {
     final bucket = _elapsed.inMilliseconds ~/ 50;
     if (bucket == _lastNotifiedMillis) return;
     _lastNotifiedMillis = bucket;
-    notifyListeners();
+    clock.value = _elapsed;
   }
 
   void _resetState() {
@@ -646,12 +668,14 @@ class TetrisController extends ChangeNotifier {
     _result = null;
     _events.clear();
     _lastNotifiedMillis = -1;
+    clock.value = Duration.zero;
   }
 
   @override
   void dispose() {
     _timer?.cancel();
     _timer = null;
+    clock.dispose();
     super.dispose();
   }
 }

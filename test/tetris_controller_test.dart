@@ -75,6 +75,42 @@ void main() {
       );
     });
 
+    test('幽灵方块在同一方块与棋盘版本内复用', () {
+      final first = controller.ghostPiece;
+      expect(identical(controller.ghostPiece, first), isTrue);
+      expect(controller.debugGhostComputations, 1);
+
+      controller.moveLeft();
+      final moved = controller.ghostPiece;
+      expect(identical(moved, first), isFalse);
+      expect(controller.debugGhostComputations, 2);
+      expect(identical(controller.ghostPiece, moved), isTrue);
+
+      controller.hardDrop();
+      expect(controller.ghostPiece, isNotNull);
+      expect(controller.debugGhostComputations, 3);
+    });
+
+    test('计时推进只更新时钟通知，不触发整页重建', () {
+      var notifications = 0;
+      void listener() => notifications++;
+      controller.addListener(listener);
+
+      controller.tick(const Duration(milliseconds: 50));
+      expect(controller.clock.value, const Duration(milliseconds: 50));
+      expect(notifications, 0);
+
+      controller.tick(const Duration(milliseconds: 49));
+      expect(controller.clock.value, const Duration(milliseconds: 50));
+
+      controller.moveLeft();
+      expect(notifications, 1);
+
+      controller.restart();
+      expect(controller.clock.value, Duration.zero);
+      controller.removeListener(listener);
+    });
+
     test('软降每格加一分', () {
       final startY = controller.piece!.y;
       controller.softDrop();

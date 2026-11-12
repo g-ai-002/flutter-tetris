@@ -146,6 +146,8 @@ class BoardEffects {
     required int hiddenRows,
     required double cellSize,
   }) {
+    if (_trails.isEmpty) return;
+    final paint = Paint();
     for (final trail in _trails) {
       final alpha = (trail.life / trail.maxLife).clamp(0.0, 1.0);
       final top = (trail.fromY - hiddenRows) * cellSize;
@@ -156,36 +158,34 @@ class BoardEffects {
         trail.width,
         math.max(0, bottom - top),
       );
-      canvas.drawRect(
-        rect,
-        Paint()
-          ..shader = LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.white.withValues(alpha: 0),
-              Colors.white.withValues(alpha: 0.30 * alpha),
-            ],
-          ).createShader(rect),
-      );
+      paint.shader = LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: [
+          Colors.white.withValues(alpha: 0),
+          Colors.white.withValues(alpha: 0.30 * alpha),
+        ],
+      ).createShader(rect);
+      canvas.drawRect(rect, paint);
     }
+    paint.shader = null;
   }
 
   void paintParticles(Canvas canvas) {
+    if (_particles.isEmpty) return;
     final paint = Paint();
     for (final particle in _particles) {
       final alpha = (particle.life / particle.maxLife).clamp(0.0, 1.0);
+      final size = particle.size;
       canvas.save();
       canvas.translate(particle.position.x, particle.position.y);
       canvas.rotate(particle.rotation);
-      final rect = Rect.fromCenter(
-        center: Offset.zero,
-        width: particle.size,
-        height: particle.size,
-      );
       paint.color = particle.color.withValues(alpha: alpha);
       canvas.drawRRect(
-        RRect.fromRectAndRadius(rect, Radius.circular(particle.size * 0.22)),
+        RRect.fromRectAndRadius(
+          Rect.fromCenter(center: Offset.zero, width: size, height: size),
+          Radius.circular(size * 0.22),
+        ),
         paint,
       );
       canvas.restore();

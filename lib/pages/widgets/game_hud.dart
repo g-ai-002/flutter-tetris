@@ -27,6 +27,14 @@ class GameHud extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 计时走独立通知：只有数值组件按 20Hz 刷新，侧栏与操作区不跟着重建。
+    return ValueListenableBuilder<Duration>(
+      valueListenable: controller.clock,
+      builder: (context, value, _) => _content(context),
+    );
+  }
+
+  Widget _content(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final score = Column(

@@ -52,18 +52,10 @@ class SoundService {
     ],
     Sfx.lock: [
       SynthNote(
-        frequency: 190,
-        start: 0,
-        duration: 0.075,
-        gain: 0.62,
-        noise: 0.38,
+        frequency: 190, start: 0, duration: 0.075, gain: 0.62, noise: 0.38,
       ),
       SynthNote(
-        frequency: 120,
-        start: 0.006,
-        duration: 0.12,
-        gain: 0.55,
-        noise: 0.22,
+        frequency: 120, start: 0.006, duration: 0.12, gain: 0.55, noise: 0.22,
       ),
     ],
     Sfx.lineClear: [
