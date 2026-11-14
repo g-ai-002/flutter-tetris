@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// 生涯统计快照：成就进度只依赖这些累计值。
 class AchievementStats {

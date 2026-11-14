@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_tetris/game/tetris_controller.dart';
 import 'package:flutter_tetris/providers/settings_provider.dart';
 import 'package:flutter_tetris/services/storage_service.dart';
 import 'package:flutter_tetris/theme/app_theme.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

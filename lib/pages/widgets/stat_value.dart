@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// 数值与标签的统一排版：纪录卡片、结算弹窗与对局 HUD 共用。
 /// 默认数值在上、标签在下；[StatValue.inline] 为左右一行，

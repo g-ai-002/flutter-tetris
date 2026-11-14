@@ -1,5 +1,4 @@
 import 'package:flame/game.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tetris/flame/tetris_game.dart';
 import 'package:flutter_tetris/game/daily_challenge.dart';
@@ -13,6 +12,7 @@ import 'package:flutter_tetris/services/storage_service.dart';
 import 'package:flutter_tetris/theme/block_skin.dart';
 import 'package:flutter_tetris/utils/constants.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'test_helpers.dart';
 

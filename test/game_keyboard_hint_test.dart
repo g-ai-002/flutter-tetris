@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tetris/input/key_bindings.dart';
 import 'package:flutter_tetris/pages/widgets/game_rails.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   testWidgets('键盘提示条显示当前键位', (tester) async {

@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_tetris/flame/playfield_component.dart';
 import 'package:flutter_tetris/game/tetromino.dart';
 import 'package:flutter_tetris/providers/settings_provider.dart';
 import 'package:flutter_tetris/theme/app_theme.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'test_helpers.dart';
 

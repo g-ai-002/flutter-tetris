@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_tetris/game/achievement.dart';
 import 'package:flutter_tetris/game/game_mode.dart';
 import 'package:flutter_tetris/pages/widgets/game_dialogs.dart';
 import 'package:flutter_tetris/services/storage_service.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'test_helpers.dart';
 

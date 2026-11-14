@@ -1,12 +1,12 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
-import 'package:flutter/material.dart';
 import 'package:flutter_tetris/flame/board_effects.dart';
 import 'package:flutter_tetris/game/board.dart';
 import 'package:flutter_tetris/game/tetromino.dart';
 import 'package:flutter_tetris/theme/block_palette.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 Board filledBoard({int rows = 1}) {
   final board = Board();

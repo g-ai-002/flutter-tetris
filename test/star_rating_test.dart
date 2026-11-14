@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_tetris/pages/widgets/star_rating.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   testWidgets('星级组件按数量显示实心与空心星', (tester) async {

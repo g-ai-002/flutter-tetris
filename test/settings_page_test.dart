@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_tetris/input/key_bindings.dart';
 import 'package:flutter_tetris/pages/settings_page.dart';
 import 'package:flutter_tetris/services/storage_service.dart';
 import 'package:flutter_tetris/theme/block_skin.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'test_helpers.dart';
 

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 /// 设置页的开关行：标题、说明与自适应开关。
 class SettingSwitchRow extends StatelessWidget {

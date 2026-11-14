@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_tetris/pages/widgets/stat_value.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   testWidgets('数值、后缀与标签一起展示，数值使用等宽数字', (tester) async {

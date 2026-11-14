@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_tetris/game/game_mode.dart';
 import 'package:flutter_tetris/game/tetris_controller.dart';
 import 'package:flutter_tetris/pages/widgets/piece_preview.dart';
@@ -7,6 +6,7 @@ import 'package:flutter_tetris/pages/widgets/touch_pad.dart';
 import 'package:flutter_tetris/game/tetromino.dart';
 import 'package:flutter_tetris/theme/app_theme.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() {
   TetrisController build({int seed = 5}) {

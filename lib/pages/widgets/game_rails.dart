@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 import '../../game/tetris_controller.dart';
 import '../../input/key_bindings.dart';

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_tetris/game/game_mode.dart';
 import 'package:flutter_tetris/game/tetris_controller.dart';
 import 'package:flutter_tetris/pages/widgets/game_rails.dart';
@@ -6,6 +5,7 @@ import 'package:flutter_tetris/pages/widgets/piece_slot.dart';
 import 'package:flutter_tetris/services/storage_service.dart';
 import 'package:flutter_tetris/theme/block_palette.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:material_ui/material_ui.dart';
 
 import 'test_helpers.dart';
 
