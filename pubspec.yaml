@@ -1,7 +1,7 @@
 name: flutter_tetris
 description: 俄罗斯方块 - 经典堆叠消行，支持 Android、Windows 与 Web
 publish_to: 'none'
-version: 0.7.7
+version: 0.7.8
 
 environment:
   sdk: '>=3.14.0 <4.0.0'
