@@ -27,12 +27,19 @@ class GameHud extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 计时走独立通知：只有数值组件按 20Hz 刷新，侧栏与操作区不跟着重建。
-    return ValueListenableBuilder<Duration>(
-      valueListenable: controller.clock,
+    // 分数与行数等只在界面状态变化时重建；
+    // 时间读数由独立的时钟通知驱动，且只刷新数值本身。
+    return ValueListenableBuilder<int>(
+      valueListenable: controller.uiRevision,
       builder: (context, value, _) => _content(context),
     );
   }
+
+  /// 计时数值：监听 20Hz 时钟通知，其余数值不跟着刷新。
+  Widget _clockStat(bool compact) => ValueListenableBuilder<Duration>(
+    valueListenable: controller.clock,
+    builder: (context, value, _) => _stat(_timeLabel, _timeValue, compact, small: true),
+  );
 
   Widget _content(BuildContext context) {
     final theme = Theme.of(context);
@@ -67,7 +74,7 @@ class GameHud extends StatelessWidget {
     final stats = <Widget>[
       _stat(compact ? '行' : '消行', '${controller.lines}', compact),
       _stat(compact ? '级' : '等级', '${controller.level}', compact),
-      _stat(_timeLabel, _timeValue, compact, small: true),
+      _clockStat(compact),
       if (!compact) _stat('最高连击', '${controller.maxCombo}', false),
     ];
     final progress = controller.targetLines == null
@@ -121,7 +128,11 @@ class GameHud extends StatelessWidget {
         if (controller.targetLines != null)
           _note(context, '${controller.lines} / ${controller.targetLines} 行'),
         if (controller.garbageInterval != null)
-          _note(context, '垃圾行 ${controller.garbageSecondsLeft} 秒后上涌'),
+          ValueListenableBuilder<Duration>(
+            valueListenable: controller.clock,
+            builder: (context, value, _) =>
+                _note(context, '垃圾行 ${controller.garbageSecondsLeft} 秒后上涌'),
+          ),
         if (controller.mode == GameMode.ultra || controller.mode == GameMode.daily)
           _note(context, controller.mode == GameMode.daily ? '每日挑战 · 限时 2 分钟' : '限时 2 分钟'),
       ],

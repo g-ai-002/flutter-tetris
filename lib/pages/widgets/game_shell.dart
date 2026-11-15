@@ -59,7 +59,7 @@ class GameShell extends StatelessWidget {
     return AppBar(
       toolbarHeight: short ? 46 : 58,
       title: AnimatedBuilder(
-        animation: Listenable.merge([controller, controller.clock]),
+        animation: Listenable.merge([controller.uiRevision, controller.clock]),
         builder: (context, _) => Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -83,7 +83,7 @@ class GameShell extends StatelessWidget {
           icon: const Icon(Icons.help_outline, size: 21),
         ),
         AnimatedBuilder(
-          animation: controller,
+          animation: controller.uiRevision,
           builder: (context, _) => IconButton(
             tooltip: controller.isPaused ? '继续' : '暂停',
             onPressed: controller.isOver ? null : onPause,
@@ -129,9 +129,9 @@ class GameShell extends StatelessWidget {
     );
   }
 
-  /// 对局 HUD 与操作区随控制器每一帧刷新。
+  /// 对局 HUD 与操作区只跟随界面状态刷新，逐次移动与旋转不再触发重建。
   Widget _bound(Widget Function() builder) =>
-      AnimatedBuilder(animation: controller, builder: (context, _) => builder());
+      AnimatedBuilder(animation: controller.uiRevision, builder: (context, _) => builder());
 
   Widget _sized(double width, Widget Function() build) =>
       SizedBox(width: width, child: _bound(build));

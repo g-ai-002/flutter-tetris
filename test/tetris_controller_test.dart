@@ -99,6 +99,29 @@ void main() {
       controller.removeListener(listener);
     });
 
+    test('移动与旋转不刷新界面版本，落定、暂存与计分才刷新', () {
+      final before = controller.uiRevision.value;
+
+      controller.moveLeft();
+      controller.rotateClockwise();
+      expect(controller.uiRevision.value, before);
+
+      controller.softDrop();
+      expect(controller.uiRevision.value, before + 1);
+
+      controller.hardDrop();
+      expect(controller.uiRevision.value, greaterThan(before + 1));
+
+      controller.hold();
+      expect(controller.uiRevision.value, greaterThan(before + 2));
+    });
+
+    test('重力推进不刷新界面版本', () {
+      final before = controller.uiRevision.value;
+      controller.tick(const Duration(milliseconds: 50));
+      expect(controller.uiRevision.value, before);
+    });
+
     test('软降每格加一分', () {
       final startY = controller.piece!.y;
       controller.softDrop();

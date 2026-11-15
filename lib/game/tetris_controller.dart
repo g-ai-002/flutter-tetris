@@ -113,6 +113,11 @@ class TetrisController extends ChangeNotifier {
   /// 界面上的数值组件单独监听它，避免侧栏与操作区跟着按帧重建。
   final ValueNotifier<Duration> clock = ValueNotifier(Duration.zero);
 
+  /// 界面可见状态的版本号：分数、消行、等级、暂存与预览变化时递增。
+  /// 左右移动与旋转只发 [notifyListeners]（供音效消费），不递增它，
+  /// 侧栏、数值区与操作区因此不会为每次按键重建。
+  final ValueNotifier<int> uiRevision = ValueNotifier(0);
+
   ActivePiece? _ghost;
   ActivePiece? _ghostSource;
   int _ghostSourceRevision = -1;
@@ -231,7 +236,7 @@ class TetrisController extends ChangeNotifier {
     _status = GameStatus.playing;
     _spawnNext();
     _startTicker();
-    notifyListeners();
+    _notifyUi();
   }
 
   void restart() => start();
@@ -241,7 +246,7 @@ class TetrisController extends ChangeNotifier {
     _status = GameStatus.paused;
     _timer?.cancel();
     _timer = null;
-    notifyListeners();
+    _notifyUi();
   }
 
   void resume() {
@@ -249,7 +254,7 @@ class TetrisController extends ChangeNotifier {
     _status = GameStatus.playing;
     _lastTick = DateTime.now();
     _startTicker();
-    notifyListeners();
+    _notifyUi();
   }
 
   bool moveLeft() => _move(-1);
@@ -274,7 +279,7 @@ class TetrisController extends ChangeNotifier {
     _gravityAccumulator = Duration.zero;
     _lastActionRotate = false;
     _refreshGrounded();
-    notifyListeners();
+    _notifyUi();
   }
 
   /// 硬降：直接落底并立即锁定，每格加 2 分。
@@ -295,6 +300,12 @@ class TetrisController extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// 界面状态变化时同时递增版本号，侧栏与操作区只监听它。
+  void _notifyUi() {
+    uiRevision.value++;
+    notifyListeners();
+  }
+
   /// 暂存：一局中每次锁定前只能使用一次，街机模式不可用。
   void hold() {
     if (!canHold || !canControl) return;
@@ -308,7 +319,7 @@ class TetrisController extends ChangeNotifier {
     }
     _holdUsed = true;
     _events.add(GameEvent.hold);
-    notifyListeners();
+    _notifyUi();
   }
 
   /// 供渲染层与测试使用的落定入口。
@@ -330,7 +341,7 @@ class TetrisController extends ChangeNotifier {
     _gravityAccumulator = Duration.zero;
     _lastActionRotate = false;
     _refreshGrounded();
-    notifyListeners();
+    _notifyUi();
   }
 
   /// 推进一帧：处理重力、锁定延迟、消行动画与计时模式。
@@ -419,7 +430,7 @@ class TetrisController extends ChangeNotifier {
       _refreshGrounded();
     }
     _events.add(GameEvent.lock);
-    notifyListeners();
+    _notifyUi();
   }
 
   void _startTicker() {
@@ -539,7 +550,7 @@ class TetrisController extends ChangeNotifier {
     if (rows.isEmpty) {
       _events.add(GameEvent.lock);
       _spawnNext();
-      notifyListeners();
+      _notifyUi();
       return;
     }
 
@@ -556,7 +567,7 @@ class TetrisController extends ChangeNotifier {
     if (target != null && lines >= target && _completedAt == null) {
       _completedAt = _elapsed;
     }
-    notifyListeners();
+    _notifyUi();
   }
 
   void _finishClear() {
@@ -572,7 +583,7 @@ class TetrisController extends ChangeNotifier {
     }
     _completedAt = null;
     _spawnNext();
-    notifyListeners();
+    _notifyUi();
   }
 
   void _end({required bool won, required String reason, Duration? elapsedOverride}) {
@@ -600,7 +611,7 @@ class TetrisController extends ChangeNotifier {
       perfectClears: perfectClears,
     );
     _events.add(won ? GameEvent.win : GameEvent.gameOver);
-    notifyListeners();
+    _notifyUi();
   }
 
   void _publishClock() {
@@ -643,6 +654,7 @@ class TetrisController extends ChangeNotifier {
     _timer?.cancel();
     _timer = null;
     clock.dispose();
+    uiRevision.dispose();
     super.dispose();
   }
 }
