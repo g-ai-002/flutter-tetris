@@ -84,6 +84,24 @@ void main() {
     expect(storage.darkMode, isTrue);
   });
 
+  testWidgets('首页背景铺满整个屏幕', (tester) async {
+    const size = Size(390, 844);
+    tester.view.physicalSize = size;
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(wrapPage(child: const HomePage(), storage: storage));
+    await tester.pump();
+
+    final background = tester
+        .widgetList<Container>(
+          find.descendant(of: find.byType(HomePage), matching: find.byType(Container)),
+        )
+        .firstWhere((widget) => (widget.decoration as BoxDecoration?)?.gradient != null);
+    expect(tester.getRect(find.byWidget(background)).size, size);
+  });
+
   testWidgets('首页内容在高屏上水平与垂直居中', (tester) async {
     const size = Size(1280, 1600);
     tester.view.physicalSize = size;

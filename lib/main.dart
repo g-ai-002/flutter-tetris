@@ -25,11 +25,14 @@ Future<void> main() async {
     return true;
   };
 
-  // 偏好读取与桌面窗口互不依赖，先并行等待；日志与音频推迟到首帧之后，
-  // 冷启动不必等磁盘建文件与十几段音频合成。
+  // 偏好读取、桌面窗口与沉浸显示互不依赖，先并行等待；日志与音频推迟到
+  // 首帧之后，冷启动不必等磁盘建文件与十几段音频合成。
+  final immersiveFuture = enterImmersiveDisplay();
   final storageFuture = StorageService.instance;
   await setupDesktopWindow();
   final storage = await storageFuture;
+  // 先收起系统栏再出首帧，首页从第一帧就是完整铺满的沉浸画面。
+  await immersiveFuture;
   LogService.info('应用启动: ${AppConstants.appName} v${AppConstants.version}');
   MusicService.enabled = storage.musicEnabled;
 
@@ -40,10 +43,9 @@ Future<void> main() async {
   });
 }
 
-/// 首帧之后的初始化：沉浸显示、日志落盘与音频合成。
+/// 首帧之后的初始化：日志落盘与音频合成。
 /// 日志服务在初始化前会把日志留在内存缓冲里，随后补写，不会丢启动日志。
 Future<void> _startBackgroundServices(StorageService storage) async {
-  await enterImmersiveDisplay();
   await initLogging();
   final soundReady = SoundService.init();
   // 音乐与音效共用 SoLoud，等音效载入后再启动，避免重复初始化音频引擎。
