@@ -48,7 +48,12 @@ class PlayfieldComponent extends PositionComponent {
   double _time = 0;
 
   ui.Picture? _staticLayer;
-  (double, double, BlockSkin, bool, bool, int)? _staticKey;
+  double _staticWidth = -1;
+  double _staticHeight = -1;
+  BlockSkin? _staticSkin;
+  bool _staticDark = false;
+  bool _staticGrid = true;
+  int _staticBoardRevision = -1;
 
   @visibleForTesting
   int debugStaticLayerBuilds = 0;
@@ -126,15 +131,17 @@ class PlayfieldComponent extends PositionComponent {
   /// 其余帧复用同一张静态图层，避免每帧为两百格重建渐变。
   void _ensureStaticLayer(PlayfieldStyle currentStyle) {
     final palette = currentStyle.palette;
-    final key = (
-      size.x,
-      size.y,
-      palette.skin,
-      palette.dark,
-      currentStyle.showGrid,
-      controller.boardRevision,
-    );
-    if (key == _staticKey) return;
+    final width = size.x;
+    final height = size.y;
+    final boardRevision = controller.boardRevision;
+    if (width == _staticWidth &&
+        height == _staticHeight &&
+        palette.skin == _staticSkin &&
+        palette.dark == _staticDark &&
+        currentStyle.showGrid == _staticGrid &&
+        boardRevision == _staticBoardRevision) {
+      return;
+    }
     final recorder = ui.PictureRecorder();
     final canvas = Canvas(recorder);
     paintBoardBackground(canvas, Offset.zero & size.toSize(), palette);
@@ -143,7 +150,12 @@ class PlayfieldComponent extends PositionComponent {
     _paintLocked(canvas, palette);
     _staticLayer?.dispose();
     _staticLayer = recorder.endRecording();
-    _staticKey = key;
+    _staticWidth = width;
+    _staticHeight = height;
+    _staticSkin = palette.skin;
+    _staticDark = palette.dark;
+    _staticGrid = currentStyle.showGrid;
+    _staticBoardRevision = boardRevision;
     debugStaticLayerBuilds++;
   }
 

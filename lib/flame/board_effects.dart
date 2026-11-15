@@ -15,6 +15,12 @@ class BoardEffects {
 
   static const int maxParticles = 260;
 
+  /// 单位粒子形状：绘制时缩放复用，避免逐帧为每颗粒子新建圆角矩形。
+  static final RRect _unitParticle = RRect.fromRectAndRadius(
+    Rect.fromCenter(center: Offset.zero, width: 1, height: 1),
+    const Radius.circular(0.22),
+  );
+
   final math.Random _random;
   final List<_Particle> _particles = [];
   final List<_Trail> _trails = [];
@@ -170,14 +176,9 @@ class BoardEffects {
       canvas.save();
       canvas.translate(particle.position.x, particle.position.y);
       canvas.rotate(particle.rotation);
+      canvas.scale(size);
       paint.color = particle.color.withValues(alpha: alpha);
-      canvas.drawRRect(
-        RRect.fromRectAndRadius(
-          Rect.fromCenter(center: Offset.zero, width: size, height: size),
-          Radius.circular(size * 0.22),
-        ),
-        paint,
-      );
+      canvas.drawRRect(_unitParticle, paint);
       canvas.restore();
     }
   }

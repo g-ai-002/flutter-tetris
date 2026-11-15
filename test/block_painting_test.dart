@@ -28,6 +28,21 @@ void main() {
     expect(debugBlockPaintBuilds, builds + 4, reason: '半透明另算一套画笔');
   });
 
+  test('同尺寸方块复用形状几何，换尺寸才重建', () {
+    final canvas = recorder();
+    const color = Color(0xFF4285F4);
+
+    paintBlock(canvas, const Rect.fromLTWH(0, 0, 30, 30), color);
+    expect(debugBlockGeometryBuilds, 1);
+
+    paintBlock(canvas, const Rect.fromLTWH(90, 30, 30, 30), color);
+    paintGhostBlock(canvas, const Rect.fromLTWH(30, 0, 30, 30), color);
+    expect(debugBlockGeometryBuilds, 1);
+
+    paintBlock(canvas, const Rect.fromLTWH(0, 0, 40, 40), color);
+    expect(debugBlockGeometryBuilds, 2);
+  });
+
   test('幽灵块画笔同样按键复用', () {
     final canvas = recorder();
     const color = Color(0xFF34A853);

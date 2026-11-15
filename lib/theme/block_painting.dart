@@ -10,18 +10,59 @@ import 'block_palette.dart';
 @visibleForTesting
 int debugBlockPaintBuilds = 0;
 
+/// 新建方块几何的次数，用于校验同尺寸格子的形状复用。
+@visibleForTesting
+int debugBlockGeometryBuilds = 0;
+
 final Map<(Color, double, double, double, bool), Paint> _fillPaints = {};
 final Map<(Color, double), Paint> _flatPaints = {};
+final Map<(double, double), _BlockGeometry> _geometries = {};
 
 /// 仅供测试：清空缓存并重置计数。
 @visibleForTesting
 void resetBlockPaintCacheForTest() {
   _fillPaints.clear();
   _flatPaints.clear();
+  _geometries.clear();
   debugBlockPaintBuilds = 0;
+  debugBlockGeometryBuilds = 0;
 }
 
 const int _maxCachedPaints = 256;
+const int _maxCachedGeometries = 64;
+
+/// 方格内留缝后的圆角矩形与顶部高光，几何只与格子尺寸有关。
+class _BlockGeometry {
+  const _BlockGeometry(this.shape, this.highlight);
+
+  final RRect shape;
+  final RRect highlight;
+}
+
+_BlockGeometry _geometryFor(Size size) {
+  final key = (size.width, size.height);
+  final cached = _geometries[key];
+  if (cached != null) return cached;
+  if (_geometries.length >= _maxCachedGeometries) _geometries.clear();
+  final gap = size.width * 0.055;
+  final shape = RRect.fromRectAndRadius(
+    (Offset.zero & size).deflate(gap),
+    Radius.circular(size.width * 0.18),
+  );
+  final highlight = RRect.fromRectAndRadius(
+    Rect.fromLTWH(
+      shape.left + shape.width * 0.14,
+      shape.top + shape.height * 0.10,
+      shape.width * 0.72,
+      shape.height * 0.18,
+    ),
+    Radius.circular(shape.width * 0.09),
+  );
+  final geometry = _BlockGeometry(shape, highlight);
+  debugBlockGeometryBuilds++;
+  _geometries[key] = geometry;
+  return geometry;
+}
 
 /// 立体方块的填充画笔：先按格子尺寸建好着色器，绘制时平移到格子位置。
 Paint _fillPaint(Color color, Size size, double opacity, bool active) {
@@ -74,39 +115,27 @@ void paintBoardBackground(Canvas canvas, Rect rect, BlockPalette palette) {
 void paintBlock(Canvas canvas, Rect rect, Color color, {double opacity = 1, bool active = false}) {
   if (rect.width <= 1 || rect.height <= 1) return;
   final size = Size(rect.width, rect.height);
-  final gap = rect.width * 0.055;
-  final shape = RRect.fromRectAndRadius(
-    (Offset.zero & size).deflate(gap),
-    Radius.circular(rect.width * 0.18),
-  );
-
-  // 顶部高光，让方块在深色背景上也有厚度。
-  final highlight = RRect.fromRectAndRadius(
-    Rect.fromLTWH(
-      shape.left + shape.width * 0.14,
-      shape.top + shape.height * 0.10,
-      shape.width * 0.72,
-      shape.height * 0.18,
-    ),
-    Radius.circular(shape.width * 0.09),
-  );
+  final geometry = _geometryFor(size);
 
   canvas
     ..save()
     ..translate(rect.left, rect.top)
-    ..drawRRect(shape, _fillPaint(color, size, opacity, active))
-    ..drawRRect(highlight, _flatPaint(Colors.white.withValues(alpha: 0.22 * opacity)))
-    ..drawRRect(shape, _flatPaint(Colors.black.withValues(alpha: 0.20 * opacity), 1))
+    ..drawRRect(geometry.shape, _fillPaint(color, size, opacity, active))
+    ..drawRRect(geometry.highlight, _flatPaint(Colors.white.withValues(alpha: 0.22 * opacity)))
+    ..drawRRect(geometry.shape, _flatPaint(Colors.black.withValues(alpha: 0.20 * opacity), 1))
     ..restore();
 }
 
 /// 绘制幽灵方块：淡填充 + 虚线感描边。
 void paintGhostBlock(Canvas canvas, Rect rect, Color color) {
   if (rect.width <= 1 || rect.height <= 1) return;
-  final gap = rect.width * 0.055;
-  final shape = RRect.fromRectAndRadius(rect.deflate(gap), Radius.circular(rect.width * 0.18));
-  canvas.drawRRect(shape, _flatPaint(color.withValues(alpha: 0.10)));
-  canvas.drawRRect(shape, _flatPaint(color.withValues(alpha: 0.48), 1.6));
+  final geometry = _geometryFor(Size(rect.width, rect.height));
+  canvas
+    ..save()
+    ..translate(rect.left, rect.top)
+    ..drawRRect(geometry.shape, _flatPaint(color.withValues(alpha: 0.10)))
+    ..drawRRect(geometry.shape, _flatPaint(color.withValues(alpha: 0.48), 1.6))
+    ..restore();
 }
 
 /// 小预览里绘制方块，按包围盒居中。
