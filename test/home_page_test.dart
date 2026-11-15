@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_tetris/game/daily_challenge.dart';
 import 'package:flutter_tetris/pages/home_page.dart';
+import 'package:flutter_tetris/pages/widgets/home_top_bar.dart';
 import 'package:flutter_tetris/services/storage_service.dart';
 import 'package:flutter_tetris/utils/constants.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -81,6 +82,23 @@ void main() {
     await tester.tap(find.byIcon(Icons.dark_mode_outlined));
     await tester.pump();
     expect(storage.darkMode, isTrue);
+  });
+
+  testWidgets('首页内容在高屏上水平与垂直居中', (tester) async {
+    const size = Size(1280, 1600);
+    tester.view.physicalSize = size;
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(wrapPage(child: const HomePage(), storage: storage));
+    await tester.pump();
+
+    final topBar = tester.getRect(find.byType(HomeTopBar));
+    final footer = tester.getRect(find.textContaining('本地离线'));
+    expect(topBar.left, closeTo(size.width - topBar.right, 1));
+    // 上下内边距分别为 14 与 24，内容在扣除内边距后的区域里垂直居中。
+    expect(topBar.top - 14, closeTo(size.height - 24 - footer.bottom, 1));
   });
 
   testWidgets('首页可以打开设置与纪录页', (tester) async {

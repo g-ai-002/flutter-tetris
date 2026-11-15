@@ -67,7 +67,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     unawaited(_gamepad.start());
     LogService.info('开始对局: ${_controller.rules.title}, 逻辑 ${settings.logicRate}Hz');
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) unawaited(enterGameDisplay());
+      if (mounted) unawaited(enterImmersiveDisplay());
     });
   }
 
@@ -77,7 +77,7 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
       if (_controller.isPlaying) _controller.pause();
     } else if (state == AppLifecycleState.resumed && mounted) {
       // 系统栏可能在后台被还原，回到前台重新进入沉浸模式。
-      unawaited(enterGameDisplay());
+      unawaited(enterImmersiveDisplay());
     }
   }
 
@@ -245,7 +245,6 @@ class _GamePageState extends State<GamePage> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _controller.removeListener(_onControllerChanged);
     unawaited(_gamepad.stop());
-    unawaited(exitGameDisplay());
     _controller.dispose();
     _focusNode.dispose();
     super.dispose();

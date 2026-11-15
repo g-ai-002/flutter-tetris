@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cupertino_ui/cupertino_ui.dart' show GlobalCupertinoLocalizations;
 import 'package:flutter/foundation.dart';
 import 'package:flutter_localizations/flutter_localizations.dart' show GlobalWidgetsLocalizations;
@@ -10,6 +12,7 @@ import 'services/music_service.dart';
 import 'services/storage_service.dart';
 import 'theme/app_theme.dart';
 import 'utils/constants.dart';
+import 'utils/game_display.dart';
 import 'utils/system_ui.dart';
 
 class TetrisApp extends StatefulWidget {
@@ -39,6 +42,8 @@ class _TetrisAppState extends State<TetrisApp> with WidgetsBindingObserver {
     switch (state) {
       case AppLifecycleState.resumed:
         MusicService.resumeForLifecycle();
+        // 系统可能在后台还原状态栏，回到前台时恢复首页与对局的沉浸显示。
+        unawaited(enterImmersiveDisplay());
         break;
       case AppLifecycleState.paused:
       case AppLifecycleState.hidden:

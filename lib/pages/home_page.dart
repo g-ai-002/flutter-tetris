@@ -36,15 +36,15 @@ class HomePage extends StatelessWidget {
               const maxContent = 960.0;
               final contentWidth = math.min(width - horizontal * 2, maxContent);
               final tight = constraints.maxHeight < 680;
+              final top = tight ? 10.0 : 14.0;
+              final bottom = tight ? 18.0 : 24.0;
               return SingleChildScrollView(
-                padding: EdgeInsets.fromLTRB(
-                  horizontal,
-                  tight ? 10 : 14,
-                  horizontal,
-                  tight ? 18 : 24,
-                ),
+                padding: EdgeInsets.fromLTRB(horizontal, top, horizontal, bottom),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: math.max(0, constraints.maxHeight - 38)),
+                  // 减去内边距后与可视区域等高，内容在宽屏与高屏上都垂直居中。
+                  constraints: BoxConstraints(
+                    minHeight: math.max(0, constraints.maxHeight - top - bottom),
+                  ),
                   child: Center(
                     child: ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: maxContent),
