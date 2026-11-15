@@ -296,8 +296,8 @@ class TetrisController extends ChangeNotifier {
     _hardDropColumn = current.x;
     _hardDropRows = distance;
     _hardDropSequence++;
+    // _lockPiece 内部已按落定或结束状态发过通知，这里不再重复通知整页。
     _lockPiece();
-    notifyListeners();
   }
 
   /// 界面状态变化时同时递增版本号，侧栏与操作区只监听它。
@@ -615,7 +615,9 @@ class TetrisController extends ChangeNotifier {
   }
 
   void _publishClock() {
-    final bucket = _elapsed.inMilliseconds ~/ 50;
+    // 竞速要显示百分秒，其余玩法只显示到秒，按各自精度节流通知。
+    final stepMillis = rules.mode == GameMode.sprint ? 50 : 1000;
+    final bucket = _elapsed.inMilliseconds ~/ stepMillis;
     if (bucket == _lastNotifiedMillis) return;
     _lastNotifiedMillis = bucket;
     clock.value = _elapsed;
@@ -645,7 +647,8 @@ class TetrisController extends ChangeNotifier {
     _lastActionRotate = false;
     _result = null;
     _events.clear();
-    _lastNotifiedMillis = -1;
+    // 时钟初始就是 0，首个 tick 不必再发一次同值通知。
+    _lastNotifiedMillis = 0;
     clock.value = Duration.zero;
   }
 

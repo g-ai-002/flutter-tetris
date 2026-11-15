@@ -85,11 +85,14 @@ void main() {
       controller.addListener(listener);
 
       controller.tick(const Duration(milliseconds: 50));
-      expect(controller.clock.value, const Duration(milliseconds: 50));
+      expect(controller.clock.value, Duration.zero, reason: '无尽模式只显示到秒');
       expect(notifications, 0);
 
       controller.tick(const Duration(milliseconds: 49));
-      expect(controller.clock.value, const Duration(milliseconds: 50));
+      expect(controller.clock.value, Duration.zero);
+
+      advance(controller, 901);
+      expect(controller.clock.value, const Duration(seconds: 1));
 
       controller.moveLeft();
       expect(notifications, 1);
@@ -97,6 +100,19 @@ void main() {
       controller.restart();
       expect(controller.clock.value, Duration.zero);
       controller.removeListener(listener);
+    });
+
+    test('竞速模式的时钟按百分秒刷新', () {
+      final sprint = TetrisController(mode: GameMode.sprint, seed: 9, autoTick: false);
+      addTearDown(sprint.dispose);
+      sprint.start();
+
+      sprint.tick(const Duration(milliseconds: 50));
+      expect(sprint.clock.value, const Duration(milliseconds: 50));
+      sprint.tick(const Duration(milliseconds: 49));
+      expect(sprint.clock.value, const Duration(milliseconds: 50));
+      sprint.tick(const Duration(milliseconds: 1));
+      expect(sprint.clock.value, const Duration(milliseconds: 100));
     });
 
     test('移动与旋转不刷新界面版本，落定、暂存与计分才刷新', () {

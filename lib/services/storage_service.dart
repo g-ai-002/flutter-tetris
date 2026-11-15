@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../game/achievement.dart';
@@ -35,6 +36,17 @@ class RecordOutcome {
 class StorageService {
   static StorageService? _instance;
   SharedPreferences? _prefs;
+
+  String? _levelSource;
+  LevelProgress? _levelCache;
+  String? _dailySource;
+  DailyProgress? _dailyCache;
+
+  /// 仅供测试：校验进度 JSON 没有在每次读取时重复解码。
+  @visibleForTesting
+  int debugLevelProgressDecodes = 0;
+  @visibleForTesting
+  int debugDailyProgressDecodes = 0;
 
   StorageService._();
 
@@ -147,13 +159,31 @@ class StorageService {
     dailyStreak: dailyStreak(DateTime.now()),
   );
 
-  LevelProgress get levelProgress =>
-      LevelProgress.decode(_p.getString(AppConstants.prefKeyLevelRecords));
+  /// 关卡进度：首页、关卡选择与纪录页会连续读取，按原始 JSON 缓存解码结果。
+  LevelProgress get levelProgress {
+    final raw = _p.getString(AppConstants.prefKeyLevelRecords);
+    final cached = _levelCache;
+    if (cached != null && raw == _levelSource) return cached;
+    _levelSource = raw;
+    final progress = LevelProgress.decode(raw);
+    _levelCache = progress;
+    debugLevelProgressDecodes++;
+    return progress;
+  }
 
   LevelRecord levelRecord(int id) => levelProgress.record(id);
 
-  DailyProgress get dailyProgress =>
-      DailyProgress.decode(_p.getString(AppConstants.prefKeyDailyRecords));
+  /// 每日进度：与关卡进度同样按原始 JSON 缓存，写入后自动失效。
+  DailyProgress get dailyProgress {
+    final raw = _p.getString(AppConstants.prefKeyDailyRecords);
+    final cached = _dailyCache;
+    if (cached != null && raw == _dailySource) return cached;
+    _dailySource = raw;
+    final progress = DailyProgress.decode(raw);
+    _dailyCache = progress;
+    debugDailyProgressDecodes++;
+    return progress;
+  }
 
   /// 指定日期（`yyyyMMdd`）的每日挑战成绩。
   DailyRecord dailyRecord(String key) => dailyProgress.record(key);

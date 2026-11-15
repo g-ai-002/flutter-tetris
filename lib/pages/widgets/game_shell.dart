@@ -56,10 +56,14 @@ class GameShell extends StatelessWidget {
   /// 顶部栏：矮窗口收起副标题，只留玩法名与操作按钮。
   PreferredSizeWidget _appBar(BuildContext context, bool short) {
     final theme = Theme.of(context);
+    // 只有限时玩法会在副标题显示倒计时，其余玩法不必跟着时钟刷新。
+    final titleAnimation = _subtitleUsesClock
+        ? Listenable.merge([controller.uiRevision, controller.clock])
+        : controller.uiRevision;
     return AppBar(
       toolbarHeight: short ? 46 : 58,
       title: AnimatedBuilder(
-        animation: Listenable.merge([controller.uiRevision, controller.clock]),
+        animation: titleAnimation,
         builder: (context, _) => Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -97,6 +101,11 @@ class GameShell extends StatelessWidget {
       ],
     );
   }
+
+  bool get _subtitleUsesClock => switch (controller.mode) {
+    GameMode.ultra || GameMode.level || GameMode.daily => true,
+    GameMode.endless || GameMode.sprint || GameMode.arcade => false,
+  };
 
   String _subtitle() {
     switch (controller.mode) {

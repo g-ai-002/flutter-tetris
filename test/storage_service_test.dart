@@ -320,5 +320,23 @@ void main() {
       expect(storage.bestScoreOverall, 0);
       expect(storage.achievementStats.games, 0);
     });
+
+    test('关卡与每日进度按原始 JSON 缓存，写入后失效', () async {
+      final storage = await prepareStorage();
+      final level = storage.levelProgress;
+      expect(identical(storage.levelProgress, level), isTrue);
+      expect(storage.debugLevelProgressDecodes, 1);
+
+      final daily = storage.dailyProgress;
+      expect(identical(storage.dailyProgress, daily), isTrue);
+      expect(storage.debugDailyProgressDecodes, 1);
+
+      await storage.recordResult(result(levelId: 1, stars: 3, challengeKey: '20261115'));
+
+      expect(identical(storage.levelProgress, level), isFalse);
+      expect(identical(storage.dailyProgress, daily), isFalse);
+      expect(storage.debugLevelProgressDecodes, 2);
+      expect(storage.debugDailyProgressDecodes, 2);
+    });
   });
 }
