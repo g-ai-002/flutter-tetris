@@ -33,13 +33,13 @@
 
 ## 下载
 
-v0.7.8（最新发布）：[Gitea Release](http://192.168.31.120:3020/GTech/flutter-tetris/releases/tag/v0.7.8)
+v0.7.9（最新发布）：[Gitea Release](http://192.168.31.120:3020/GTech/flutter-tetris/releases/tag/v0.7.9)
 
 | 平台 | 产物 |
 | --- | --- |
-| Android (arm64) | `flutter-tetris-0.7.8-android-aarch64.apk` |
-| Windows (x64, Win10+) | `flutter-tetris-0.7.8-windows-x86_64.zip` |
-| Web | `flutter-tetris-0.7.8-web.zip`（解压后起静态服务器） |
+| Android (arm64) | `flutter-tetris-0.7.9-android-aarch64.apk` |
+| Windows (x64, Win10+) | `flutter-tetris-0.7.9-windows-x86_64.zip` |
+| Web | `flutter-tetris-0.7.9-web.zip`（解压后起静态服务器） |
 
 ## 开发
 
@@ -90,8 +90,8 @@ lib/
 
 | 版本 | 说明 |
 | --- | --- |
+| v0.7.9 | 升级音频引擎 flutter_soloud 至 5.3.0，沿用精简构建，接口与产物不变 |
 | v0.7.8 | 运行性能优化：时钟按精度节流、进度解码缓存、方块几何与粒子复用，首帧即沉浸全屏 |
 | v0.7.7 | 界面重建收敛与启动提速：状态版本号、时间单独刷新、日志与音频延后到首帧，首页铺满居中 |
 | v0.7.6 | 运行性能优化：幽灵落点与方块笔触缓存、计时通知分离、启动阶段并行化 |
 | v0.7.5 | 手机端暂存与预览移到棋盘左侧，标签改简体中文，触屏只留左移 / 硬降 / 右移 |
-| v0.7.4 | 修复手机强制横屏：对局只保留沉浸全屏，屏幕方向交给系统与用户 |
